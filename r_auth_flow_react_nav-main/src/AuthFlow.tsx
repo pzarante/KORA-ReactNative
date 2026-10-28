@@ -12,10 +12,16 @@ import AddProductScreen from "./features/products/presentation/screens/AddProduc
 import ProductListScreen from "./features/products/presentation/screens/ProductListScreen";
 import UpdateProductScreen from "./features/products/presentation/screens/UpdateProductScreen";
 import SettingScreen from "./features/settings/SettingScreen";
+import WelcomeScreen from "./features/auth/presentation/screens/WelcomeScreen";
+import OnboardingNameScreen from "./features/auth/presentation/screens/OnboardingNameScreen";
+import OnboardingRoleScreen from "./features/auth/presentation/screens/OnboardingRoleScreen";
+import OnboardingSkillsScreen from "./features/auth/presentation/screens/OnboardingSkillsScreen";
+import OnboardingBioScreen from "./features/auth/presentation/screens/OnboardingBioScreen";
+import OnboardingPhotoScreen from "./features/auth/presentation/screens/OnboardingPhotoScreen";
+import OnboardingSuccessScreen from "./features/auth/presentation/screens/OnboardingSuccessScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
 
 function ContentTabs() {
   const { logout } = useAuth();
@@ -25,18 +31,6 @@ function ContentTabs() {
       screenOptions={{
         headerShown: false,
       }}
-    // screenOptions={{
-    //   headerShown: true,
-    //   headerTitle: "Auth demo with React Navigation",
-    //   headerRight: () => (
-    //     <IconButton icon="logout" onPress={() => logout()} />
-    //   ),
-    //   headerTitleAlign: "left",
-    //   headerStyle: {
-    //     elevation: 0,
-    //     shadowOpacity: 0,
-    //   },
-    // }}
     >
       <Tab.Screen
         name="Home"
@@ -99,9 +93,16 @@ export default function AuthFlow() {
         <Stack.Screen name="Authenticated" component={AuthenticatedStack} />
       ) : (
         <>
+          <Stack.Screen name="Welcome" component={WelcomeScreen} /> 
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
+          <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
+          <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
+          <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
+          <Stack.Screen name="OnboardingPhoto" component={OnboardingPhotoScreen} />
+          <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
         </>
       )}
     </Stack.Navigator>

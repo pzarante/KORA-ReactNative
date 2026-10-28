@@ -1,139 +1,179 @@
-import React, { useState } from "react";
-import { Keyboard, StyleSheet, View } from "react-native";
-import { Button, HelperText, IconButton, Snackbar, Surface, Text, TextInput } from "react-native-paper";
-import { useAuth } from "../context/authContext";
+import React, { useState } from 'react';
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  TextInput, 
+  TouchableOpacity, 
+  SafeAreaView, 
+  KeyboardAvoidingView, 
+  Platform,
+  ScrollView
+} from 'react-native';
 
 export default function ForgotPasswordScreen({ navigation }: { navigation: any }) {
-    const { forgotPassword, error, clearError } = useAuth();
+  const [email, setEmail] = useState('');
 
-    const [email, setEmail] = useState("");
-    const [emailError, setEmailError] = useState<string | undefined>();
-    const [loading, setLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const handleSendResetEmail = () => {
+    // Aquí puedes integrar la lógica para enviar el correo de recuperación
+    console.log("Enviando enlace de recuperación a:", email);
+  };
 
-    const validate = (): boolean => {
-        const trimmed = email.trim();
-        if (!trimmed) {
-            setEmailError("Please enter your email");
-            return false;
-        } else if (!trimmed.includes("@")) {
-            setEmailError("Please enter a valid email address");
-            return false;
-        }
-        setEmailError(undefined);
-        return true;
-    };
+  return (
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        style={styles.innerContainer}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+          {/* Logo superior */}
+          <View style={styles.logoContainer}>
+            <Text style={styles.logoText}>K</Text>
+          </View>
 
-    const handleSubmit = async () => {
-        Keyboard.dismiss();
-        if (!validate()) return;
+          {/* Títulos y descripción */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.subHeader}>¿OLVIDASTE TU CONTRASEÑA?</Text>
+            <Text style={styles.title}>Recuperar Contraseña</Text>
+            <Text style={styles.description}>
+              Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+            </Text>
+          </View>
 
-        setLoading(true);
-        await forgotPassword(email.trim()).finally(() => setLoading(false));
-
-        if (!error) setSuccessMessage(`Password reset link sent to ${email.trim()}`);
-    };
-
-    return (
-        <Surface style={styles.surface}>
-
-            {/* ✅ AppBar-like back button */}
-            <View style={styles.header}>
-                <IconButton
-                    icon="arrow-left"
-                    size={24}
-                    onPress={() => navigation.goBack()}
-                />
+          {/* Formulario */}
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>Correo Electrónico</Text>
+            <View style={styles.inputWrapper}>
+              <Text style={styles.inputIcon}>✉️</Text>
+              <TextInput 
+                style={styles.input}
+                placeholder="ejemplo@uninorte.co"
+                placeholderTextColor="#A0A0A0"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
             </View>
 
-            <View style={styles.content}>
-                <Text variant="headlineSmall" style={styles.title}>
-                    Enter your email to reset password
-                </Text>
+            {/* Enlace rápido debajo del input */}
+            <TouchableOpacity onPress={handleSendResetEmail} style={styles.sendLinkContainer}>
+              <Text style={styles.sendLinkText}>Enviar enlace</Text>
+            </TouchableOpacity>
+          </View>
 
-                {/* EMAIL */}
-                <TextInput
-                    label="Email address"
-                    value={email}
-                    onChangeText={(v) => {
-                        setEmail(v);
-                        if (emailError) setEmailError(undefined);
-                    }}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                    error={!!emailError}
-                    returnKeyType="done"
-                    onSubmitEditing={handleSubmit}
-                    style={styles.input}
-                />
-                <HelperText type="error" visible={!!emailError}>
-                    {emailError}
-                </HelperText>
-
-                <Button
-                    mode="contained-tonal"
-                    onPress={handleSubmit}
-                    loading={loading}
-                    disabled={loading}
-                    style={styles.button}
-                >
-                    Send Reset Link
-                </Button>
-            </View>
-
-            {/* SUCCESS SNACKBAR */}
-            <Snackbar
-                visible={!!successMessage}
-                onDismiss={() => {
-                    setSuccessMessage(null);
-                    navigation.goBack();
-                }}
-                duration={3000}
-                action={{
-                    label: "OK",
-                    onPress: () => {
-                        setSuccessMessage(null);
-                        navigation.goBack();
-                    },
-                }}
-            >
-                {successMessage}
-            </Snackbar>
-
-            {/* ERROR SNACKBAR */}
-            <Snackbar
-                visible={!!error}
-                onDismiss={clearError}
-                duration={3000}
-                action={{ label: "Dismiss", onPress: clearError }}
-            >
-                {error}
-            </Snackbar>
-        </Surface>
-    );
+          {/* Botón Volver a Inicio de sesión */}
+          <TouchableOpacity 
+            style={styles.primaryButton} 
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.primaryButtonText}>Volver a Inicio de sesión →</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    surface: {
-        flex: 1,
-    },
-    header: {
-        paddingTop: 8,
-        paddingHorizontal: 4,
-    },
-    content: {
-        flex: 1,
-        justifyContent: "center",
-        padding: 20,
-    },
-    title: {
-        textAlign: "center",
-        marginBottom: 20,
-    },
-    input: {
-        marginBottom: 4,
-    },
-    button: {
-        marginTop: 12,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  innerContainer: {
+    flex: 1,
+  },
+  scrollContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    marginBottom: 20,
+  },
+  logoText: {
+    fontSize: 36,
+    fontWeight: '900',
+    color: '#4A0E95',
+  },
+  headerContainer: {
+    marginBottom: 30,
+  },
+  subHeader: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#7C3AED',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#1A1A1A',
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 14,
+    color: '#666666',
+    lineHeight: 20,
+  },
+  formContainer: {
+    width: '100%',
+    marginBottom: 30,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    marginBottom: 8,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#EFECE9',
+    borderRadius: 16,
+    backgroundColor: '#FAFAFA',
+    paddingHorizontal: 14,
+    height: 55,
+    marginBottom: 8,
+  },
+  inputIcon: {
+    marginRight: 10,
+    fontSize: 16,
+  },
+  input: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1A1A1A',
+  },
+  sendLinkContainer: {
+    alignItems: 'flex-start',
+    marginTop: 4,
+    paddingLeft: 4,
+  },
+  sendLinkText: {
+    color: '#4A0E95',
+    fontSize: 13,
+    fontWeight: '650',
+    textDecorationLine: 'underline',
+  },
+  primaryButton: {
+    backgroundColor: '#4A0E95',
+    paddingVertical: 16,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#4A0E95',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
