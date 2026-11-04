@@ -3,8 +3,11 @@ import { StyleSheet, Text, View } from "react-native";
 
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import OnboardingLayout from "../components/OnboardingLayout";
+import { useAuth } from "../context/authContext";
 
 export default function OnboardingSuccessScreen({ navigation }: { navigation: any }) {
+  const { completeProfile, error } = useAuth();
+
   return (
     <OnboardingLayout>
       <View style={styles.heading}>
@@ -17,8 +20,12 @@ export default function OnboardingSuccessScreen({ navigation }: { navigation: an
       </View>
       <AuthPrimaryButton
         label="Ir a la comunidad"
-        onPress={() => navigation.navigate("App")}
+        onPress={async () => {
+          await completeProfile();
+          navigation.navigate("App");
+        }}
       />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
     </OnboardingLayout>
   );
 }
@@ -31,4 +38,5 @@ const styles = StyleSheet.create({
   avatarText: { fontSize: 110 },
   badge: { position: "absolute", right: -2, bottom: -1, width: 57, height: 57, borderRadius: 29, backgroundColor: "#4500B5", borderWidth: 2, borderColor: "#FFFFFF", alignItems: "center", justifyContent: "center" },
   badgeText: { color: "#FFFFFF", fontSize: 25, fontWeight: "800" },
+  error: { color: "#B42318", marginTop: 16, textAlign: "center" },
 });

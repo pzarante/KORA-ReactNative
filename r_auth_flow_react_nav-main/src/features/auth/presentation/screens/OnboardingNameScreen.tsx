@@ -4,9 +4,13 @@ import { StyleSheet, Text, View } from "react-native";
 import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import OnboardingLayout from "../components/OnboardingLayout";
+import { useAuth } from "../context/authContext";
 
 export default function OnboardingNameScreen({ navigation }: { navigation: any }) {
   const [name, setName] = useState("");
+  const { profile, updateProfile } = useAuth();
+
+  React.useEffect(() => setName(profile.nombreCompleto), [profile.nombreCompleto]);
 
   return (
     <OnboardingLayout>
@@ -24,7 +28,10 @@ export default function OnboardingNameScreen({ navigation }: { navigation: any }
       <View style={styles.button}>
         <AuthPrimaryButton
           label="Continuar"
-          onPress={() => navigation.navigate("OnboardingRole")}
+          onPress={() => {
+            updateProfile({ nombreCompleto: name.trim() });
+            navigation.navigate("OnboardingRole");
+          }}
         />
       </View>
     </OnboardingLayout>

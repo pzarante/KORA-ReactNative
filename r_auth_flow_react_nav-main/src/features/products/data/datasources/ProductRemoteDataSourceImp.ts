@@ -20,7 +20,8 @@ export class ProductRemoteDataSourceImp implements ProductDataSource {
     }
     this.prefs = LocalPreferencesAsyncStorage.getInstance();
     this.projectId = projectId;
-    this.baseUrl = `https://roble-api.openlab.uninorte.edu.co/database/${this.projectId}`;
+    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.openlab.uninorte.edu.co").replace(/\/$/, "");
+    this.baseUrl = `${apiUrl}/database/${this.projectId}`;
   }
 
   private async authorizedFetch(
@@ -29,6 +30,7 @@ export class ProductRemoteDataSourceImp implements ProductDataSource {
     retry = true
   ): Promise<Response> {
     const token = await this.prefs.retrieveData<string>("token");
+    if (!token) throw new Error("No hay una sesión activa para consultar Roble");
     const headers = {
       ...(options.headers || {}),
       Authorization: `Bearer ${token}`,
@@ -63,6 +65,7 @@ export class ProductRemoteDataSourceImp implements ProductDataSource {
 
     const response = await this.authorizedFetch(url, { method: "GET" });
 
+    if (response.status === 404) return [];
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error("Unauthorized (token issue)");

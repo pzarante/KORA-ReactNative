@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import OnboardingLayout from "../components/OnboardingLayout";
+import { useAuth } from "../context/authContext";
 
 const skills = [
   "Creatividad", "Investigación", "Innovación", "Programación",
@@ -12,6 +13,9 @@ const skills = [
 
 export default function OnboardingSkillsScreen({ navigation }: { navigation: any }) {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const { profile, updateProfile } = useAuth();
+
+  React.useEffect(() => setSelectedSkills(profile.habilidades), [profile.habilidades]);
 
   const toggleSkill = (skill: string) => {
     setSelectedSkills((current) =>
@@ -44,7 +48,10 @@ export default function OnboardingSkillsScreen({ navigation }: { navigation: any
         </View>
         <AuthPrimaryButton
           label="Continuar"
-          onPress={() => navigation.navigate("OnboardingSuccess")}
+          onPress={() => {
+            updateProfile({ habilidades: selectedSkills });
+            navigation.navigate("OnboardingBio");
+          }}
         />
       </ScrollView>
     </OnboardingLayout>

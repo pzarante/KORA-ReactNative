@@ -69,6 +69,8 @@ function AuthenticatedStack() {
         <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
         <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
         <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
+        <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
+        <Stack.Screen name="OnboardingPhoto" component={OnboardingPhotoScreen} />
         <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
         <Stack.Screen
           name="AddProductScreen"

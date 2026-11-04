@@ -3,11 +3,15 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import OnboardingLayout from "../components/OnboardingLayout";
+import { useAuth } from "../context/authContext";
 
 const roles = ["Estudiante", "Docente", "Egresado"];
 
 export default function OnboardingRoleScreen({ navigation }: { navigation: any }) {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const { profile, updateProfile } = useAuth();
+
+  React.useEffect(() => setSelectedRole(profile.rol || null), [profile.rol]);
 
   return (
     <OnboardingLayout>
@@ -30,7 +34,11 @@ export default function OnboardingRoleScreen({ navigation }: { navigation: any }
       </View>
       <AuthPrimaryButton
         label="Continuar"
-        onPress={() => navigation.navigate("OnboardingSkills")}
+        onPress={() => {
+          if (!selectedRole) return;
+          updateProfile({ rol: selectedRole });
+          navigation.navigate("OnboardingSkills");
+        }}
       />
     </OnboardingLayout>
   );

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { useAuth } from '../context/authContext';
 
 export default function OnboardingBioScreen({ navigation }: { navigation: any }) {
   const [bio, setBio] = useState('');
+  const { profile, updateProfile } = useAuth();
+
+  React.useEffect(() => setBio(profile.infoAdicional), [profile.infoAdicional]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,7 +35,10 @@ export default function OnboardingBioScreen({ navigation }: { navigation: any })
 
         <TouchableOpacity 
           style={styles.primaryButton} 
-          onPress={() => navigation.navigate('OnboardingPhoto')}
+          onPress={() => {
+            updateProfile({ infoAdicional: bio.trim() });
+            navigation.navigate('OnboardingPhoto');
+          }}
         >
           <Text style={styles.primaryButtonText}>Continuar →</Text>
         </TouchableOpacity>
