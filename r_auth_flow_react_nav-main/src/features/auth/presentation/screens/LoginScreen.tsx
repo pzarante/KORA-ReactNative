@@ -18,20 +18,30 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
   const { login, error, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const handleLogin = async () => {
     if (loading) return;
-    if (!email.trim()) return setValidationError("Ingresa tu correo");
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      return setValidationError("Ingresa un correo válido");
+    if (!email.trim()) {
+      setEmailError("Ingresa tu correo");
+      return;
     }
-    if (!password) return setValidationError("Ingresa tu contraseña");
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setEmailError("Ingresa un correo válido");
+      return;
+    }
+    if (!password) {
+      setPasswordError("Ingresa tu contraseña");
+      return;
+    }
     if (password.length < 6) {
-      return setValidationError("La contraseña debe tener mínimo 6 caracteres");
+      setPasswordError("La contraseña debe tener mínimo 6 caracteres");
+      return;
     }
 
-    setValidationError(null);
+    setEmailError(null);
+    setPasswordError(null);
     await login(email.trim(), password);
   };
 
@@ -56,12 +66,13 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
               value={email}
               onChangeText={(value) => {
                 setEmail(value);
-                setValidationError(null);
+                setEmailError(null);
               }}
               placeholder="Escribe tu correo"
               keyboardType="email-address"
               autoCapitalize="none"
               autoComplete="email"
+              error={emailError ?? undefined}
             />
             <Text style={styles.label}>Contraseña</Text>
             <AuthField
@@ -70,12 +81,12 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
               value={password}
               onChangeText={(value) => {
                 setPassword(value);
-                setValidationError(null);
+                setPasswordError(null);
               }}
               placeholder="Escribe tu contraseña"
               secureTextEntry
               autoComplete="password"
-              error={validationError ?? error ?? undefined}
+              error={passwordError ?? error ?? undefined}
             />
           </View>
 

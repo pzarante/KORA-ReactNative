@@ -13,22 +13,32 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(true);
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
 
   const handleSignup = async () => {
     if (loading) return;
     if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
-      return setValidationError("Ingresa un correo válido");
+      setEmailError("Ingresa un correo válido");
+      return;
     }
     if (password.length < 6) {
-      return setValidationError("La contraseña debe tener mínimo 6 caracteres");
+      setPasswordError("La contraseña debe tener mínimo 6 caracteres");
+      return;
     }
     if (password !== confirmPassword) {
-      return setValidationError("Las contraseñas no coinciden");
+      setConfirmPasswordError("Las contraseñas no coinciden");
+      return;
     }
-    if (!acceptedTerms) return setValidationError("Acepta los términos y condiciones");
+    if (!acceptedTerms) {
+      setConfirmPasswordError("Acepta los términos y condiciones");
+      return;
+    }
 
-    setValidationError(null);
+    setEmailError(null);
+    setPasswordError(null);
+    setConfirmPasswordError(null);
     await signup(email.trim(), password);
   };
 
@@ -53,11 +63,12 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
               value={email}
               onChangeText={(value) => {
                 setEmail(value);
-                setValidationError(null);
+                setEmailError(null);
               }}
               placeholder="ejemplo@uninorte.co"
               keyboardType="email-address"
               autoCapitalize="none"
+              error={emailError ?? undefined}
             />
             <Text style={styles.label}>Contraseña</Text>
             <AuthField
@@ -66,10 +77,11 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
               value={password}
               onChangeText={(value) => {
                 setPassword(value);
-                setValidationError(null);
+                setPasswordError(null);
               }}
               placeholder="Crea tu contraseña"
               secureTextEntry
+              error={passwordError ?? undefined}
             />
             <Text style={styles.label}>Confirmar Contraseña</Text>
             <AuthField
@@ -78,18 +90,18 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
               value={confirmPassword}
               onChangeText={(value) => {
                 setConfirmPassword(value);
-                setValidationError(null);
+                setConfirmPasswordError(null);
               }}
               placeholder="Repite tu contraseña"
               secureTextEntry
-              error={validationError ?? error ?? undefined}
+              error={confirmPasswordError ?? error ?? undefined}
             />
           </View>
 
           <TouchableOpacity
             onPress={() => {
               setAcceptedTerms((current) => !current);
-              setValidationError(null);
+              setConfirmPasswordError(null);
             }}
             style={styles.terms}
           >
