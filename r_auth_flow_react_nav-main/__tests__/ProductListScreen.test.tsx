@@ -41,6 +41,7 @@ const createMockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthCo
 const createMockProductContext = (overrides: Partial<ProductContextType> = {}): ProductContextType => ({
     products: mockProducts,
     isLoading: false,
+    isRefreshing: false,
     error: null,
     clearError: jest.fn(),
     addProduct: jest.fn(),
@@ -48,6 +49,7 @@ const createMockProductContext = (overrides: Partial<ProductContextType> = {}): 
     removeProduct: jest.fn(),
     getProduct: jest.fn(),
     refreshProducts: jest.fn(),
+    forceRefresh: jest.fn(),
     ...overrides,
 });
 

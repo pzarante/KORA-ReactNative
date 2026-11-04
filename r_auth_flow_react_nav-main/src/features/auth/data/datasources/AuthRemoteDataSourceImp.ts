@@ -59,7 +59,13 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return this.login(email, password);
       } else {
         const body = await response.json();
-        throw new Error(`Signup error: ${(body.message || []).join(" ")}`);
+        if (response.status === 429) {
+          throw new Error("Demasiados intentos. Espera un momento e inténtalo nuevamente.");
+        }
+        const message = Array.isArray(body.message)
+          ? body.message.join(" ")
+          : body.message || "No fue posible crear la cuenta";
+        throw new Error(`Signup error: ${message}`);
       }
     } catch (e: any) {
       console.error("Signup failed", e);

@@ -1,6 +1,6 @@
 import { ILocalPreferences } from "@/src/core/iLocalPreferences";
 import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
-import { AuthRemoteDataSourceImpl } from "@/src/features/auth/data/datasources/AuthRemoteDataSourceImp";
+import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 import { NewProduct, Product } from "../../domain/entities/Product";
 import { ProductDataSource } from "./ProductDataSource";
 
@@ -12,7 +12,7 @@ export class ProductRemoteDataSourceImp implements ProductDataSource {
   private prefs: ILocalPreferences;
 
   constructor(
-    private authService: AuthRemoteDataSourceImpl,
+    private authService: AuthRemoteDataSource,
     projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID
   ) {
     if (!projectId) {

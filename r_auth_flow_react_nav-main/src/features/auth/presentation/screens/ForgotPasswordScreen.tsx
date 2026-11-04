@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   sendLinkText: {
     color: '#4A0E95',
     fontSize: 13,
-    fontWeight: '650',
+    fontWeight: '600',
     textDecorationLine: 'underline',
   },
   primaryButton: {

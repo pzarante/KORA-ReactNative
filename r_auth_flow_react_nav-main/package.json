@@ -55,16 +55,15 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~7.1.2",
     "jest-expo": "~51.0.4",
-    "react-test-renderer": "19.1.0",
+    "jest": "^29.7.0",
+    "react-test-renderer": "18.2.0",
+    "@types/node": "^22.15.0",
     "typescript": "~5.3.3"
   },
   "jest": {
     "preset": "jest-expo",
     "setupFiles": [
       "./jest.setup.ts"
-    ],
-    "types": [
-      "jest"
     ]
   },
   "private": true

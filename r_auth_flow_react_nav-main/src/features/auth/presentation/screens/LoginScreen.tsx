@@ -1,202 +1,128 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  TextInput, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  KeyboardAvoidingView, 
-  Platform 
-} from 'react-native';
+import React, { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+import AuthBrand from "../components/AuthBrand";
+import AuthField from "../components/AuthField";
+import AuthPrimaryButton from "../components/AuthPrimaryButton";
+import AuthSurface from "../components/AuthSurface";
+import { useAuth } from "../context/authContext";
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { login, error, loading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const handleLogin = () => {
-    // Aquí puedes integrar la lógica de autenticación que ya usa tu proyecto
-    console.log("Iniciando sesión con:", email, password);
+  const handleLogin = async () => {
+    if (loading) return;
+    if (!email.trim()) return setValidationError("Ingresa tu correo");
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      return setValidationError("Ingresa un correo válido");
+    }
+    if (!password) return setValidationError("Ingresa tu contraseña");
+    if (password.length < 6) {
+      return setValidationError("La contraseña debe tener mínimo 6 caracteres");
+    }
+
+    setValidationError(null);
+    await login(email.trim(), password);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-        style={styles.innerContainer}
+    <AuthSurface>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={styles.keyboard}
       >
-        {/* Logo superior */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>K</Text>
-        </View>
+        <View testID="login-screen" style={styles.container}>
+          <AuthBrand />
+          <View style={styles.heading}>
+            <Text style={styles.eyebrow}>¡HOLA DE NUEVO!</Text>
+            <Text style={styles.title}>Iniciar Sesión</Text>
+          </View>
 
-        {/* Títulos */}
-        <View style={styles.headerContainer}>
-          <Text style={styles.subHeader}>¡HOLA DE NUEVO!</Text>
-          <Text style={styles.title}>Iniciar Sesión</Text>
-        </View>
-
-        {/* Formulario */}
-        <View style={styles.formContainer}>
-          {/* Correo Electrónico */}
-          <Text style={styles.label}>Correo Electrónico</Text>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.inputIcon}>✉️</Text>
-            <TextInput 
-              style={styles.input}
-              placeholder="Escribe tu correo"
-              placeholderTextColor="#A0A0A0"
+          <View style={styles.form}>
+            <Text style={styles.label}>Correo Electrónico</Text>
+            <AuthField
+              icon="✉"
+              testID="email-input"
               value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
+              onChangeText={(value) => {
+                setEmail(value);
+                setValidationError(null);
+              }}
+              placeholder="Escribe tu correo"
               keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
             />
-          </View>
-
-          {/* Contraseña */}
-          <Text style={styles.label}>Contraseña</Text>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.inputIcon}>🔒</Text>
-            <TextInput 
-              style={styles.input}
-              placeholder="Escribe tu contraseña"
-              placeholderTextColor="#A0A0A0"
-              secureTextEntry
+            <Text style={styles.label}>Contraseña</Text>
+            <AuthField
+              icon="▢"
+              testID="password-input"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(value) => {
+                setPassword(value);
+                setValidationError(null);
+              }}
+              placeholder="Escribe tu contraseña"
+              secureTextEntry
+              autoComplete="password"
+              error={validationError ?? error ?? undefined}
             />
           </View>
 
-          {/* Enlace Olvidaste tu contraseña */}
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('ForgotPassword')}
-            style={styles.forgotContainer}
+          <TouchableOpacity
+            accessibilityRole="link"
+            onPress={() => navigation.navigate("ForgotPassword")}
+            style={styles.forgot}
           >
-            <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
+            <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
-        </View>
 
-        {/* Botón Iniciar Sesión */}
-        <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
-          <Text style={styles.primaryButtonText}>Iniciar Sesión →</Text>
-        </TouchableOpacity>
+          <AuthPrimaryButton
+            label="Iniciar Sesión"
+            onPress={handleLogin}
+            testID="login-button"
+            disabled={loading}
+          />
 
-        {/* Enlace para Registrarse */}
-        <View style={styles.footerContainer}>
-          <Text style={styles.footerText}>¿No tienes una cuenta? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-            <Text style={styles.registerLink}>Regístrate</Text>
-          </TouchableOpacity>
+          <View style={styles.footer}>
+            <View style={styles.line} />
+            <Text style={styles.footerText}>¿No tienes una cuenta?</Text>
+            <TouchableOpacity
+              accessibilityRole="link"
+              onPress={() => navigation.navigate("Signup")}
+              testID="create-account-button"
+            >
+              <Text style={styles.link}>Regístrate</Text>
+            </TouchableOpacity>
+            <View style={styles.line} />
+          </View>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AuthSurface>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  innerContainer: {
-    flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    marginBottom: 20,
-  },
-  logoText: {
-    fontSize: 36,
-    fontWeight: '900',
-    color: '#4A0E95',
-  },
-  headerContainer: {
-    marginBottom: 30,
-  },
-  subHeader: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#7C3AED',
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-  },
-  formContainer: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 8,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#EFECE9',
-    borderRadius: 16,
-    backgroundColor: '#FAFAFA',
-    paddingHorizontal: 14,
-    height: 55,
-    marginBottom: 20,
-  },
-  inputIcon: {
-    marginRight: 10,
-    fontSize: 16,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: '#1A1A1A',
-  },
-  forgotContainer: {
-    alignItems: 'flex-end',
-    marginTop: -10,
-  },
-  forgotText: {
-    color: '#4A0E95',
-    fontSize: 13,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
-  primaryButton: {
-    backgroundColor: '#4A0E95',
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#4A0E95',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 4,
-    marginBottom: 25,
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  footerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerText: {
-    color: '#666666',
-    fontSize: 14,
-  },
-  registerLink: {
-    color: '#4A0E95',
-    fontSize: 14,
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-  },
+  keyboard: { flex: 1 },
+  container: { flex: 1, paddingTop: 48 },
+  heading: { marginTop: 18, marginBottom: 27 },
+  eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
+  title: { color: "#211832", fontSize: 32, fontWeight: "800", marginTop: 5 },
+  form: { gap: 8 },
+  label: { color: "#211832", fontSize: 14, fontWeight: "700", marginTop: 9 },
+  forgot: { alignSelf: "flex-end", marginTop: 14, marginBottom: 31 },
+  link: { color: "#4500B5", fontSize: 13, fontWeight: "800", textDecorationLine: "underline" },
+  footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 24 },
+  line: { height: 1, backgroundColor: "#E6DDF2", flex: 1 },
+  footerText: { color: "#756A8E", fontSize: 13, fontWeight: "600" },
 });

@@ -57,10 +57,19 @@ function ContentTabs() {
 }
 
 function AuthenticatedStack() {
+  const { needsOnboarding } = useAuth();
+
   return (
     <ProductProvider>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName={needsOnboarding ? "OnboardingName" : "App"}
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="App" component={ContentTabs} />
+        <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
+        <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
+        <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
+        <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
         <Stack.Screen
           name="AddProductScreen"
           component={AddProductScreen}

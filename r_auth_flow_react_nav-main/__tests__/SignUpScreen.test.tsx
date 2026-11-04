@@ -51,7 +51,7 @@ describe("SignupScreen", () => {
         expect(getByTestId("signup-password-input")).toBeTruthy();
         expect(getByTestId("signup-button")).toBeTruthy();
         expect(getByTestId("go-to-login-button")).toBeTruthy();
-        expect(getByText("Create an Account")).toBeTruthy();
+        expect(getByText("Crear Cuenta")).toBeTruthy();
     });
 
     it("starts with empty fields", () => {
@@ -75,7 +75,7 @@ describe("SignupScreen", () => {
         });
 
         await waitFor(() => {
-            expect(getByText("Enter email")).toBeTruthy();
+            expect(getByText("Ingresa un correo válido")).toBeTruthy();
         });
     });
 
@@ -89,7 +89,7 @@ describe("SignupScreen", () => {
         });
 
         await waitFor(() => {
-            expect(getByText("Enter a valid email address")).toBeTruthy();
+            expect(getByText("Ingresa un correo válido")).toBeTruthy();
         });
     });
 
@@ -103,7 +103,7 @@ describe("SignupScreen", () => {
         });
 
         await waitFor(() => {
-            expect(getByText("Enter email")).toBeTruthy();
+            expect(getByText("Ingresa un correo válido")).toBeTruthy();
         });
 
         await act(async () => {
@@ -130,7 +130,7 @@ describe("SignupScreen", () => {
         });
 
         await waitFor(() => {
-            expect(getByText("Enter password")).toBeTruthy();
+            expect(getByText("La contraseña debe tener mínimo 6 caracteres")).toBeTruthy();
         });
     });
 
@@ -145,7 +145,7 @@ describe("SignupScreen", () => {
         });
 
         await waitFor(() => {
-            expect(getByText("Password should have at least 6 characters")).toBeTruthy();
+            expect(getByText("La contraseña debe tener mínimo 6 caracteres")).toBeTruthy();
         });
     });
 
@@ -160,7 +160,7 @@ describe("SignupScreen", () => {
         });
 
         await waitFor(() => {
-            expect(getByText("Enter password")).toBeTruthy();
+            expect(getByText("La contraseña debe tener mínimo 6 caracteres")).toBeTruthy();
         });
 
         await act(async () => {
@@ -197,6 +197,7 @@ describe("SignupScreen", () => {
 
         fireEvent.changeText(getByTestId("signup-email-input"), "test@test.com");
         fireEvent.changeText(getByTestId("signup-password-input"), "password123");
+        fireEvent.changeText(getByTestId("signup-confirm-password-input"), "password123");
 
         await act(async () => {
             fireEvent.press(getByTestId("signup-button"));
@@ -213,6 +214,7 @@ describe("SignupScreen", () => {
 
         fireEvent.changeText(getByTestId("signup-email-input"), "  test@test.com  ");
         fireEvent.changeText(getByTestId("signup-password-input"), "password123");
+        fireEvent.changeText(getByTestId("signup-confirm-password-input"), "password123");
 
         await act(async () => {
             fireEvent.press(getByTestId("signup-button"));
@@ -235,7 +237,7 @@ describe("SignupScreen", () => {
             fireEvent.press(getByTestId("go-to-login-button"));
         });
 
-        expect(navigationMock.goBack).toHaveBeenCalled();
+        expect(navigationMock.navigate).toHaveBeenCalledWith("Login");
     });
 
 
@@ -244,10 +246,10 @@ describe("SignupScreen", () => {
     // =========================
 
     it("shows snackbar when server returns error", async () => {
-        const { getByTestId } = renderScreen({ error: "Email already in use" });
+        const { getByText } = renderScreen({ error: "Email already in use" });
 
         await waitFor(() => {
-            expect(getByTestId("signup-error-snackbar")).toBeTruthy();
+            expect(getByText("Email already in use")).toBeTruthy();
         });
     });
 });

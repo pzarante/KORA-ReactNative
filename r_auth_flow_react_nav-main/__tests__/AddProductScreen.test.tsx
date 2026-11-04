@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
-import React, { act } from "react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
+import React from "react";
 import { PaperProvider } from "react-native-paper";
 
 import { AuthContext, AuthContextType } from "@/src/features/auth/presentation/context/authContext";
@@ -31,6 +31,7 @@ const createMockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthCo
 const createMockProductContext = (overrides: Partial<ProductContextType> = {}): ProductContextType => ({
     products: [],
     isLoading: false,
+    isRefreshing: false,
     error: null,
     clearError: jest.fn(),
     addProduct: jest.fn(),
@@ -38,6 +39,7 @@ const createMockProductContext = (overrides: Partial<ProductContextType> = {}): 
     removeProduct: jest.fn(),
     getProduct: jest.fn(),
     refreshProducts: jest.fn(),
+    forceRefresh: jest.fn(),
     ...overrides,
 });
 

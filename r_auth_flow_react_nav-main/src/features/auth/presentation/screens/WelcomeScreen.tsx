@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   guestText: {
     color: '#4A0E95',
     fontSize: 14,
-    fontWeight: '650',
+    fontWeight: '600',
     textDecorationLine: 'underline',
   },
 });

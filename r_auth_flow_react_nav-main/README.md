@@ -13,7 +13,7 @@ This is a starter project for building React Native apps with [Expo](https://exp
 2. Create a `.env` file in the root directory and add your Roble project ID
 
    ```
-   ROBLE_PROJECT_ID=your_project_id_here
+   EXPO_PUBLIC_ROBLE_PROJECT_ID=your_project_id_here
    ```
 
 3. Start the app
@@ -21,6 +21,15 @@ This is a starter project for building React Native apps with [Expo](https://exp
    ```bash
    npx expo start
    ```
+
+   To preview the authentication and onboarding screens without connecting to
+   Roble, add this variable to `.env`:
+
+   ```
+   EXPO_PUBLIC_AUTH_MODE=mock
+   ```
+
+   Remove it or set it to `remote` when you want to use the real Roble API.
 
 4. Test with Jest
 

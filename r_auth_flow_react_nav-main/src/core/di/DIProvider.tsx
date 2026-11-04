@@ -3,6 +3,8 @@ import React, { createContext, useContext, useMemo } from "react";
 import { TOKENS } from "./tokens";
 
 import { AuthRemoteDataSourceImpl } from "@/src/features/auth/data/datasources/AuthRemoteDataSourceImp";
+import { MockAuthRemoteDataSource } from "@/src/features/auth/data/datasources/MockAuthRemoteDataSource";
+import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 import { AuthRepositoryImpl } from "@/src/features/auth/data/repositories/AuthRepositoryImpl";
 import { LocalProductCacheSource } from "@/src/features/products/data/datasources/local/LocalProductCacheSource";
 import { ProductRemoteDataSourceImp } from "@/src/features/products/data/datasources/ProductRemoteDataSourceImp";
@@ -15,7 +17,10 @@ export function DIProvider({ children }: { children: React.ReactNode }) {
     const container = useMemo(() => {
         const c = new Container();
 
-        const authDS = new AuthRemoteDataSourceImpl();
+        const authDS: AuthRemoteDataSource =
+            process.env.EXPO_PUBLIC_AUTH_MODE === "mock"
+                ? new MockAuthRemoteDataSource()
+                : new AuthRemoteDataSourceImpl();
         const authRepo = new AuthRepositoryImpl(authDS);
 
         c.register(TOKENS.AuthRemoteDS, authDS)

@@ -8,6 +8,7 @@ import { AuthRepository } from "../../domain/repositories/AuthRepository";
 export type AuthContextType = {
   loggedUser: AuthUser | null;
   isLoggedIn: boolean;
+  needsOnboarding?: boolean;
   loading: boolean;
   error: string | null;
   clearError: () => void;
@@ -28,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [loggedUser, setLoggedUser] = useState<AuthUser | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       await authRepo.login(email, password);
       setIsLoggedIn(true);
+      setNeedsOnboarding(false);
     } catch (err: any) {
       setError(err?.message ?? "Login failed");
     } finally {
@@ -62,6 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       await authRepo.signup(email, password);
       setIsLoggedIn(true);
+      setNeedsOnboarding(true);
     } catch (err: any) {
       setError(err?.message ?? "Signup failed");
     } finally {
@@ -75,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       await authRepo.logout();
       setIsLoggedIn(false);
+      setNeedsOnboarding(false);
     } catch (err: any) {
       setError(err?.message ?? "Logout failed");
     } finally {
@@ -113,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ loggedUser, isLoggedIn, loading, error, clearError, login, signup, logout, forgotPassword, validate, getLoggedUser }}>
+    <AuthContext.Provider value={{ loggedUser, isLoggedIn, needsOnboarding, loading, error, clearError, login, signup, logout, forgotPassword, validate, getLoggedUser }}>
       {children}
     </AuthContext.Provider>
   );
