@@ -1,11 +1,14 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AuthSurface({ children }: { children: React.ReactNode }) {
   return (
     <SafeAreaView style={styles.surface}>
+      <StatusBar style="dark" backgroundColor="#FFFFFF" />
       <View pointerEvents="none" style={styles.purpleGlow} />
+      <View pointerEvents="none" style={styles.middleGlow} />
       <View pointerEvents="none" style={styles.orangeGlow} />
       <View style={styles.content}>{children}</View>
     </SafeAreaView>
@@ -24,6 +27,16 @@ const styles = StyleSheet.create({
     borderRadius: 110,
     backgroundColor: "#E5CEFF",
     opacity: 0.72,
+  },
+  middleGlow: {
+    position: "absolute",
+    top: "34%",
+    right: -54,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: "#E9D6FF",
+    opacity: 0.4,
   },
   orangeGlow: {
     position: "absolute",

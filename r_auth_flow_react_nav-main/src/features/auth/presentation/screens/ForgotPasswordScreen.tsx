@@ -1,179 +1,258 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  TextInput, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  KeyboardAvoidingView, 
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  KeyboardAvoidingView,
   Platform,
-  ScrollView
-} from 'react-native';
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+import AuthBrand from "../components/AuthBrand";
+import AuthSurface from "../components/AuthSurface";
+import { useAuth } from "../context/authContext";
 
 export default function ForgotPasswordScreen({ navigation }: { navigation: any }) {
-  const [email, setEmail] = useState('');
+  const { forgotPassword, error, loading, clearError } = useAuth();
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [requestFailed, setRequestFailed] = useState(false);
 
-  const handleSendResetEmail = () => {
-    // Aquí puedes integrar la lógica para enviar el correo de recuperación
-    console.log("Enviando enlace de recuperación a:", email);
+  const handleSendResetEmail = async () => {
+    const normalizedEmail = email.trim();
+    setSubmitted(false);
+    setEmailError(null);
+    setRequestFailed(false);
+    clearError();
+
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+      setEmailError("Ingresa un correo electrónico válido.");
+      return;
+    }
+
+    if (await forgotPassword(normalizedEmail)) {
+      setSubmitted(true);
+    } else {
+      setRequestFailed(true);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-        style={styles.innerContainer}
+    <AuthSurface>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={styles.keyboard}
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-          {/* Logo superior */}
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>K</Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View testID="forgot-password-screen" style={styles.container}>
+            <AuthBrand />
 
-          {/* Títulos y descripción */}
-          <View style={styles.headerContainer}>
-            <Text style={styles.subHeader}>¿OLVIDASTE TU CONTRASEÑA?</Text>
-            <Text style={styles.title}>Recuperar Contraseña</Text>
-            <Text style={styles.description}>
-              Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
-            </Text>
-          </View>
-
-          {/* Formulario */}
-          <View style={styles.formContainer}>
-            <Text style={styles.label}>Correo Electrónico</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.inputIcon}>✉️</Text>
-              <TextInput 
-                style={styles.input}
-                placeholder="ejemplo@uninorte.co"
-                placeholderTextColor="#A0A0A0"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
+            <View style={styles.heading}>
+              <Text style={styles.eyebrow}>¿OLVIDASTE TU CONTRASEÑA?</Text>
+              <Text style={styles.title}>Recuperar Contraseña</Text>
+              <Text style={styles.description}>
+                Ingresa tu correo electrónico y te enviaremos un enlace para
+                restablecer tu contraseña.
+              </Text>
             </View>
 
-            {/* Enlace rápido debajo del input */}
-            <TouchableOpacity onPress={handleSendResetEmail} style={styles.sendLinkContainer}>
-              <Text style={styles.sendLinkText}>Enviar enlace</Text>
+            <View style={styles.form}>
+              <Text style={styles.label}>Correo Electrónico</Text>
+              <View style={styles.inputWrapper}>
+                <MaterialCommunityIcons
+                  name="email-outline"
+                  size={17}
+                  color="#756A8E"
+                />
+                <TextInput
+                  accessibilityLabel="Correo Electrónico"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  keyboardType="email-address"
+                  onChangeText={(value) => {
+                    setEmail(value);
+                    setSubmitted(false);
+                    setEmailError(null);
+                    setRequestFailed(false);
+                    clearError();
+                  }}
+                  placeholder="Escribe tu correo"
+                  placeholderTextColor="#666666"
+                  style={styles.input}
+                  testID="forgot-password-email-input"
+                  value={email}
+                />
+              </View>
+              {emailError ? (
+                <Text accessibilityRole="alert" style={styles.error}>
+                  {emailError}
+                </Text>
+              ) : null}
+              {requestFailed || error ? (
+                <Text accessibilityRole="alert" style={styles.error}>
+                  {error ?? "No pudimos enviar el enlace. Intenta de nuevo más tarde."}
+                </Text>
+              ) : null}
+
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityState={{ disabled: loading }}
+                disabled={loading}
+                onPress={handleSendResetEmail}
+                style={[styles.sendLink, loading && styles.sendLinkDisabled]}
+                testID="send-reset-link-button"
+              >
+                <Text style={styles.sendLinkText}>
+                  {loading ? "Enviando..." : "Enviar enlace"}
+                </Text>
+              </TouchableOpacity>
+              {submitted ? (
+                <Text
+                  accessibilityLiveRegion="polite"
+                  style={styles.status}
+                  testID="reset-submission-status"
+                >
+                  Si el correo está registrado, recibirás un enlace para
+                  restablecer tu contraseña.
+                </Text>
+              ) : null}
+            </View>
+
+            <TouchableOpacity
+              accessibilityRole="button"
+              onPress={() => navigation.navigate("Login")}
+              style={styles.backButton}
+              testID="back-to-login-button"
+            >
+              <Text style={styles.backButtonText}>
+                Volver a Inicio de sesión
+              </Text>
+              <MaterialCommunityIcons
+                name="arrow-right"
+                size={15}
+                color="#FFFFFF"
+              />
             </TouchableOpacity>
           </View>
-
-          {/* Botón Volver a Inicio de sesión */}
-          <TouchableOpacity 
-            style={styles.primaryButton} 
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={styles.primaryButtonText}>Volver a Inicio de sesión →</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AuthSurface>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboard: { flex: 1 },
+  scrollContent: { flexGrow: 1 },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    paddingTop: 48,
+    paddingBottom: 32,
   },
-  innerContainer: {
-    flex: 1,
+  heading: {
+    marginTop: 18,
   },
-  scrollContainer: {
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    marginBottom: 20,
-  },
-  logoText: {
-    fontSize: 36,
-    fontWeight: '900',
-    color: '#4A0E95',
-  },
-  headerContainer: {
-    marginBottom: 30,
-  },
-  subHeader: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#7C3AED',
-    letterSpacing: 1,
-    marginBottom: 4,
+  eyebrow: {
+    color: "#3C00A0",
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0.2,
   },
   title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 10,
+    color: "#1E1630",
+    fontSize: 32,
+    fontWeight: "800",
+    letterSpacing: -0.32,
+    marginTop: 10,
   },
   description: {
-    fontSize: 14,
-    color: '#666666',
-    lineHeight: 20,
+    color: "#6B6282",
+    fontSize: 15,
+    fontWeight: "600",
+    lineHeight: 22.5,
+    marginTop: 7,
   },
-  formContainer: {
-    width: '100%',
-    marginBottom: 30,
+  form: {
+    marginTop: 82,
   },
   label: {
+    color: "#1E1630",
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 8,
+    fontWeight: "600",
+    marginBottom: 5,
   },
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#EFECE9',
-    borderRadius: 16,
-    backgroundColor: '#FAFAFA',
-    paddingHorizontal: 14,
-    height: 55,
-    marginBottom: 8,
-  },
-  inputIcon: {
-    marginRight: 10,
-    fontSize: 16,
+    height: 54,
+    borderWidth: 1,
+    borderColor: "#E9E3F5",
+    borderRadius: 27,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    marginHorizontal: 2,
   },
   input: {
     flex: 1,
+    color: "#666666",
     fontSize: 15,
-    color: '#1A1A1A',
+    marginLeft: 12,
+    paddingVertical: 0,
   },
-  sendLinkContainer: {
-    alignItems: 'flex-start',
-    marginTop: 4,
-    paddingLeft: 4,
+  sendLink: {
+    alignSelf: "flex-start",
+    marginTop: 7,
+    marginLeft: 21,
+    paddingVertical: 2,
   },
   sendLinkText: {
-    color: '#4A0E95',
+    color: "#3C00A0",
     fontSize: 13,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
+    fontWeight: "600",
+    textDecorationLine: "underline",
   },
-  primaryButton: {
-    backgroundColor: '#4A0E95',
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#4A0E95',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 4,
+  sendLinkDisabled: { opacity: 0.6 },
+  error: {
+    color: "#B42318",
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 6,
+    marginHorizontal: 21,
   },
-  primaryButtonText: {
-    color: '#FFFFFF',
+  status: {
+    color: "#6B6282",
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 8,
+    marginHorizontal: 21,
+  },
+  backButton: {
+    minHeight: 54,
+    borderRadius: 28,
+    backgroundColor: "#3C00A0",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 60,
+    marginLeft: -3,
+    marginRight: 3,
+    shadowColor: "#3C00A0",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.19,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "700",
+    marginRight: 7,
   },
 });

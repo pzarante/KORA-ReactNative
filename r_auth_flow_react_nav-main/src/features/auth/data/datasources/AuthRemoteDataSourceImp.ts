@@ -152,8 +152,30 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw e;
     }
   }
-  forgotPassword(email: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async forgotPassword(email: string): Promise<void> {
+    let response: Response;
+    try {
+      response = await fetch(`${this.baseUrl}/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=UTF-8" },
+        body: JSON.stringify({ email }),
+      });
+    } catch {
+      throw new Error(
+        "No pudimos conectar con el servicio. Revisa tu conexión e inténtalo de nuevo.",
+      );
+    }
+
+    if (response.status === 429) {
+      throw new Error(
+        "Demasiados intentos. Espera un momento e inténtalo nuevamente.",
+      );
+    }
+    if (!response.ok) {
+      throw new Error(
+        "No pudimos enviar el enlace. Intenta de nuevo más tarde.",
+      );
+    }
   }
   resetPassword(
     email: string,

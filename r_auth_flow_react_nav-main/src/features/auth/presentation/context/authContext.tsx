@@ -29,7 +29,7 @@ export type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  forgotPassword: (email: string) => Promise<void>;
+  forgotPassword: (email: string) => Promise<boolean>;
   validate: (email: string, validationCode: string) => Promise<string | null>;
   getLoggedUser: () => Promise<any | null>;
   profile: ProfileDraft;
@@ -133,8 +133,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       await authRepo.forgotPassword(email);
+      return true;
     } catch (err: any) {
-      setError(err?.message ?? "Failed to send password reset link");
+      setError(err?.message ?? "No pudimos enviar el enlace. Intenta de nuevo más tarde.");
+      return false;
     } finally {
       setLoading(false);
     }
