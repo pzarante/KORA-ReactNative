@@ -13,6 +13,9 @@ import { MockProductDataSource } from "@/src/features/products/data/datasources/
 import { ProfileDataSource } from "@/src/features/auth/data/datasources/ProfileDataSource";
 import { ProfileRemoteDataSourceImp } from "@/src/features/auth/data/datasources/ProfileRemoteDataSourceImp";
 import { MockProfileDataSource } from "@/src/features/auth/data/datasources/MockProfileDataSource";
+import { MockProjectDataSource } from "@/src/features/projects/data/datasources/MockProjectDataSource";
+import { ProjectDataSource } from "@/src/features/projects/data/datasources/ProjectDataSource";
+import { ProjectRemoteDataSourceImp } from "@/src/features/projects/data/datasources/ProjectRemoteDataSourceImp";
 import { Container } from "./container";
 const DIContext = createContext<Container | null>(null);
 
@@ -46,6 +49,12 @@ export function DIProvider({ children }: { children: React.ReactNode }) {
                 ? new MockProfileDataSource()
                 : new ProfileRemoteDataSourceImp();
         c.register(TOKENS.ProfileDataSource, profileDS);
+
+        const projectDS: ProjectDataSource =
+            process.env.EXPO_PUBLIC_AUTH_MODE === "mock"
+                ? new MockProjectDataSource()
+                : new ProjectRemoteDataSourceImp(authDS);
+        c.register(TOKENS.ProjectDataSource, projectDS);
 
 
 
