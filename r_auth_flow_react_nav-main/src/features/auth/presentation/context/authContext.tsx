@@ -34,7 +34,7 @@ export type AuthContextType = {
   getLoggedUser: () => Promise<any | null>;
   profile: ProfileDraft;
   updateProfile: (patch: Partial<ProfileDraft>) => void;
-  completeProfile: () => Promise<void>;
+  completeProfile: () => Promise<boolean>;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -80,10 +80,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const completeProfile = async () => {
+    clearError();
     const completed = { ...profile, onboardingCompletado: true };
-    await profileDS.saveProfile(completed);
-    setProfile(completed);
-    await prefs.storeData("profile_draft", completed);
+    try {
+      await profileDS.saveProfile(completed);
+      setProfile(completed);
+      await prefs.storeData("profile_draft", completed);
+      return true;
+    } catch (err: any) {
+      setError(err?.message ?? "No se pudo guardar el perfil");
+      return false;
+    }
   };
 
   const login = async (email: string, password: string) => {
@@ -91,8 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       await authRepo.login(email, password);
-      setIsLoggedIn(true);
       setNeedsOnboarding(false);
+      setIsLoggedIn(true);
     } catch (err: any) {
       setError(err?.message ?? "Login failed");
     } finally {
@@ -105,8 +112,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       await authRepo.signup(email, password);
-      setIsLoggedIn(true);
+      // Set before isLoggedIn: without batching, AuthenticatedStack mounts with the stale value.
       setNeedsOnboarding(true);
+      setIsLoggedIn(true);
     } catch (err: any) {
       setError(err?.message ?? "Signup failed");
     } finally {

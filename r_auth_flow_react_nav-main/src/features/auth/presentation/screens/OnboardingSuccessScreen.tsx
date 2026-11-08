@@ -21,8 +21,7 @@ export default function OnboardingSuccessScreen({ navigation }: { navigation: an
       <AuthPrimaryButton
         label="Ir a la comunidad"
         onPress={async () => {
-          await completeProfile();
-          navigation.navigate("App");
+          if (await completeProfile()) navigation.navigate("App");
         }}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}

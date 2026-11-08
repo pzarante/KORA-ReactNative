@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-na
 
 export default function WelcomeScreen({ navigation }: { navigation: any }) {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView testID="welcome-screen" style={styles.container}>
       {/* Logo de KORA */}
       <View style={styles.logoContainer}>
         <Text style={styles.logoText}>KORA</Text>
@@ -27,6 +27,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
         {/* Botón Iniciar Sesión (lleva al LoginScreen existente) */}
         <TouchableOpacity 
           style={styles.primaryButton} 
+          testID="welcome-login-button"
           onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.primaryButtonText}>Iniciar Sesión →</Text>
@@ -35,6 +36,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
         {/* Botón Registrarse (lleva al SignupScreen existente) */}
         <TouchableOpacity 
           style={styles.secondaryButton} 
+          testID="welcome-signup-button"
           onPress={() => navigation.navigate('Signup')}
         >
           <Text style={styles.secondaryButtonText}>Registrarse</Text>
