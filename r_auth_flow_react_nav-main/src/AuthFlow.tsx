@@ -24,8 +24,6 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function ContentTabs() {
-  const { logout } = useAuth();
-
   return (
     <Tab.Navigator
       screenOptions={{

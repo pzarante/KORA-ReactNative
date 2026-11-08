@@ -163,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const getLoggedUser = async () => {
     try {
       return await authRepo.getCurrentUser();
-    } catch (err) {
+    } catch {
       return null;
     }
   }
