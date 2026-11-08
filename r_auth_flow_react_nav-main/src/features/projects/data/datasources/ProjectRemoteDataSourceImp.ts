@@ -31,7 +31,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
       fetch(`${this.baseUrl}/insert`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ tableName: "Proyecto", records: [this.toRecord(project)] }),
+        body: JSON.stringify({ tableName: "proyecto", records: [this.toRecord(project)] }),
       });
 
     let response = await insert(token);

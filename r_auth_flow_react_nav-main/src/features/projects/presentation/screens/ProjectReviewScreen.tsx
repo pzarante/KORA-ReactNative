@@ -36,7 +36,7 @@ export default function ProjectReviewScreen({ navigation }: { navigation: any })
   };
 
   return (
-    <ProjectStepLayout title="Revisar proyecto" nextLabel={saving ? "Creando..." : "Krear proyecto"} nextDisabled={saving} onNext={submit}>
+    <ProjectStepLayout title="Revisar proyecto" nextLabel={saving ? "Creando..." : "Crear proyecto"} nextDisabled={saving} onNext={submit}>
       <Text style={styles.intro}>Verifica los datos de tu propuesta antes de publicarla en la comunidad universitaria.</Text>
 
       <ReviewCard icon="file-document-outline" title="Información básica" onEdit={() => edit("ProjectBasicInfo")}>

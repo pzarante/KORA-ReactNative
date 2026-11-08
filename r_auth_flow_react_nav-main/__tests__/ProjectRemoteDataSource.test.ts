@@ -28,7 +28,7 @@ describe("ProjectRemoteDataSourceImp", () => {
     await prefs.storeData("token", jwt("user-1"));
   });
 
-  it("inserts the project into the Proyecto table with the creator from the token", async () => {
+  it("inserts the project into the proyecto table with the creator from the token", async () => {
     const fetchMock = jest.spyOn(global, "fetch").mockResolvedValue({ ok: true, status: 201 } as Response);
 
     const project = await new ProjectRemoteDataSourceImp(authService, "test-project").createProject(draft, "Nancy");
@@ -37,7 +37,7 @@ describe("ProjectRemoteDataSourceImp", () => {
     const [url, options] = fetchMock.mock.calls[0];
     expect(url).toContain("/database/test-project/insert");
     const body = JSON.parse((options as RequestInit).body as string);
-    expect(body.tableName).toBe("Proyecto");
+    expect(body.tableName).toBe("proyecto");
     expect(body.records[0]).toMatchObject({ nombre: "EcoCampus", etiquetas: ["Sostenibilidad"], creador_id: "user-1", creador_nombre: "Nancy" });
   });
 
