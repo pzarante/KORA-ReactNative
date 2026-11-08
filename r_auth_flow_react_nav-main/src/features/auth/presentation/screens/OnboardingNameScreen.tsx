@@ -29,6 +29,7 @@ export default function OnboardingNameScreen({ navigation }: { navigation: any }
         <AuthPrimaryButton
           label="Continuar"
           onPress={() => {
+            if (!name.trim()) return;
             updateProfile({ nombreCompleto: name.trim() });
             navigation.navigate("OnboardingRole");
           }}

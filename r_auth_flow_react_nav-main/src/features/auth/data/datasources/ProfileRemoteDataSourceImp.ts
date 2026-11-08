@@ -64,7 +64,8 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       rol: profile.rol,
       habilidades: profile.habilidades,
       info_adicional: profile.infoAdicional,
-      onboarding_completado: profile.onboardingCompletado,
+      // The Roble column is a timestamp (NOT NULL): store when onboarding was completed.
+      onboarding_completado: profile.onboardingCompletado ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     };
   }
