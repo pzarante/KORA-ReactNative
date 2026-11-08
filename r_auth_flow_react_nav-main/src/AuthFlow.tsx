@@ -17,7 +17,6 @@ import OnboardingNameScreen from "./features/auth/presentation/screens/Onboardin
 import OnboardingRoleScreen from "./features/auth/presentation/screens/OnboardingRoleScreen";
 import OnboardingSkillsScreen from "./features/auth/presentation/screens/OnboardingSkillsScreen";
 import OnboardingBioScreen from "./features/auth/presentation/screens/OnboardingBioScreen";
-import OnboardingPhotoScreen from "./features/auth/presentation/screens/OnboardingPhotoScreen";
 import OnboardingSuccessScreen from "./features/auth/presentation/screens/OnboardingSuccessScreen";
 
 const Stack = createStackNavigator();
@@ -68,7 +67,6 @@ function AuthenticatedStack() {
         <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
         <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
         <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
-        <Stack.Screen name="OnboardingPhoto" component={OnboardingPhotoScreen} />
         <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
         <Stack.Screen
           name="AddProductScreen"
@@ -110,7 +108,6 @@ export default function AuthFlow() {
           <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
           <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
           <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
-          <Stack.Screen name="OnboardingPhoto" component={OnboardingPhotoScreen} />
           <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
         </>
       )}

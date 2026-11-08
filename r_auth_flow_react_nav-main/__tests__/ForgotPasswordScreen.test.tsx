@@ -28,7 +28,7 @@ function renderScreen(
       rol: "",
       habilidades: [],
       infoAdicional: "",
-      fotoUrl: null,
+     
       onboardingCompletado: false,
     },
     updateProfile: jest.fn(),

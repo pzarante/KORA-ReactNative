@@ -15,7 +15,6 @@ const emptyProfile: ProfileDraft = {
   rol: "",
   habilidades: [],
   infoAdicional: "",
-  fotoUrl: null,
   onboardingCompletado: false,
 };
 

@@ -4,6 +4,5 @@ export type UserProfile = {
   rol: string;
   habilidades: string[];
   infoAdicional: string;
-  fotoUrl: string | null;
   onboardingCompletado: boolean;
 };

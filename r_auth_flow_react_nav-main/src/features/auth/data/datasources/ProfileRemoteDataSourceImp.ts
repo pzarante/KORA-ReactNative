@@ -64,7 +64,6 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       rol: profile.rol,
       habilidades: profile.habilidades,
       info_adicional: profile.infoAdicional,
-      foto_url: profile.fotoUrl,
       onboarding_completado: profile.onboardingCompletado,
       updated_at: new Date().toISOString(),
     };

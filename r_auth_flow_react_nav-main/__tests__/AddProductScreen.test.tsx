@@ -25,7 +25,7 @@ const createMockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthCo
     forgotPassword: jest.fn(),
     validate: jest.fn(),
     getLoggedUser: jest.fn(),
-    profile: { nombreCompleto: "", rol: "", habilidades: [], infoAdicional: "", fotoUrl: null, onboardingCompletado: false },
+    profile: { nombreCompleto: "", rol: "", habilidades: [], infoAdicional: "", onboardingCompletado: false },
     updateProfile: jest.fn(),
     completeProfile: jest.fn(),
     ...overrides,

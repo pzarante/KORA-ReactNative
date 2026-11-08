@@ -37,7 +37,7 @@ export default function OnboardingBioScreen({ navigation }: { navigation: any })
           style={styles.primaryButton} 
           onPress={() => {
             updateProfile({ infoAdicional: bio.trim() });
-            navigation.navigate('OnboardingPhoto');
+            navigation.navigate('OnboardingSuccess');
           }}
         >
           <Text style={styles.primaryButtonText}>Continuar →</Text>
