@@ -1,4 +1,5 @@
 import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { userIdFromToken } from "@/src/core/userIdFromToken";
 import { UserProfile } from "../../domain/entities/UserProfile";
 import { ProfileDataSource } from "./ProfileDataSource";
 
@@ -18,7 +19,7 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
     const token = await this.prefs.retrieveData<string>("token");
     if (!token) throw new Error("No hay una sesión activa para guardar el perfil");
 
-    const userId = this.getUserIdFromToken(token);
+    const userId = userIdFromToken(token);
     const completeProfile: UserProfile = { ...profile, userId };
     const existing = await this.findProfile(userId, token);
     const response = existing
@@ -68,17 +69,5 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       onboarding_completado: profile.onboardingCompletado ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     };
-  }
-
-  private getUserIdFromToken(token: string): string {
-    try {
-      const payload = token.split(".")[1];
-      const decoded = JSON.parse(globalThis.atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-      const userId = decoded.sub ?? decoded.uid ?? decoded.user_id ?? decoded.userId ?? decoded.id;
-      if (typeof userId === "string" && userId.length > 0) return userId;
-    } catch {
-      // The API should return a JWT; the explicit error below is more useful if it does not.
-    }
-    throw new Error("La sesión de Roble no contiene el user_id del usuario");
   }
 }
