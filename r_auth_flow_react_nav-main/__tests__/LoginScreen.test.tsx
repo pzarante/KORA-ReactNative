@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
-import React, { act } from "react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
+import React from "react";
 import { PaperProvider } from "react-native-paper";
 
 import { AuthContext, AuthContextType } from "@/src/features/auth/presentation/context/authContext";
@@ -21,6 +21,9 @@ const createMockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthCo
     forgotPassword: jest.fn(),
     validate: jest.fn(),
     getLoggedUser: jest.fn(),
+    profile: { nombreCompleto: "", rol: "", habilidades: [], infoAdicional: "", onboardingCompletado: false },
+    updateProfile: jest.fn(),
+    completeProfile: jest.fn(),
     ...overrides,
 });
 
@@ -53,8 +56,8 @@ describe("LoginScreen", () => {
 
         it("shows email and password fields with default values", () => {
             const { getByTestId } = renderScreen();
-            expect(getByTestId("email-input").props.value).toBe("a@a.com");
-            expect(getByTestId("password-input").props.value).toBe("ThePassword!1");
+            expect(getByTestId("email-input").props.value).toBe("");
+            expect(getByTestId("password-input").props.value).toBe("");
         });
 
         it("shows Log In button", () => {
@@ -64,8 +67,8 @@ describe("LoginScreen", () => {
 
         it("shows Forgot password and Sign Up buttons", () => {
             const { getByText } = renderScreen();
-            expect(getByText("Forgot password?")).toBeTruthy();
-            expect(getByText("Don't have an account? Sign Up")).toBeTruthy();
+            expect(getByText("¿Olvidaste tu contraseña?")).toBeTruthy();
+            expect(getByText("¿No tienes una cuenta?")).toBeTruthy();
         });
 
         it("shows error snackbar when error is set", async () => {
@@ -90,7 +93,7 @@ describe("LoginScreen", () => {
             });
 
             await waitFor(() => {
-                expect(getByText("Enter email")).toBeTruthy();
+                expect(getByText("Ingresa tu correo")).toBeTruthy();
             });
         });
 
@@ -105,7 +108,7 @@ describe("LoginScreen", () => {
             });
 
             await waitFor(() => {
-                expect(getByText("Enter a valid email address")).toBeTruthy();
+                expect(getByText("Ingresa un correo válido")).toBeTruthy();
             });
         });
 
@@ -121,7 +124,7 @@ describe("LoginScreen", () => {
             });
 
             await waitFor(() => {
-                expect(getByText("Enter password")).toBeTruthy();
+                expect(getByText("Ingresa tu contraseña")).toBeTruthy();
             });
         });
 
@@ -136,7 +139,7 @@ describe("LoginScreen", () => {
             });
 
             await waitFor(() => {
-                expect(getByText("Password should have at least 6 characters")).toBeTruthy();
+                expect(getByText("La contraseña debe tener mínimo 6 caracteres")).toBeTruthy();
             });
         });
 
@@ -178,17 +181,12 @@ describe("LoginScreen", () => {
         });
 
 
-        it("calls login with default prefilled values", async () => {
+        it("does not submit empty default values", async () => {
             const mockLogin = jest.fn().mockResolvedValue(undefined);
             const { getByTestId } = renderScreen({ login: mockLogin });
 
-            await act(async () => {
-                fireEvent.press(getByTestId("login-button"));
-            });
-
-            await waitFor(() => {
-                expect(mockLogin).toHaveBeenCalledWith("a@a.com", "ThePassword!1");
-            });
+            fireEvent.press(getByTestId("login-button"));
+            expect(mockLogin).not.toHaveBeenCalled();
         });
 
         it("clears email error when user starts typing", async () => {
@@ -201,7 +199,7 @@ describe("LoginScreen", () => {
             });
 
             await waitFor(() => {
-                expect(getByText("Enter email")).toBeTruthy();
+                expect(getByText("Ingresa tu correo")).toBeTruthy();
             });
 
             await act(async () => {
@@ -209,7 +207,7 @@ describe("LoginScreen", () => {
             });
 
             await waitFor(() => {
-                expect(queryByText("Enter email")).toBeNull();
+                expect(queryByText("Ingresa tu correo")).toBeNull();
             });
         });
 

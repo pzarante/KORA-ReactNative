@@ -38,7 +38,7 @@ export default function UpdateProductScreen({ route }: { route: any }) {
           setDescription(p.description);
           setQuantity(p.quantity.toString());
         }
-      } catch (error) {
+      } catch {
         setNotFound(true);
       } finally {
         setLoading(false);

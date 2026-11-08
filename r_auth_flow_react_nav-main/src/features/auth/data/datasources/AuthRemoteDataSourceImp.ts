@@ -9,11 +9,12 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   private prefs: ILocalPreferences;
 
   constructor(projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID) {
-    if (!projectId) {
-      throw new Error("Missing EXPO_PUBLIC_ROBLE_PROJECT_ID env var");
+    if (!projectId || projectId === "TU_PROJECT_ID_REAL") {
+      throw new Error("Configura el Project ID real de Roble en el archivo .env");
     }
     this.projectId = projectId;
-    this.baseUrl = `https://roble-api.openlab.uninorte.edu.co/auth/${this.projectId}`;
+    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.openlab.uninorte.edu.co").replace(/\/$/, "");
+    this.baseUrl = `${apiUrl}/auth/${this.projectId}`;
     this.prefs = LocalPreferencesAsyncStorage.getInstance();
   }
 
@@ -25,10 +26,13 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         body: JSON.stringify({ email, password }),
       });
 
-      if (response.status === 201) {
+      if (response.ok) {
         const data = await response.json();
         const token = data["accessToken"];
         const refreshToken = data["refreshToken"];
+        if (!token || !refreshToken) {
+          throw new Error("Roble no devolvió los tokens de sesión");
+        }
         await this.prefs.storeData("token", token);
         await this.prefs.storeData("refreshToken", refreshToken);
         //console.log("Token:", token, "\nRefresh Token:", refreshToken);
@@ -45,7 +49,8 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   async signUp(email: string, password: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/signup`, {
+      const signupEndpoint = process.env.EXPO_PUBLIC_ROBLE_SIGNUP_ENDPOINT ?? "signup";
+      const response = await fetch(`${this.baseUrl}/${signupEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify({
@@ -59,7 +64,13 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return this.login(email, password);
       } else {
         const body = await response.json();
-        throw new Error(`Signup error: ${(body.message || []).join(" ")}`);
+        if (response.status === 429) {
+          throw new Error("Demasiados intentos. Espera un momento e inténtalo nuevamente.");
+        }
+        const message = Array.isArray(body.message)
+          ? body.message.join(" ")
+          : body.message || "No fue posible crear la cuenta";
+        throw new Error(`Signup error: ${message}`);
       }
     } catch (e: any) {
       console.error("Signup failed", e);
@@ -125,9 +136,10 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         body: JSON.stringify({ refreshToken }),
       });
 
-      if (response.status === 201) {
+      if (response.ok) {
         const data = await response.json();
         const newToken = data["accessToken"];
+        if (!newToken) throw new Error("Roble no devolvió un access token renovado");
         await this.prefs.storeData("token", newToken);
         console.log("Token refreshed successfully");
         return true;
@@ -140,8 +152,30 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw e;
     }
   }
-  forgotPassword(email: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async forgotPassword(email: string): Promise<void> {
+    let response: Response;
+    try {
+      response = await fetch(`${this.baseUrl}/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=UTF-8" },
+        body: JSON.stringify({ email }),
+      });
+    } catch {
+      throw new Error(
+        "No pudimos conectar con el servicio. Revisa tu conexión e inténtalo de nuevo.",
+      );
+    }
+
+    if (response.status === 429) {
+      throw new Error(
+        "Demasiados intentos. Espera un momento e inténtalo nuevamente.",
+      );
+    }
+    if (!response.ok) {
+      throw new Error(
+        "No pudimos enviar el enlace. Intenta de nuevo más tarde.",
+      );
+    }
   }
   resetPassword(
     email: string,

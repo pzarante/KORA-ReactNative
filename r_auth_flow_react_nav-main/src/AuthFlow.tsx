@@ -17,15 +17,12 @@ import OnboardingNameScreen from "./features/auth/presentation/screens/Onboardin
 import OnboardingRoleScreen from "./features/auth/presentation/screens/OnboardingRoleScreen";
 import OnboardingSkillsScreen from "./features/auth/presentation/screens/OnboardingSkillsScreen";
 import OnboardingBioScreen from "./features/auth/presentation/screens/OnboardingBioScreen";
-import OnboardingPhotoScreen from "./features/auth/presentation/screens/OnboardingPhotoScreen";
 import OnboardingSuccessScreen from "./features/auth/presentation/screens/OnboardingSuccessScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function ContentTabs() {
-  const { logout } = useAuth();
-
   return (
     <Tab.Navigator
       screenOptions={{
@@ -57,10 +54,20 @@ function ContentTabs() {
 }
 
 function AuthenticatedStack() {
+  const { needsOnboarding } = useAuth();
+
   return (
     <ProductProvider>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName={needsOnboarding ? "OnboardingName" : "App"}
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="App" component={ContentTabs} />
+        <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
+        <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
+        <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
+        <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
+        <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
         <Stack.Screen
           name="AddProductScreen"
           component={AddProductScreen}
@@ -101,7 +108,6 @@ export default function AuthFlow() {
           <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
           <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
           <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
-          <Stack.Screen name="OnboardingPhoto" component={OnboardingPhotoScreen} />
           <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
         </>
       )}

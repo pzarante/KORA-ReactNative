@@ -1,263 +1,151 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  TextInput, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  KeyboardAvoidingView, 
-  Platform,
-  ScrollView
-} from 'react-native';
+import React, { useState } from "react";
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+import AuthBrand from "../components/AuthBrand";
+import AuthField from "../components/AuthField";
+import AuthPrimaryButton from "../components/AuthPrimaryButton";
+import AuthSurface from "../components/AuthSurface";
+import { useAuth } from "../context/authContext";
 
 export default function SignupScreen({ navigation }: { navigation: any }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const { signup, error, loading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(true);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
 
-  const handleSignup = () => {
-    // Aquí puedes integrar la lógica de registro de tu proyecto
-    console.log("Registrando usuario:", email, password);
+  const handleSignup = async () => {
+    if (loading) return;
+    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setEmailError("Ingresa un correo válido");
+      return;
+    }
+    if (password.length < 6) {
+      setPasswordError("La contraseña debe tener mínimo 6 caracteres");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setConfirmPasswordError("Las contraseñas no coinciden");
+      return;
+    }
+    if (!acceptedTerms) {
+      setConfirmPasswordError("Acepta los términos y condiciones");
+      return;
+    }
+
+    setEmailError(null);
+    setPasswordError(null);
+    setConfirmPasswordError(null);
+    await signup(email.trim(), password);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-        style={styles.innerContainer}
+    <AuthSurface>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={styles.keyboard}
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-          {/* Logo superior */}
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>K</Text>
-          </View>
-
-          {/* Títulos */}
-          <View style={styles.headerContainer}>
-            <Text style={styles.subHeader}>REGÍSTRATE</Text>
+        <View testID="signup-screen" style={styles.container}>
+          <AuthBrand />
+          <View style={styles.heading}>
+            <Text style={styles.eyebrow}>REGÍSTRATE</Text>
             <Text style={styles.title}>Crear Cuenta</Text>
           </View>
 
-          {/* Formulario */}
-          <View style={styles.formContainer}>
-            {/* Correo Electrónico */}
+          <View style={styles.form}>
             <Text style={styles.label}>Correo Electrónico</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.inputIcon}>✉️</Text>
-              <TextInput 
-                style={styles.input}
-                placeholder="ejemplo@uninorte.co"
-                placeholderTextColor="#A0A0A0"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
-            </View>
-
-            {/* Contraseña */}
+            <AuthField
+              icon="✉"
+              testID="signup-email-input"
+              value={email}
+              onChangeText={(value) => {
+                setEmail(value);
+                setEmailError(null);
+              }}
+              placeholder="ejemplo@uninorte.co"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              error={emailError ?? undefined}
+            />
             <Text style={styles.label}>Contraseña</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.inputIcon}>🔒</Text>
-              <TextInput 
-                style={styles.input}
-                placeholder="Crea tu contraseña"
-                placeholderTextColor="#A0A0A0"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              />
-              <Text style={styles.eyeIcon}>👁️</Text>
-            </View>
-
-            {/* Confirmar Contraseña */}
+            <AuthField
+              icon="▢"
+              testID="signup-password-input"
+              value={password}
+              onChangeText={(value) => {
+                setPassword(value);
+                setPasswordError(null);
+              }}
+              placeholder="Crea tu contraseña"
+              secureTextEntry
+              error={passwordError ?? undefined}
+            />
             <Text style={styles.label}>Confirmar Contraseña</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.inputIcon}>🔒</Text>
-              <TextInput 
-                style={styles.input}
-                placeholder="Repite tu contraseña"
-                placeholderTextColor="#A0A0A0"
-                secureTextEntry
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-              />
-              <Text style={styles.eyeIcon}>👁️</Text>
-            </View>
-
-            {/* Términos y condiciones */}
-            <TouchableOpacity 
-              style={styles.termsContainer} 
-              onPress={() => setAcceptedTerms(!acceptedTerms)}
-              activeOpacity={0.8}
-            >
-              <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
-                {acceptedTerms && <Text style={styles.checkmark}>✓</Text>}
-              </View>
-              <Text style={styles.termsText}>
-                Acepto los <Text style={styles.termsLink}>términos y condiciones</Text> de uso
-              </Text>
-            </TouchableOpacity>
+            <AuthField
+              icon="▢"
+              testID="signup-confirm-password-input"
+              value={confirmPassword}
+              onChangeText={(value) => {
+                setConfirmPassword(value);
+                setConfirmPasswordError(null);
+              }}
+              placeholder="Repite tu contraseña"
+              secureTextEntry
+              error={confirmPasswordError ?? error ?? undefined}
+            />
           </View>
 
-          {/* Botón Continuar */}
-          <TouchableOpacity style={styles.primaryButton} onPress={handleSignup}>
-            <Text style={styles.primaryButtonText}>Continuar →</Text>
+          <TouchableOpacity
+            onPress={() => {
+              setAcceptedTerms((current) => !current);
+              setConfirmPasswordError(null);
+            }}
+            style={styles.terms}
+          >
+            <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
+              {acceptedTerms ? <Text style={styles.checkmark}>✓</Text> : null}
+            </View>
+            <Text style={styles.termsText}>
+              Acepto los <Text style={styles.link}>términos y condiciones</Text> de uso
+            </Text>
           </TouchableOpacity>
 
-          {/* Enlace para Iniciar Sesión */}
-          <View style={styles.footerContainer}>
-            <Text style={styles.footerText}>¿Ya tienes una cuenta? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLink}>Inicia sesión</Text>
+          <AuthPrimaryButton
+            label="Continuar"
+            onPress={handleSignup}
+            testID="signup-button"
+            disabled={loading}
+          />
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>¿Ya tienes una cuenta?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")} testID="go-to-login-button">
+              <Text style={styles.link}>Inicia sesión</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AuthSurface>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  innerContainer: {
-    flex: 1,
-  },
-  scrollContainer: {
-    paddingHorizontal: 24,
-    paddingVertical: 30,
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    marginBottom: 16,
-  },
-  logoText: {
-    fontSize: 36,
-    fontWeight: '900',
-    color: '#4A0E95',
-  },
-  headerContainer: {
-    marginBottom: 24,
-  },
-  subHeader: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#7C3AED',
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-  },
-  formContainer: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 6,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#EFECE9',
-    borderRadius: 16,
-    backgroundColor: '#FAFAFA',
-    paddingHorizontal: 14,
-    height: 52,
-    marginBottom: 16,
-  },
-  inputIcon: {
-    marginRight: 10,
-    fontSize: 16,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: '#1A1A1A',
-  },
-  eyeIcon: {
-    fontSize: 16,
-    color: '#888',
-  },
-  termsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 5,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: '#4A0E95',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-    backgroundColor: '#FFF',
-  },
-  checkboxChecked: {
-    backgroundColor: '#4A0E95',
-  },
-  checkmark: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  termsText: {
-    fontSize: 13,
-    color: '#666666',
-    flex: 1,
-  },
-  termsLink: {
-    color: '#4A0E95',
-    textDecorationLine: 'underline',
-    fontWeight: '600',
-  },
-  primaryButton: {
-    backgroundColor: '#4A0E95',
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#4A0E95',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 4,
-    marginBottom: 20,
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  footerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  footerText: {
-    color: '#666666',
-    fontSize: 14,
-  },
-  loginLink: {
-    color: '#4A0E95',
-    fontSize: 14,
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-  },
+  keyboard: { flex: 1 },
+  container: { flex: 1, paddingTop: 48 },
+  heading: { marginTop: 18, marginBottom: 27 },
+  eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
+  title: { color: "#211832", fontSize: 32, fontWeight: "800", marginTop: 5 },
+  form: { gap: 8 },
+  label: { color: "#211832", fontSize: 14, fontWeight: "700", marginTop: 9 },
+  terms: { flexDirection: "row", alignItems: "center", gap: 11, marginVertical: 21 },
+  checkbox: { width: 22, height: 22, borderWidth: 1, borderColor: "#4500B5", borderRadius: 6, alignItems: "center", justifyContent: "center" },
+  checkboxChecked: { backgroundColor: "#4500B5" },
+  checkmark: { color: "#FFFFFF", fontWeight: "800" },
+  termsText: { flex: 1, color: "#211832", fontSize: 13, fontWeight: "600" },
+  link: { color: "#4500B5", fontWeight: "800", textDecorationLine: "underline" },
+  footer: { flexDirection: "row", gap: 5, marginTop: 22 },
+  footerText: { color: "#756A8E", fontSize: 13, fontWeight: "600" },
 });

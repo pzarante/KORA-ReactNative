@@ -1,0 +1,12 @@
+{
+  "name": "kora-react-native-workspace",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix r_auth_flow_react_nav-main start",
+    "web": "npm --prefix r_auth_flow_react_nav-main run web",
+    "android": "npm --prefix r_auth_flow_react_nav-main run android",
+    "ios": "npm --prefix r_auth_flow_react_nav-main run ios",
+    "test": "npm --prefix r_auth_flow_react_nav-main run test:ci -- --runInBand",
+    "lint": "npm --prefix r_auth_flow_react_nav-main run lint"
+  }
+}
