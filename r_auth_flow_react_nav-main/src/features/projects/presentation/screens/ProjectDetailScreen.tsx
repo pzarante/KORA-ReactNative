@@ -3,6 +3,7 @@ import React from "react";
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import AppTabBar from "@/src/AppTabBar";
 import AuthBrand from "@/src/features/auth/presentation/components/AuthBrand";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project, PROJECT_STAGES } from "../../domain/entities/Project";
@@ -56,7 +57,7 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   };
 
   return (
-    <SafeAreaView style={styles.container} testID="project-detail-screen">
+    <SafeAreaView edges={["top", "left", "right"]} style={styles.container} testID="project-detail-screen">
       <View style={styles.topBar}>
         <TouchableOpacity accessibilityLabel="Volver" onPress={() => navigation.goBack()} style={styles.roundButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
@@ -185,6 +186,7 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
           </TouchableOpacity>
         )}
       </View>
+      <AppTabBar navigation={navigation} />
     </SafeAreaView>
   );
 }

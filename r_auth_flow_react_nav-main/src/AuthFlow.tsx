@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import { StyleSheet } from "react-native";
 
+import { APP_TABS, openCreate } from "./AppTabBar";
 import { useAuth } from "./features/auth/presentation/context/authContext";
 import AccountRequiredScreen from "./features/auth/presentation/screens/AccountRequiredScreen";
 import ForgotPasswordScreen from "./features/auth/presentation/screens/ForgotPasswordScreen";
@@ -80,6 +81,13 @@ function CreateProjectFlow() {
 // Without a session the same tabs work as guest mode: account-only actions open AccountRequired.
 function ContentTabs() {
   const { isLoggedIn } = useAuth();
+  const TAB_SCREENS = {
+    Home: HomeFeedScreen,
+    Explore: ExploreScreen,
+    Create: NoScreen,
+    MyProjects: MyProjectsScreen,
+    Profile: isLoggedIn ? MyProfileScreen : GuestProfileScreen,
+  };
 
   return (
     <Tab.Navigator
@@ -92,54 +100,25 @@ function ContentTabs() {
         tabBarStyle: { backgroundColor: "#FFFFFF", borderTopColor: colors.border },
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeFeedScreen}
-        options={{
-          tabBarLabel: "Inicio",
-          tabBarIcon: ({ color }) => <Feather name="home" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Explore"
-        component={ExploreScreen}
-        options={{
-          tabBarLabel: "Explorar",
-          tabBarIcon: ({ color }) => <Feather name="compass" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Create"
-        component={NoScreen}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            e.preventDefault();
-            navigation.navigate(isLoggedIn ? "CreateProject" : "AccountRequired");
-          },
-        })}
-        options={{
-          tabBarLabel: "Crear",
-          tabBarAccessibilityLabel: "Crear proyecto",
-          tabBarButtonTestID: "create-project-tab",
-          tabBarIcon: ({ color }) => <Feather name="plus-circle" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="MyProjects"
-        component={MyProjectsScreen}
-        options={{
-          tabBarLabel: "Mis Proyectos",
-          tabBarIcon: ({ color }) => <Feather name="bookmark" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={isLoggedIn ? MyProfileScreen : GuestProfileScreen}
-        options={{
-          tabBarLabel: "Mi Perfil",
-          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
-        }}
-      />
+      {APP_TABS.map((tab) => (
+        <Tab.Screen
+          key={tab.name}
+          name={tab.name}
+          component={TAB_SCREENS[tab.name]}
+          listeners={tab.name === "Create" ? ({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              openCreate(navigation, isLoggedIn);
+            },
+          }) : undefined}
+          options={{
+            tabBarLabel: tab.label,
+            tabBarAccessibilityLabel: tab.name === "Create" ? "Crear proyecto" : undefined,
+            tabBarButtonTestID: tab.name === "Create" ? "create-project-tab" : undefined,
+            tabBarIcon: ({ color }) => <Feather name={tab.icon} size={24} color={color} />,
+          }}
+        />
+      ))}
     </Tab.Navigator>
   );
 }

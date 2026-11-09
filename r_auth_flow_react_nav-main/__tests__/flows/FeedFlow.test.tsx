@@ -107,6 +107,22 @@ describe("Project feed", () => {
         expect(tables.solicitud[0]).toMatchObject({ proyecto_id: "p1", usuario_id: "ana", usuario_nombre: "Ana", rol: "Diseño UI/UX", estado: "pendiente" });
     });
 
+    it("shows the tab bar on the project detail and switches tabs from it", async () => {
+        const tables: Record<string, any[]> = { proyecto: [project], Usuario: [profileRow("ana", "Ana")], comentario: [], solicitud: [] };
+        globalThis.fetch = fakeRoble("ana", tables) as unknown as typeof fetch;
+        const utils = renderApp();
+        const { getByTestId, queryByTestId } = utils;
+        await loginAs(utils);
+
+        await act(async () => fireEvent.press(getByTestId("project-row-p1")));
+        await waitFor(() => expect(getByTestId("app-tab-bar")).toBeTruthy());
+        expect(getByTestId("app-tab-Home").props.accessibilityState).toMatchObject({ selected: true });
+
+        await act(async () => fireEvent.press(getByTestId("app-tab-Profile")));
+        await waitFor(() => expect(getByTestId("my-profile-screen")).toBeTruthy());
+        await waitFor(() => expect(queryByTestId("project-detail-screen")).toBeNull());
+    });
+
     it("lets the creator accept a pending request and see the new member", async () => {
         const request = { _id: "s1", proyecto_id: "p1", usuario_id: "ana", usuario_nombre: "Ana", rol: "Diseño UI/UX", mensaje: "Hola", estado: "pendiente", created_at: "2026-08-11T00:00:00.000Z" };
         const tables: Record<string, any[]> = {
