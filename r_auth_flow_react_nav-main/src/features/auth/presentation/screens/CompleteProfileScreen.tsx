@@ -6,7 +6,7 @@ import AuthSurface from "../components/AuthSurface";
 
 export default function CompleteProfileScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface>
+    <AuthSurface scroll>
       <View style={{ flex: 1 }} testID="complete-profile-screen">
         <AccountPrompt
           icon="pencil"

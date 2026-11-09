@@ -7,7 +7,7 @@ import AuthSurface from "../components/AuthSurface";
 
 export default function GuestProfileScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface>
+    <AuthSurface scroll>
       <Text style={styles.title} testID="guest-profile-screen">Mi perfil</Text>
       <AccountPrompt
         title="Aún no tienes una cuenta"

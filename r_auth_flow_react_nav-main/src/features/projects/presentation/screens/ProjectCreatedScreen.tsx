@@ -10,7 +10,7 @@ export default function ProjectCreatedScreen({ navigation, route }: { navigation
   const project: Project = route.params.project;
 
   return (
-    <AuthSurface>
+    <AuthSurface scroll>
       <View style={styles.container} testID="project-created-screen">
         <View style={styles.check}>
           <MaterialCommunityIcons name="check" size={64} color="#FFFFFF" />

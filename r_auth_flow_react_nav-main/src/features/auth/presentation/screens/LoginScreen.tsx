@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -46,11 +44,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
   };
 
   return (
-    <AuthSurface>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.keyboard}
-      >
+    <AuthSurface scroll>
         <View testID="login-screen" style={styles.container}>
           <AuthBrand />
           <View style={styles.heading}>
@@ -118,13 +112,11 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
             <View style={styles.line} />
           </View>
         </View>
-      </KeyboardAvoidingView>
     </AuthSurface>
   );
 }
 
 const styles = StyleSheet.create({
-  keyboard: { flex: 1 },
   container: { flex: 1, paddingTop: 48 },
   heading: { marginTop: 18, marginBottom: 27 },
   eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },

@@ -8,7 +8,7 @@ import AuthSurface from "../components/AuthSurface";
 // Shown when a guest tries something that needs an account (crear o postularse a un proyecto).
 export default function AccountRequiredScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface>
+    <AuthSurface scroll>
       <View style={styles.brand} testID="account-required-screen">
         <AuthBrand />
       </View>

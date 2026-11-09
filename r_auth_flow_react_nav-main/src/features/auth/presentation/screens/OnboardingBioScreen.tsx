@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { ui } from "@/src/features/projects/presentation/components/projectUi";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
@@ -13,9 +13,7 @@ export default function OnboardingBioScreen({ navigation }: { navigation: any })
   React.useEffect(() => setBio(profile.infoAdicional), [profile.infoAdicional]);
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}>
       <OnboardingLayout step={4} pending={{ infoAdicional: bio }} navigation={navigation}>
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={styles.heading}>
             <Text style={styles.title}>Información adicional</Text>
             <Text style={styles.subtitle}>Esto nos ayudará a personalizar tu experiencia</Text>
@@ -36,14 +34,11 @@ export default function OnboardingBioScreen({ navigation }: { navigation: any })
               navigation.navigate("OnboardingSuccess");
             }}
           />
-        </ScrollView>
       </OnboardingLayout>
-    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
   heading: { alignItems: "center", marginTop: 32, marginBottom: 22 },
   title: { color: "#211832", fontSize: 32, fontWeight: "800", textAlign: "center" },
   subtitle: { color: "#756A8E", fontSize: 15, fontWeight: "600", marginTop: 7, textAlign: "center" },

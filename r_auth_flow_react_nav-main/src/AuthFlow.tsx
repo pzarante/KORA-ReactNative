@@ -47,6 +47,9 @@ import EditProfileScreen from "./features/auth/presentation/screens/EditProfileS
 import MyProfileScreen from "./features/auth/presentation/screens/MyProfileScreen";
 
 const Stack = createStackNavigator();
+// "float" stops the web build from growing each screen past the window and scrolling the whole page,
+// which pushed bottom bars (e.g. ProjectDetail's tab bar) out of view. Headers are hidden, so phones look the same.
+const stackOptions = { headerShown: false, headerMode: "float" } as const;
 const Tab = createBottomTabNavigator();
 
 // The "+" tab never shows a screen: pressing it opens the create-project flow over the tabs.
@@ -64,7 +67,7 @@ const publicFeedScreens = [
 function CreateProjectFlow() {
   return (
     <CreateProjectProvider>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={stackOptions}>
         <Stack.Screen name="CreateProjectIntro" component={CreateProjectIntroScreen} />
         <Stack.Screen name="ProjectStage" component={ProjectStageScreen} />
         <Stack.Screen name="ProjectBasicInfo" component={ProjectBasicInfoScreen} />
@@ -130,7 +133,7 @@ function AuthenticatedStack() {
     <ProductProvider>
       <Stack.Navigator
         initialRouteName={needsOnboarding ? "OnboardingName" : "App"}
-        screenOptions={{ headerShown: false }}
+        screenOptions={stackOptions}
       >
         <Stack.Screen name="App" component={ContentTabs} />
         <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
@@ -174,7 +177,7 @@ export default function AuthFlow() {
   const { isLoggedIn } = useAuth();
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={stackOptions}>
       {isLoggedIn ? (
         <Stack.Screen name="Authenticated" component={AuthenticatedStack} />
       ) : (

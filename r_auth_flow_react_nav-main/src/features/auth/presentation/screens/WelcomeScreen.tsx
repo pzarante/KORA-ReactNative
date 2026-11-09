@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-native';
 
 export default function WelcomeScreen({ navigation }: { navigation: any }) {
   return (
-    <SafeAreaView testID="welcome-screen" style={styles.container}>
+    <SafeAreaView testID="welcome-screen" style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.container} alwaysBounceVertical={false} showsVerticalScrollIndicator={false}>
       {/* Logo de KORA */}
       <View style={styles.logoContainer}>
         <Text style={styles.logoText}>KORA</Text>
@@ -51,14 +52,16 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
           <Text style={styles.guestText}>Ingresar como invitado</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#FFFFFF' },
+  // flexGrow: fills the screen like before, and scrolls only on phones too short for it.
   container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingHorizontal: 24,

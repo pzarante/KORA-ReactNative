@@ -8,7 +8,7 @@ import { colors, ui } from "../components/projectUi";
 
 export default function CreateProjectIntroScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface>
+    <AuthSurface scroll>
       <View style={styles.container} testID="create-project-intro">
         <View style={styles.brand}>
           <AuthBrand />

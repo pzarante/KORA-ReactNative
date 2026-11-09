@@ -4,10 +4,9 @@ import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "r
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AppTabBar from "@/src/AppTabBar";
-import AuthBrand from "@/src/features/auth/presentation/components/AuthBrand";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project, PROJECT_STAGES } from "../../domain/entities/Project";
-import { Initial, ProjectIcon, Tags, useFocusLoad, useProjectDS } from "../components/feed";
+import { Initial, ProjectIcon, RoundButton, Tags, TopBar, useFocusLoad, useProjectDS } from "../components/feed";
 import { colors, ui } from "../components/projectUi";
 
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -59,13 +58,10 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.container} testID="project-detail-screen">
       <View style={styles.topBar}>
-        <TouchableOpacity accessibilityLabel="Volver" onPress={() => navigation.goBack()} style={styles.roundButton}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
-        </TouchableOpacity>
-        <AuthBrand />
-        <TouchableOpacity accessibilityLabel="Ir al inicio" onPress={() => navigation.popTo("App")} style={styles.roundButton}>
-          <MaterialCommunityIcons name="home-variant-outline" size={24} color={colors.text} />
-        </TouchableOpacity>
+        <TopBar
+          onBack={() => navigation.goBack()}
+          right={<RoundButton icon="home-variant-outline" label="Ir al inicio" onPress={() => navigation.popTo("App")} />}
+        />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -194,26 +190,25 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FFFFFF" },
   flex: { flex: 1 },
-  topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 8 },
-  roundButton: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
-  content: { padding: 20, gap: 16 },
+  topBar: { paddingHorizontal: 24 },
+  content: { padding: 24, gap: 16 },
   hero: { flexDirection: "row", gap: 16 },
   heroText: { flex: 1 },
-  name: { color: colors.text, fontSize: 30, fontWeight: "800" },
-  description: { color: colors.muted, fontSize: 15, marginTop: 6, lineHeight: 21 },
-  row: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18 },
+  name: { color: colors.text, fontSize: 26, lineHeight: 34, fontWeight: "800", letterSpacing: -0.5 },
+  description: { color: colors.muted, fontSize: 15, marginTop: 6, lineHeight: 22 },
+  row: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
   small: { color: colors.muted, fontSize: 13 },
   strong: { color: colors.text, fontSize: 17, fontWeight: "800", marginTop: 2 },
   dots: { flexDirection: "row", gap: 4 },
   dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 1.5, borderColor: "#B9AEDA" },
   dotActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   divider: { width: 1, alignSelf: "stretch", backgroundColor: colors.border },
-  section: { flexDirection: "row", gap: 14, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18 },
-  sectionIcon: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
+  section: { flexDirection: "row", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
+  sectionIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
   sectionBody: { flex: 1, gap: 8 },
-  sectionTitle: { color: colors.text, fontSize: 20, fontWeight: "800" },
+  sectionTitle: { color: colors.text, fontSize: 18, lineHeight: 24, fontWeight: "700" },
   subTitle: { color: colors.text, fontSize: 15, fontWeight: "800" },
-  body: { color: colors.muted, fontSize: 15, lineHeight: 21 },
+  body: { color: colors.muted, fontSize: 14, lineHeight: 20 },
   separator: { height: 1, backgroundColor: colors.border, marginVertical: 4 },
   link: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.soft, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
   linkText: { flex: 1, color: colors.text, fontSize: 14 },
@@ -222,8 +217,9 @@ const styles = StyleSheet.create({
   more: { color: colors.primary, fontWeight: "800", marginLeft: 4 },
   pill: { flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1.5, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginLeft: "auto" },
   pillText: { color: colors.primary, fontSize: 14, fontWeight: "800" },
-  commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18 },
-  commentsTitle: { flex: 1, color: colors.text, fontSize: 18, fontWeight: "800" },
-  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.border },
+  commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
+  commentsTitle: { flex: 1, color: colors.text, fontSize: 18, lineHeight: 24, fontWeight: "700" },
+  // No top border: the tab bar right below already draws one.
+  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 24, paddingVertical: 12 },
   status: { flex: 1, color: colors.primary, fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },
 });

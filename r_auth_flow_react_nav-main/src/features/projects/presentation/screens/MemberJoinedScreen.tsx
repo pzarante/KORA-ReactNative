@@ -10,7 +10,7 @@ export default function MemberJoinedScreen({ navigation, route }: { navigation: 
   const { request, project }: { request: JoinRequest; project: Project } = route.params;
 
   return (
-    <AuthSurface>
+    <AuthSurface scroll>
       <View style={styles.top}>
         <RoundButton icon="home-variant-outline" label="Ir al inicio" color={colors.text} onPress={() => navigation.popTo("App")} />
       </View>

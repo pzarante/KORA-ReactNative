@@ -8,7 +8,7 @@ import { colors, ui } from "../components/projectUi";
 
 export default function RequestSentScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface>
+    <AuthSurface scroll>
       <TopBar right={<RoundButton icon="home-variant-outline" label="Ir al inicio" color={colors.text} onPress={() => navigation.popTo("App", { screen: "Home" })} />} />
       <View style={styles.container} testID="request-sent-screen">
         <View style={styles.check}>

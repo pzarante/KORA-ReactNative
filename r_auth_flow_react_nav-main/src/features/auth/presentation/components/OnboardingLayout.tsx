@@ -19,7 +19,7 @@ type StepProps = {
 
 export default function OnboardingLayout({ children, ...stepProps }: { children: React.ReactNode } & Partial<StepProps>) {
   return (
-    <AuthSurface>
+    <AuthSurface scroll>
       <View style={[styles.container, stepProps.step ? styles.withProgress : undefined]}>
         {stepProps.step ? <StepProgress {...(stepProps as StepProps)} /> : null}
         <AuthBrand />
