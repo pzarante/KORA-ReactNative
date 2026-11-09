@@ -2,13 +2,14 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { RoundButton, TopBar } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function RequestSentScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <TopBar right={<RoundButton icon="home-variant-outline" label="Ir al inicio" color={colors.text} onPress={() => navigation.popTo("App", { screen: "Home" })} />} />
       <View style={styles.container} testID="request-sent-screen">
         <View style={styles.check}>
@@ -24,7 +25,7 @@ export default function RequestSentScreen({ navigation }: { navigation: any }) {
       <TouchableOpacity onPress={() => navigation.popTo("App", { screen: "MyProjects" })} style={[ui.outlineButton, styles.button]}>
         <Text style={ui.outlineButtonText}>Ver mis solicitudes</Text>
       </TouchableOpacity>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

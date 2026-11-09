@@ -4,7 +4,9 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-nativ
 
 import IconPickerModal from "../components/IconPickerModal";
 import ProjectStepLayout from "../components/ProjectStepLayout";
-import { colors, PROJECT_ICONS, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
+import { PROJECT_ICONS } from "@/src/features/projects/presentation/components/projectIcons";
 import { useCreateProject } from "../context/createProjectContext";
 
 const MAX_DESCRIPTION = 150;

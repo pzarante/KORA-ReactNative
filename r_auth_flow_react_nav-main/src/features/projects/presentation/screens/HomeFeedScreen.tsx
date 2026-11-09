@@ -1,10 +1,10 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Initial, memberCount, Message, ProjectRow, useFeed } from "../components/feed";
-import { colors } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
 
 const RECENT = 10;
 
@@ -13,7 +13,7 @@ export default function HomeFeedScreen({ navigation }: { navigation: any }) {
   const { data: feed, error } = useFeed();
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <ScrollView contentContainerStyle={styles.content} testID="home-screen" showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           {isLoggedIn ? (
@@ -45,7 +45,7 @@ export default function HomeFeedScreen({ navigation }: { navigation: any }) {
           ))}
         </View>
       </ScrollView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

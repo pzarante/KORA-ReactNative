@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { colors, ui } from "./projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 type Props = {
   title: string;

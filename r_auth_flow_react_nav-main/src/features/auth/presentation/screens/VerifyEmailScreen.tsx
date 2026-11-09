@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AuthBrand from "../components/AuthBrand";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
 import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
-import AuthSurface from "../components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
 
 // Only reached with EXPO_PUBLIC_ROBLE_SIGNUP_ENDPOINT=signup (real e-mails): Roble mails a code after signup.
@@ -33,10 +33,10 @@ export default function VerifyEmailScreen({ navigation, route }: { navigation: a
   };
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.keyboard}>
         <View testID="verify-email-screen" style={styles.container}>
-          <AuthBrand />
+          <BrandLogo />
           <View style={styles.heading}>
             <Text style={styles.eyebrow}>VERIFICA TU CORREO</Text>
             <Text style={styles.title}>Ingresa el código</Text>
@@ -88,7 +88,7 @@ export default function VerifyEmailScreen({ navigation, route }: { navigation: a
           </View>
         </View>
       </KeyboardAvoidingView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

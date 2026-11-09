@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function AuthSurface({ children }: { children: React.ReactNode }) {
+export default function ScreenSurface({ children }: { children: React.ReactNode }) {
   return (
     <SafeAreaView style={styles.surface}>
       <StatusBar style="dark" backgroundColor="#FFFFFF" />

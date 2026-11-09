@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AuthBrand from "../components/AuthBrand";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
 import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
-import AuthSurface from "../components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
 
 export default function SignupScreen({ navigation }: { navigation: any }) {
@@ -43,13 +43,13 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
   };
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.keyboard}
       >
         <View testID="signup-screen" style={styles.container}>
-          <AuthBrand />
+          <BrandLogo />
           <View style={styles.heading}>
             <Text style={styles.eyebrow}>REGÍSTRATE</Text>
             <Text style={styles.title}>Crear Cuenta</Text>
@@ -128,7 +128,7 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
       </KeyboardAvoidingView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

@@ -2,15 +2,16 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { Project } from "../../domain/entities/Project";
-import { colors, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function ProjectCreatedScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <View style={styles.container} testID="project-created-screen">
         <View style={styles.check}>
           <MaterialCommunityIcons name="check" size={64} color="#FFFFFF" />
@@ -33,7 +34,7 @@ export default function ProjectCreatedScreen({ navigation, route }: { navigation
           </TouchableOpacity>
         </View>
       </View>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

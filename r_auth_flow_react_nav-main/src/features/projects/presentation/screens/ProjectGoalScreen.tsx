@@ -2,7 +2,8 @@ import React from "react";
 import { Text, TextInput, View } from "react-native";
 
 import ProjectStepLayout from "../components/ProjectStepLayout";
-import { colors, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 import { useCreateProject } from "../context/createProjectContext";
 
 export default function ProjectGoalScreen() {

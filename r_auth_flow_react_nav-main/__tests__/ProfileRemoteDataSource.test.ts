@@ -1,4 +1,4 @@
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { ProfileRemoteDataSourceImp } from "@/src/features/auth/data/datasources/ProfileRemoteDataSourceImp";
 
 const jwt = `x.${btoa(JSON.stringify({ sub: "user-1" })).replace(/=+$/, "")}.y`;

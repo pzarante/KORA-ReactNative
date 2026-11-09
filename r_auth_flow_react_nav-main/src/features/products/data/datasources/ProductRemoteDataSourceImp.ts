@@ -1,5 +1,5 @@
-import { ILocalPreferences } from "@/src/core/iLocalPreferences";
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { ILocalPreferences } from "@/src/shared/storage/iLocalPreferences";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 import { NewProduct, Product } from "../../domain/entities/Product";
 import { ProductDataSource } from "./ProductDataSource";

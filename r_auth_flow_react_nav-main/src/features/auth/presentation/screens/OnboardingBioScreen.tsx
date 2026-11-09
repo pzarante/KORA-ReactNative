@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { ui } from "@/src/features/projects/presentation/components/projectUi";
+import { ui } from "@/src/shared/ui/styles";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import OnboardingLayout from "../components/OnboardingLayout";
 import { useAuth } from "../context/authContext";

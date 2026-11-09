@@ -4,7 +4,8 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-nativ
 
 import AddRolesSheet from "../components/AddRolesSheet";
 import ProjectStepLayout from "../components/ProjectStepLayout";
-import { colors, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 import { useCreateProject } from "../context/createProjectContext";
 
 const URL_PATTERN = /^https?:\/\/\S+\.\S+$/i;

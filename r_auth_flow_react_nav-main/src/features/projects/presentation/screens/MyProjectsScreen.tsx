@@ -2,11 +2,11 @@ import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import AccountPrompt from "@/src/features/auth/presentation/components/AccountPrompt";
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project } from "../../domain/entities/Project";
 import { memberCount, Message, ProjectRow, useFeed } from "../components/feed";
-import { colors } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
 
 const STATUS = { pendiente: "Pendiente", rechazada: "Rechazada", aceptada: "Aceptada" };
 
@@ -43,7 +43,7 @@ function Logged({ navigation }: { navigation: any }) {
 export default function MyProjectsScreen({ navigation }: { navigation: any }) {
   const { isLoggedIn } = useAuth();
   return (
-    <AuthSurface>
+    <ScreenSurface>
       {isLoggedIn ? (
         <Logged navigation={navigation} />
       ) : (
@@ -58,7 +58,7 @@ export default function MyProjectsScreen({ navigation }: { navigation: any }) {
           />
         </View>
       )}
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

@@ -3,21 +3,10 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useAuth } from "./features/auth/presentation/context/authContext";
-import { colors } from "./features/projects/presentation/components/projectUi";
+import { useAuth } from "@/src/features/auth/presentation/context/authContext";
+import { colors } from "@/src/shared/ui/tokens";
 
-/** The bottom tabs, shared by the tab navigator and the copy shown on screens stacked over it. */
-export const APP_TABS = [
-  { name: "Home", label: "Inicio", icon: "home" },
-  { name: "Explore", label: "Explorar", icon: "compass" },
-  { name: "Create", label: "Crear", icon: "plus-circle" },
-  { name: "MyProjects", label: "Mis Proyectos", icon: "bookmark" },
-  { name: "Profile", label: "Mi Perfil", icon: "user" },
-] as const;
-
-/** "Crear" never shows a tab: it opens the create-project flow, or asks guests for an account. */
-export const openCreate = (navigation: any, isLoggedIn: boolean) =>
-  navigation.navigate(isLoggedIn ? "CreateProject" : "AccountRequired");
+import { APP_TABS, openCreate } from "./tabs";
 
 /** Same look as the tab bar, for stack screens (e.g. ProjectDetail) that cover the real one. */
 export default function AppTabBar({ navigation }: { navigation: any }) {

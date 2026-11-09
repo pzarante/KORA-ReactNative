@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-export default function AuthBrand() {
+export default function BrandLogo() {
   return (
     <View accessibilityLabel="Kora" style={styles.logo}>
       <View style={styles.stem} />

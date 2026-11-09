@@ -2,10 +2,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
-import AuthBrand from "@/src/features/auth/presentation/components/AuthBrand";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
 import { commentCount, memberCount, Message, useFeed } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 const NEW_DAYS = 3;
 const ALL = "Todos";
@@ -23,9 +24,9 @@ export default function ExploreScreen({ navigation }: { navigation: any }) {
   });
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <View style={styles.brand}>
-        <AuthBrand />
+        <BrandLogo />
       </View>
       <Text style={styles.title}>Explorar</Text>
       <View style={styles.segment}>
@@ -104,7 +105,7 @@ export default function ExploreScreen({ navigation }: { navigation: any }) {
           </View>
         </ScrollView>
       )}
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

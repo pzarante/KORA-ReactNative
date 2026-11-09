@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Appbar, Surface, Text } from 'react-native-paper';
-import { useAuth } from '../auth/presentation/context/authContext';
+import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 
 
-export default function SettingScreen() {
+export default function SettingsScreen() {
     const { logout } = useAuth();
     return (
         <Surface style={styles.container}>

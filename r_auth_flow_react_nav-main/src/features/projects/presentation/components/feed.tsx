@@ -5,14 +5,15 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useDI } from "@/src/core/di/DIProvider";
 import { TOKENS } from "@/src/core/di/tokens";
-import AuthBrand from "@/src/features/auth/presentation/components/AuthBrand";
-import { ProjectDataSource } from "../../data/datasources/ProjectDataSource";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
 import { JoinRequest, Project, ProjectComment } from "../../domain/entities/Project";
-import { colors, ui } from "./projectUi";
+import { ProjectUseCases } from "../../domain/use-cases/ProjectUseCases";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
-export function useProjectDS() {
+export function useProjectUseCases() {
   const di = useDI();
-  return useMemo(() => di.resolve<ProjectDataSource>(TOKENS.ProjectDataSource), [di]);
+  return useMemo(() => di.resolve<ProjectUseCases>(TOKENS.ProjectUseCases), [di]);
 }
 
 /** Runs `load` every time the screen gains focus, so lists refresh after creating or answering something. */
@@ -37,18 +38,18 @@ export type Feed = { projects: Project[]; requests: JoinRequest[]; comments: Pro
 
 /** Everything the lists need, including the counters for members and comments. */
 export function useFeed() {
-  const ds = useProjectDS();
+  const useCases = useProjectUseCases();
   return useFocusLoad<Feed>(
     async () => {
       const [projects, requests, comments, userId] = await Promise.all([
-        ds.listProjects(),
-        ds.listRequests(),
-        ds.listComments(),
-        ds.currentUserId(),
+        useCases.listProjects(),
+        useCases.listRequests(),
+        useCases.listComments(),
+        useCases.currentUserId(),
       ]);
       return { projects, requests, comments, userId };
     },
-    [ds],
+    [useCases],
   );
 }
 
@@ -89,7 +90,7 @@ export function TopBar({ onBack, right }: { onBack?: () => void; right?: React.R
   return (
     <View style={styles.topBar}>
       {onBack ? <RoundButton icon="arrow-left" label="Volver" onPress={onBack} /> : <View style={styles.spacer} />}
-      <AuthBrand />
+      <BrandLogo />
       {right ?? <View style={styles.spacer} />}
     </View>
   );

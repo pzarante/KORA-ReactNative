@@ -1,16 +1,17 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { JoinRequest, Project } from "../../domain/entities/Project";
 import { Initial, RoundButton } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function MemberJoinedScreen({ navigation, route }: { navigation: any; route: any }) {
   const { request, project }: { request: JoinRequest; project: Project } = route.params;
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <View style={styles.top}>
         <RoundButton icon="home-variant-outline" label="Ir al inicio" color={colors.text} onPress={() => navigation.popTo("App")} />
       </View>
@@ -33,7 +34,7 @@ export default function MemberJoinedScreen({ navigation, route }: { navigation: 
           </TouchableOpacity>
         </View>
       </View>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

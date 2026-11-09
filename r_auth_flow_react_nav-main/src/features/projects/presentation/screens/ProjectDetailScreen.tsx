@@ -3,12 +3,13 @@ import React from "react";
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import AppTabBar from "@/src/AppTabBar";
-import AuthBrand from "@/src/features/auth/presentation/components/AuthBrand";
+import AppTabBar from "@/src/navigation/AppTabBar";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project, PROJECT_STAGES } from "../../domain/entities/Project";
-import { Initial, ProjectIcon, Tags, useFocusLoad, useProjectDS } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { Initial, ProjectIcon, Tags, useFocusLoad, useProjectUseCases } from "../components/feed";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
@@ -36,13 +37,13 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   const stageIndex = PROJECT_STAGES.indexOf(project.etapa);
   const creador = project.creadorNombre || "Tú";
   const { isLoggedIn, profile } = useAuth();
-  const ds = useProjectDS();
+  const useCases = useProjectUseCases();
   const { data } = useFocusLoad(async () => {
-    const userId = await ds.currentUserId();
+    const userId = await useCases.currentUserId();
     // Guests can't read Roble, so they only see the creator.
-    const requests = userId && project.id ? await ds.listRequests({ proyectoId: project.id }) : [];
+    const requests = userId && project.id ? await useCases.listRequests({ proyectoId: project.id }) : [];
     return { userId, requests };
-  }, [ds, project.id]);
+  }, [useCases, project.id]);
 
   const userId = data?.userId ?? null;
   const isCreator = !!userId && userId === project.creadorId;
@@ -62,7 +63,7 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
         <TouchableOpacity accessibilityLabel="Volver" onPress={() => navigation.goBack()} style={styles.roundButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <AuthBrand />
+        <BrandLogo />
         <TouchableOpacity accessibilityLabel="Ir al inicio" onPress={() => navigation.popTo("App")} style={styles.roundButton}>
           <MaterialCommunityIcons name="home-variant-outline" size={24} color={colors.text} />
         </TouchableOpacity>

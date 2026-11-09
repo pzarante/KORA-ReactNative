@@ -1,4 +1,4 @@
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
 import { UserProfile } from "../../domain/entities/UserProfile";
 import { ProfileDataSource } from "./ProfileDataSource";

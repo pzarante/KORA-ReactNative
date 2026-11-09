@@ -1,4 +1,4 @@
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
 import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 import { JoinRequest, NewProject, Project, ProjectComment, RequestStatus } from "../../domain/entities/Project";

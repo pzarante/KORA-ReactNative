@@ -2,11 +2,11 @@ import React from "react";
 import { View } from "react-native";
 
 import AccountPrompt from "../components/AccountPrompt";
-import AuthSurface from "../components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 
 export default function CompleteProfileScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <View style={{ flex: 1 }} testID="complete-profile-screen">
         <AccountPrompt
           icon="pencil"
@@ -18,6 +18,6 @@ export default function CompleteProfileScreen({ navigation }: { navigation: any 
           onSecondary={() => navigation.goBack()}
         />
       </View>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }

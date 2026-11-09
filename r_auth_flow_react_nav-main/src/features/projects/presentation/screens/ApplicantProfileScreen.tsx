@@ -3,19 +3,19 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 
 import { useDI } from "@/src/core/di/DIProvider";
 import { TOKENS } from "@/src/core/di/tokens";
-import { ProfileDataSource } from "@/src/features/auth/data/datasources/ProfileDataSource";
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import { ProfileUseCases } from "@/src/features/auth/domain/use-cases/ProfileUseCases";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import ProfileView from "@/src/features/auth/presentation/components/ProfileView";
 import { JoinRequest, Project, RequestStatus } from "../../domain/entities/Project";
-import { TopBar, useFeed, useFocusLoad, useProjectDS } from "../components/feed";
-import { ui } from "../components/projectUi";
+import { TopBar, useFeed, useFocusLoad, useProjectUseCases } from "../components/feed";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function ApplicantProfileScreen({ navigation, route }: { navigation: any; route: any }) {
   const { request, project }: { request: JoinRequest; project: Project } = route.params;
   const di = useDI();
-  const profileDS = useMemo(() => di.resolve<ProfileDataSource>(TOKENS.ProfileDataSource), [di]);
-  const ds = useProjectDS();
-  const { data: profile } = useFocusLoad(() => profileDS.getProfile(request.usuarioId), [profileDS, request.usuarioId]);
+  const profileUseCases = useMemo(() => di.resolve<ProfileUseCases>(TOKENS.ProfileUseCases), [di]);
+  const projectUseCases = useProjectUseCases();
+  const { data: profile } = useFocusLoad(() => profileUseCases.getProfile(request.usuarioId), [profileUseCases, request.usuarioId]);
   const { data: feed } = useFeed();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export default function ApplicantProfileScreen({ navigation, route }: { navigati
     setSaving(true);
     setError(null);
     try {
-      await ds.setRequestStatus(request.id, estado);
+      await projectUseCases.setRequestStatus(request.id, estado);
       if (estado === "aceptada") navigation.replace("MemberJoined", { request, project });
       else navigation.goBack();
     } catch (err: any) {
@@ -34,7 +34,7 @@ export default function ApplicantProfileScreen({ navigation, route }: { navigati
   };
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <TopBar onBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.content} testID="applicant-profile-screen">
         <ProfileView
@@ -58,7 +58,7 @@ export default function ApplicantProfileScreen({ navigation, route }: { navigati
           <Text style={ui.primaryButtonText}>Aceptar</Text>
         </TouchableOpacity>
       </View>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

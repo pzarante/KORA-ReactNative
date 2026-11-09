@@ -1,5 +1,5 @@
-import { ILocalPreferences } from "@/src/core/iLocalPreferences";
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { ILocalPreferences } from "@/src/shared/storage/iLocalPreferences";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 
 export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {

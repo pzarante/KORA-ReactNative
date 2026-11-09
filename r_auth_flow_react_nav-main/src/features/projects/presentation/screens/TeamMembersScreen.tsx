@@ -2,17 +2,18 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { Project } from "../../domain/entities/Project";
-import { Initial, TopBar, useFocusLoad, useProjectDS } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { Initial, TopBar, useFocusLoad, useProjectUseCases } from "../components/feed";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function TeamMembersScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
-  const ds = useProjectDS();
+  const useCases = useProjectUseCases();
   const { data: accepted, error } = useFocusLoad(
-    async () => ((await ds.currentUserId()) ? (await ds.listRequests({ proyectoId: project.id })).filter((r) => r.estado === "aceptada") : []),
-    [ds, project.id],
+    async () => ((await useCases.currentUserId()) ? (await useCases.listRequests({ proyectoId: project.id })).filter((r) => r.estado === "aceptada") : []),
+    [useCases, project.id],
   );
   const members = [
     { name: project.creadorNombre || "Creador", rol: "", creator: true },
@@ -20,7 +21,7 @@ export default function TeamMembersScreen({ navigation, route }: { navigation: a
   ];
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <TopBar onBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.content} testID="team-members-screen">
         <Text style={styles.title}>Equipo del proyecto</Text>
@@ -52,7 +53,7 @@ export default function TeamMembersScreen({ navigation, route }: { navigation: a
           </View>
         ))}
       </ScrollView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

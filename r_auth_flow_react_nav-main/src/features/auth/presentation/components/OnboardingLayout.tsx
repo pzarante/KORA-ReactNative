@@ -3,8 +3,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { profileCompletion } from "../../domain/entities/UserProfile";
 import { ProfileDraft, useAuth } from "../context/authContext";
-import AuthBrand from "./AuthBrand";
-import AuthSurface from "./AuthSurface";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import ProfileProgress from "./ProfileProgress";
 
 export const ONBOARDING_STEPS = 4;
@@ -19,14 +19,14 @@ type StepProps = {
 
 export default function OnboardingLayout({ children, ...stepProps }: { children: React.ReactNode } & Partial<StepProps>) {
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <View style={[styles.container, stepProps.step ? styles.withProgress : undefined]}>
         {stepProps.step ? <StepProgress {...(stepProps as StepProps)} /> : null}
-        <AuthBrand />
+        <BrandLogo />
         {children}
         {stepProps.step ? <SkipButton {...(stepProps as StepProps)} /> : null}
       </View>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

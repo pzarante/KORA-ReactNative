@@ -3,7 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { PROJECT_STAGES } from "../../domain/entities/Project";
 import ProjectStepLayout from "../components/ProjectStepLayout";
-import { colors } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
 import { useCreateProject } from "../context/createProjectContext";
 
 export default function ProjectStageScreen() {

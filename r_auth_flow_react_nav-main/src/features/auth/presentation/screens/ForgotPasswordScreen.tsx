@@ -11,8 +11,8 @@ import {
   View,
 } from "react-native";
 
-import AuthBrand from "../components/AuthBrand";
-import AuthSurface from "../components/AuthSurface";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
 
 export default function ForgotPasswordScreen({ navigation }: { navigation: any }) {
@@ -42,7 +42,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
   };
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.keyboard}
@@ -53,7 +53,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
           showsVerticalScrollIndicator={false}
         >
           <View testID="forgot-password-screen" style={styles.container}>
-            <AuthBrand />
+            <BrandLogo />
 
             <View style={styles.heading}>
               <Text style={styles.eyebrow}>¿OLVIDASTE TU CONTRASEÑA?</Text>
@@ -144,7 +144,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

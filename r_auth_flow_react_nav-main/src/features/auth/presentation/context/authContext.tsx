@@ -2,13 +2,14 @@ import React, { createContext, useContext, useEffect, useMemo, useRef, useState 
 
 import { useDI } from "@/src/core/di/DIProvider";
 import { TOKENS } from "@/src/core/di/tokens";
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { AuthUser } from "../../domain/entities/AuthUser";
-import { AuthRepository } from "../../domain/repositories/AuthRepository";
-import { canJoinProjects, UserProfile } from "../../domain/entities/UserProfile";
-import { ProfileDataSource } from "../../data/datasources/ProfileDataSource";
+import { canJoinProjects } from "../../domain/entities/UserProfile";
+import { ProfileDraft } from "../../domain/repositories/ProfileRepository";
+import { AuthUseCases } from "../../domain/use-cases/AuthUseCases";
+import { ProfileUseCases } from "../../domain/use-cases/ProfileUseCases";
 
-export type ProfileDraft = Omit<UserProfile, "userId">;
+export type { ProfileDraft };
 
 const emptyProfile: ProfileDraft = {
   nombreCompleto: "",
@@ -45,8 +46,8 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const di = useDI();
 
-  const authRepo = useMemo(() => di.resolve<AuthRepository>(TOKENS.AuthRepo), [di]);
-  const profileDS = useMemo(() => di.resolve<ProfileDataSource>(TOKENS.ProfileDataSource), [di]);
+  const authUseCases = useMemo(() => di.resolve<AuthUseCases>(TOKENS.AuthUseCases), [di]);
+  const profileUseCases = useMemo(() => di.resolve<ProfileUseCases>(TOKENS.ProfileUseCases), [di]);
   const prefs = LocalPreferencesAsyncStorage.getInstance();
 
   const [loggedUser, setLoggedUser] = useState<AuthUser | null>(null);
@@ -61,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearError = () => setError(null);
 
   useEffect(() => {
-    authRepo.getCurrentUser()
+    authUseCases.getCurrentUser()
       .then((user) => {
         setLoggedUser(user);
         setIsLoggedIn(!!user);
@@ -79,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // The local draft can belong to another account, so the saved Roble profile wins once logged in.
   useEffect(() => {
     if (!isLoggedIn) return;
-    profileDS.getProfile()
+    profileUseCases.getProfile()
       .then((saved) => {
         if (saved) {
           const { userId: _userId, ...draft } = saved;
@@ -87,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch(() => {});
-  }, [isLoggedIn, profileDS]);
+  }, [isLoggedIn, profileUseCases]);
 
   const updateProfile = (patch: Partial<ProfileDraft>) => {
     setProfile((current) => {
@@ -102,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const merged = { ...profile, ...patch };
     const completed = { ...merged, onboardingCompletado: canJoinProjects(merged) };
     try {
-      await profileDS.saveProfile(completed);
+      await profileUseCases.saveProfile(completed);
       setProfile(completed);
       await prefs.storeData("profile_draft", completed);
       return true;
@@ -116,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearError();
     try {
       setLoading(true);
-      await authRepo.login(email, password);
+      await authUseCases.login(email, password);
       setNeedsOnboarding(false);
       setIsLoggedIn(true);
     } catch (err: any) {
@@ -130,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearError();
     try {
       setLoading(true);
-      if (await authRepo.signup(email, password)) {
+      if (await authUseCases.signup(email, password)) {
         pendingSignup.current = { email, password };
         return true;
       }
@@ -149,7 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearError();
     try {
       setLoading(true);
-      await authRepo.logout();
+      await authUseCases.logout();
       setIsLoggedIn(false);
       setNeedsOnboarding(false);
     } catch (err: any) {
@@ -163,7 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearError();
     try {
       setLoading(true);
-      await authRepo.forgotPassword(email);
+      await authUseCases.forgotPassword(email);
       return true;
     } catch (err: any) {
       setError(err?.message ?? "No pudimos enviar el enlace. Intenta de nuevo más tarde.");
@@ -177,10 +178,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearError();
     try {
       setLoading(true);
-      await authRepo.validate(email, validationCode);
+      await authUseCases.validate(email, validationCode);
       const pending = pendingSignup.current;
       if (pending?.email === email) {
-        await authRepo.login(email, pending.password);
+        await authUseCases.login(email, pending.password);
         pendingSignup.current = null;
         setNeedsOnboarding(true);
         setIsLoggedIn(true);
@@ -195,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resendCode = async (email: string) => {
     try {
-      await authRepo.resendCode(email);
+      await authUseCases.resendCode(email);
       return null;
     } catch (err: any) {
       return err?.message ?? "No pudimos reenviar el código";
@@ -204,7 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const getLoggedUser = async () => {
     try {
-      return await authRepo.getCurrentUser();
+      return await authUseCases.getCurrentUser();
     } catch {
       return null;
     }
