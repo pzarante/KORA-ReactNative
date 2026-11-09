@@ -8,12 +8,13 @@ import { useAuth } from "../context/authContext";
 
 export default function OnboardingNameScreen({ navigation }: { navigation: any }) {
   const [name, setName] = useState("");
+  const [error, setError] = useState<string>();
   const { profile, updateProfile } = useAuth();
 
   React.useEffect(() => setName(profile.nombreCompleto), [profile.nombreCompleto]);
 
   return (
-    <OnboardingLayout>
+    <OnboardingLayout step={1} pending={{ nombreCompleto: name }} navigation={navigation}>
       <View style={styles.heading}>
         <Text style={styles.title}>¿Cómo te llamas?</Text>
         <Text style={styles.subtitle}>Ingresa tu nombre completo para comenzar</Text>
@@ -21,15 +22,22 @@ export default function OnboardingNameScreen({ navigation }: { navigation: any }
       <AuthField
         icon="account-outline"
         value={name}
-        onChangeText={setName}
-        placeholder="Nombre completo"
+        onChangeText={(text) => {
+          setName(text);
+          setError(undefined);
+        }}
+        placeholder="Nombre completo *"
         autoCapitalize="words"
+        autoComplete="name"
+        error={error}
+        testID="onboarding-name-input"
       />
       <View style={styles.button}>
         <AuthPrimaryButton
           label="Continuar"
+          testID="onboarding-continue"
           onPress={() => {
-            if (!name.trim()) return;
+            if (!name.trim()) return setError("Tu nombre es obligatorio");
             updateProfile({ nombreCompleto: name.trim() });
             navigation.navigate("OnboardingRole");
           }}
@@ -40,7 +48,7 @@ export default function OnboardingNameScreen({ navigation }: { navigation: any }
 }
 
 const styles = StyleSheet.create({
-  heading: { alignItems: "center", marginTop: 45, marginBottom: 22 },
+  heading: { alignItems: "center", marginTop: 32, marginBottom: 22 },
   title: { color: "#211832", fontSize: 32, fontWeight: "800", textAlign: "center" },
   subtitle: { color: "#756A8E", fontSize: 15, fontWeight: "600", marginTop: 7, textAlign: "center" },
   button: { marginTop: 37 },

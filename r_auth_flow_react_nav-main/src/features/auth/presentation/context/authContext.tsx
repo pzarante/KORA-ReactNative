@@ -5,7 +5,7 @@ import { TOKENS } from "@/src/core/di/tokens";
 import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
 import { AuthUser } from "../../domain/entities/AuthUser";
 import { AuthRepository } from "../../domain/repositories/AuthRepository";
-import { UserProfile } from "../../domain/entities/UserProfile";
+import { canJoinProjects, UserProfile } from "../../domain/entities/UserProfile";
 import { ProfileDataSource } from "../../data/datasources/ProfileDataSource";
 
 export type ProfileDraft = Omit<UserProfile, "userId">;
@@ -36,7 +36,8 @@ export type AuthContextType = {
   getLoggedUser: () => Promise<any | null>;
   profile: ProfileDraft;
   updateProfile: (patch: Partial<ProfileDraft>) => void;
-  completeProfile: () => Promise<boolean>;
+  /** Saves the profile (plus `patch`) to Roble; used when finishing, skipping or editing it. */
+  completeProfile: (patch?: Partial<ProfileDraft>) => Promise<boolean>;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -96,9 +97,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const completeProfile = async () => {
+  const completeProfile = async (patch: Partial<ProfileDraft> = {}) => {
     clearError();
-    const completed = { ...profile, onboardingCompletado: true };
+    const merged = { ...profile, ...patch };
+    const completed = { ...merged, onboardingCompletado: canJoinProjects(merged) };
     try {
       await profileDS.saveProfile(completed);
       setProfile(completed);

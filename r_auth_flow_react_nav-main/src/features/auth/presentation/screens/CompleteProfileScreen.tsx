@@ -13,7 +13,7 @@ export default function CompleteProfileScreen({ navigation }: { navigation: any 
           title="Completa tu perfil para unirte"
           text="Para participar en esta iniciativa, necesitas completar la información de tu perfil. Así, otras personas podrán conocerte y colaborar contigo."
           primaryLabel="Completar mi perfil"
-          onPrimary={() => navigation.replace("OnboardingName")}
+          onPrimary={() => navigation.replace("EditProfile")}
           secondaryLabel="Volver al proyecto"
           onSecondary={() => navigation.goBack()}
         />

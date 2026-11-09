@@ -42,6 +42,7 @@ import RequestSentScreen from "./features/projects/presentation/screens/RequestS
 import RequestsScreen from "./features/projects/presentation/screens/RequestsScreen";
 import TeamMembersScreen from "./features/projects/presentation/screens/TeamMembersScreen";
 import CompleteProfileScreen from "./features/auth/presentation/screens/CompleteProfileScreen";
+import EditProfileScreen from "./features/auth/presentation/screens/EditProfileScreen";
 import MyProfileScreen from "./features/auth/presentation/screens/MyProfileScreen";
 
 const Stack = createStackNavigator();
@@ -166,6 +167,7 @@ function AuthenticatedStack() {
         <Stack.Screen name="ApplicantProfile" component={ApplicantProfileScreen} />
         <Stack.Screen name="MemberJoined" component={MemberJoinedScreen} />
         <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen
           name="AddProductScreen"
           component={AddProductScreen}
