@@ -3,8 +3,11 @@ import React from "react";
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import AppTabBar from "@/src/AppTabBar";
 import AuthBrand from "@/src/features/auth/presentation/components/AuthBrand";
+import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project, PROJECT_STAGES } from "../../domain/entities/Project";
+import { Initial, ProjectIcon, Tags, useFocusLoad, useProjectDS } from "../components/feed";
 import { colors, ui } from "../components/projectUi";
 
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -32,9 +35,29 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   const project: Project = route.params.project;
   const stageIndex = PROJECT_STAGES.indexOf(project.etapa);
   const creador = project.creadorNombre || "Tú";
+  const { isLoggedIn, profile } = useAuth();
+  const ds = useProjectDS();
+  const { data } = useFocusLoad(async () => {
+    const userId = await ds.currentUserId();
+    // Guests can't read Roble, so they only see the creator.
+    const requests = userId && project.id ? await ds.listRequests({ proyectoId: project.id }) : [];
+    return { userId, requests };
+  }, [ds, project.id]);
+
+  const userId = data?.userId ?? null;
+  const isCreator = !!userId && userId === project.creadorId;
+  const myRequest = data?.requests.find((r) => r.usuarioId === userId);
+  const members = [creador, ...(data?.requests.filter((r) => r.estado === "aceptada").map((r) => r.usuarioNombre) ?? [])];
+  const pending = data?.requests.filter((r) => r.estado === "pendiente").length ?? 0;
+
+  const askToJoin = () => {
+    if (!isLoggedIn) navigation.navigate("AccountRequired");
+    else if (!profile.onboardingCompletado) navigation.navigate("CompleteProfile");
+    else navigation.navigate("JoinRequest", { project });
+  };
 
   return (
-    <SafeAreaView style={styles.container} testID="project-detail-screen">
+    <SafeAreaView edges={["top", "left", "right"]} style={styles.container} testID="project-detail-screen">
       <View style={styles.topBar}>
         <TouchableOpacity accessibilityLabel="Volver" onPress={() => navigation.goBack()} style={styles.roundButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
@@ -47,23 +70,13 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.hero}>
-          <View style={styles.heroIcon}>
-            <MaterialCommunityIcons name={project.icono as any} size={64} color={colors.primary} />
-          </View>
+          <ProjectIcon icon={project.icono} />
           <View style={styles.heroText}>
             <Text style={styles.name}>{project.nombre}</Text>
             <Text style={styles.description}>{project.descripcion}</Text>
           </View>
         </View>
-        {project.etiquetas.length > 0 ? (
-          <View style={ui.chips}>
-            {project.etiquetas.map((tag, index) => (
-              <View key={tag} style={[ui.chip, index % 2 === 1 && styles.orangeChip]}>
-                <Text style={[ui.chipText, index % 2 === 1 && styles.orangeText]}>{tag}</Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
+        <Tags tags={project.etiquetas} />
 
         <View style={styles.row}>
           <MaterialCommunityIcons name="layers-outline" size={26} color={colors.primary} />
@@ -135,12 +148,45 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
         ) : null}
 
         <Section icon="account-group-outline" title="Equipo del proyecto">
-          <Text style={styles.body}>1 integrante</Text>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{creador.charAt(0).toUpperCase()}</Text>
+          <Text style={styles.body}>{members.length} {members.length === 1 ? "integrante" : "integrantes"}</Text>
+          <View style={styles.teamRow}>
+            {members.slice(0, 4).map((name, index) => (
+              <View key={`${name}-${index}`} style={index > 0 && styles.overlap}>
+                <Initial name={name} />
+              </View>
+            ))}
+            {members.length > 4 ? <Text style={styles.more}>+{members.length - 4}</Text> : null}
+            <TouchableOpacity onPress={() => navigation.navigate("TeamMembers", { project })} style={styles.pill} testID="view-team-button">
+              <Text style={styles.pillText}>Ver equipo</Text>
+              <MaterialCommunityIcons name="arrow-right" size={18} color={colors.primary} />
+            </TouchableOpacity>
           </View>
         </Section>
+
+        <TouchableOpacity onPress={() => navigation.navigate("Comments", { project })} style={styles.commentsRow} testID="view-comments-button">
+          <MaterialCommunityIcons name="comment-text-multiple-outline" size={26} color={colors.primary} />
+          <Text style={styles.commentsTitle}>Comentarios</Text>
+          <Text style={styles.pillText}>Ver comentarios</Text>
+          <MaterialCommunityIcons name="arrow-right" size={20} color={colors.primary} />
+        </TouchableOpacity>
       </ScrollView>
+
+      <View style={styles.footer}>
+        {isCreator ? (
+          <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
+            <Text style={ui.outlineButtonText}>Ver solicitudes{pending ? ` (${pending})` : ""}</Text>
+          </TouchableOpacity>
+        ) : myRequest?.estado === "aceptada" ? (
+          <Text style={styles.status}>Eres parte del equipo</Text>
+        ) : myRequest ? (
+          <Text style={styles.status}>{myRequest.estado === "pendiente" ? "Solicitud enviada, esperando respuesta" : "Tu solicitud fue rechazada"}</Text>
+        ) : (
+          <TouchableOpacity onPress={askToJoin} style={ui.primaryButton} testID="join-project-button">
+            <Text style={ui.primaryButtonText}>Solicitar unirme</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <AppTabBar navigation={navigation} />
     </SafeAreaView>
   );
 }
@@ -152,12 +198,9 @@ const styles = StyleSheet.create({
   roundButton: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
   content: { padding: 20, gap: 16 },
   hero: { flexDirection: "row", gap: 16 },
-  heroIcon: { width: 110, height: 110, borderRadius: 32, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
   heroText: { flex: 1 },
   name: { color: colors.text, fontSize: 30, fontWeight: "800" },
   description: { color: colors.muted, fontSize: 15, marginTop: 6, lineHeight: 21 },
-  orangeChip: { backgroundColor: colors.orangeSoft },
-  orangeText: { color: colors.orange },
   row: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18 },
   small: { color: colors.muted, fontSize: 13 },
   strong: { color: colors.text, fontSize: 17, fontWeight: "800", marginTop: 2 },
@@ -174,6 +217,13 @@ const styles = StyleSheet.create({
   separator: { height: 1, backgroundColor: colors.border, marginVertical: 4 },
   link: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.soft, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
   linkText: { flex: 1, color: colors.text, fontSize: 14 },
-  avatar: { width: 46, height: 46, borderRadius: 23, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
-  avatarText: { color: colors.primary, fontSize: 18, fontWeight: "800" },
+  teamRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 4 },
+  overlap: { marginLeft: -12 },
+  more: { color: colors.primary, fontWeight: "800", marginLeft: 4 },
+  pill: { flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1.5, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginLeft: "auto" },
+  pillText: { color: colors.primary, fontSize: 14, fontWeight: "800" },
+  commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18 },
+  commentsTitle: { flex: 1, color: colors.text, fontSize: 18, fontWeight: "800" },
+  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.border },
+  status: { flex: 1, color: colors.primary, fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },
 });

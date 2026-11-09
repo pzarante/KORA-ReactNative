@@ -14,7 +14,31 @@ export type NewProject = {
 };
 
 export type Project = NewProject & {
+  id: string;
   creadorId: string;
   creadorNombre: string;
+  createdAt: string;
+};
+
+export type ProjectComment = {
+  id: string;
+  proyectoId: string;
+  autorId: string | null;
+  autorNombre: string;
+  texto: string;
+  respuestaA: string | null;
+  createdAt: string;
+};
+
+export type RequestStatus = "pendiente" | "aceptada" | "rechazada";
+
+export type JoinRequest = {
+  id: string;
+  proyectoId: string;
+  usuarioId: string;
+  usuarioNombre: string;
+  rol: string;
+  mensaje: string;
+  estado: RequestStatus;
   createdAt: string;
 };

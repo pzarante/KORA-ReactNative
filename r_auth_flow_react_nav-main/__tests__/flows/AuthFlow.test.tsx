@@ -180,7 +180,7 @@ describe("Auth integration flow", () => {
             return mockFetchResponse({ message: "not found" }, 404);
         });
 
-        const { getByTestId } = render(<TestApp />);
+        const { getByTestId, getByText } = render(<TestApp />);
 
         // App starts at Welcome
         await goToLogin(getByTestId);
@@ -192,10 +192,11 @@ describe("Auth integration flow", () => {
         });
 
         await waitFor(() => {
-            expect(getByTestId("product-screen")).toBeTruthy();
+            expect(getByTestId("home-screen")).toBeTruthy();
         });
 
-        // Logout → back to Welcome
+        // Logout from Mi Perfil → back to Welcome
+        await act(async () => fireEvent.press(getByText("Mi Perfil")));
         await act(async () => {
             fireEvent.press(getByTestId("logout-button"));
         });
@@ -209,7 +210,7 @@ describe("Auth integration flow", () => {
         });
 
         await waitFor(() => {
-            expect(getByTestId("product-screen")).toBeTruthy();
+            expect(getByTestId("home-screen")).toBeTruthy();
         });
     });
 });

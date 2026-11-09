@@ -44,7 +44,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
 
         {/* Ingresar como invitado */}
         <TouchableOpacity
-          onPress={() => navigation.navigate('GuestApp')}
+          onPress={() => navigation.navigate('App')}
           style={styles.guestLink}
           testID="welcome-guest-button"
         >

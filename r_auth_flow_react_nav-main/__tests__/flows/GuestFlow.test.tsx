@@ -30,7 +30,7 @@ describe("Guest mode", () => {
 
         await waitFor(() => expect(getByTestId("welcome-screen")).toBeTruthy());
         await act(async () => fireEvent.press(getByTestId("welcome-guest-button")));
-        await waitFor(() => expect(getByTestId("guest-home-screen")).toBeTruthy());
+        await waitFor(() => expect(getByTestId("home-screen")).toBeTruthy());
 
         await act(async () => fireEvent.press(getByTestId("create-project-tab")));
         await waitFor(() => expect(getByTestId("account-required-screen")).toBeTruthy());

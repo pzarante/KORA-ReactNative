@@ -8,7 +8,11 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   private prefs: ILocalPreferences;
 
-  constructor(projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID) {
+  constructor(
+    projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID,
+    // "signup-direct": practice accounts, no e-mail. "signup": real e-mails, Roble sends a verification code.
+    private readonly signupEndpoint = process.env.EXPO_PUBLIC_ROBLE_SIGNUP_ENDPOINT ?? "signup-direct",
+  ) {
     if (!projectId || projectId === "TU_PROJECT_ID_REAL") {
       throw new Error("Configura el Project ID real de Roble en el archivo .env");
     }
@@ -47,10 +51,9 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  async signUp(email: string, password: string): Promise<void> {
+  async signUp(email: string, password: string): Promise<boolean> {
     try {
-      const signupEndpoint = process.env.EXPO_PUBLIC_ROBLE_SIGNUP_ENDPOINT ?? "signup";
-      const response = await fetch(`${this.baseUrl}/${signupEndpoint}`, {
+      const response = await fetch(`${this.baseUrl}/${this.signupEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify({
@@ -61,7 +64,10 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       });
 
       if (response.status === 201) {
-        return this.login(email, password);
+        // With "signup" the account stays inactive until verify-email, so logging in now would fail.
+        if (this.signupEndpoint === "signup") return true;
+        await this.login(email, password);
+        return false;
       } else {
         const body = await response.json();
         if (response.status === 429) {
@@ -102,6 +108,18 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw e;
     }
   }
+  async resendCode(email: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/resend-code`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=UTF-8" },
+      body: JSON.stringify({ email }),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.message ?? "No pudimos reenviar el código. Intenta de nuevo.");
+    }
+  }
+
   async validate(email: string, validationCode: string): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/verify-email`, {

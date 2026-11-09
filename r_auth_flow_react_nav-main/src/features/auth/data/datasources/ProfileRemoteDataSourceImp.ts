@@ -45,6 +45,21 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
     }
   }
 
+  async getProfile(userId?: string): Promise<UserProfile | null> {
+    const token = await this.prefs.retrieveData<string>("token");
+    if (!token) return null;
+    const row: any = await this.findProfile(userId ?? userIdFromToken(token), token);
+    if (!row) return null;
+    return {
+      userId: row.user_id,
+      nombreCompleto: row.nombre_completo ?? "",
+      rol: row.rol ?? "",
+      habilidades: Array.isArray(row.habilidades) ? row.habilidades : [],
+      infoAdicional: row.info_adicional ?? "",
+      onboardingCompletado: !!row.onboarding_completado,
+    };
+  }
+
   private async findProfile(userId: string, token: string): Promise<RemoteProfile | undefined> {
     const response = await fetch(
       `${this.baseUrl}/read?tableName=Usuario&user_id=${encodeURIComponent(userId)}`,
