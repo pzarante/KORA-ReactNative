@@ -61,7 +61,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
           <View style={styles.form}>
             <Text style={styles.label}>Correo Electrónico</Text>
             <AuthField
-              icon="✉"
+              icon="email-outline"
               testID="email-input"
               value={email}
               onChangeText={(value) => {
@@ -76,7 +76,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
             />
             <Text style={styles.label}>Contraseña</Text>
             <AuthField
-              icon="▢"
+              icon="lock-outline"
               testID="password-input"
               value={password}
               onChangeText={(value) => {

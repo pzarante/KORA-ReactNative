@@ -8,5 +8,12 @@
     "ios": "npm --prefix r_auth_flow_react_nav-main run ios",
     "test": "npm --prefix r_auth_flow_react_nav-main run test:ci -- --runInBand",
     "lint": "npm --prefix r_auth_flow_react_nav-main run lint"
+  },
+  "dependencies": {
+    "expo": "^58.0.23"
+  },
+  "devDependencies": {
+    "@types/react": "~19.3.0",
+    "typescript": "~6.0.3"
   }
 }

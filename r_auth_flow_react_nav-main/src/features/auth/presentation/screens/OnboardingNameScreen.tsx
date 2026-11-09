@@ -19,7 +19,7 @@ export default function OnboardingNameScreen({ navigation }: { navigation: any }
         <Text style={styles.subtitle}>Ingresa tu nombre completo para comenzar</Text>
       </View>
       <AuthField
-        icon="♙"
+        icon="account-outline"
         value={name}
         onChangeText={setName}
         placeholder="Nombre completo"
