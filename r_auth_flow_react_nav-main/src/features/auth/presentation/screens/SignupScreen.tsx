@@ -58,7 +58,7 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
           <View style={styles.form}>
             <Text style={styles.label}>Correo Electrónico</Text>
             <AuthField
-              icon="✉"
+              icon="email-outline"
               testID="signup-email-input"
               value={email}
               onChangeText={(value) => {
@@ -72,7 +72,7 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
             />
             <Text style={styles.label}>Contraseña</Text>
             <AuthField
-              icon="▢"
+              icon="lock-outline"
               testID="signup-password-input"
               value={password}
               onChangeText={(value) => {
@@ -85,7 +85,7 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
             />
             <Text style={styles.label}>Confirmar Contraseña</Text>
             <AuthField
-              icon="▢"
+              icon="lock-outline"
               testID="signup-confirm-password-input"
               value={confirmPassword}
               onChangeText={(value) => {

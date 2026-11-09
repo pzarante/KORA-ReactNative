@@ -1,8 +1,8 @@
-import { FontAwesome6 } from "@react-native-vector-icons/fontawesome6";
+import { Feather } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useAuth } from "./features/auth/presentation/context/authContext";
 import AccountRequiredScreen from "./features/auth/presentation/screens/AccountRequiredScreen";
@@ -22,6 +22,7 @@ import OnboardingRoleScreen from "./features/auth/presentation/screens/Onboardin
 import OnboardingSkillsScreen from "./features/auth/presentation/screens/OnboardingSkillsScreen";
 import OnboardingBioScreen from "./features/auth/presentation/screens/OnboardingBioScreen";
 import OnboardingSuccessScreen from "./features/auth/presentation/screens/OnboardingSuccessScreen";
+import { colors } from "./features/projects/presentation/components/projectUi";
 import { CreateProjectProvider } from "./features/projects/presentation/context/createProjectContext";
 import CreateProjectIntroScreen from "./features/projects/presentation/screens/CreateProjectIntroScreen";
 import ProjectBasicInfoScreen from "./features/projects/presentation/screens/ProjectBasicInfoScreen";
@@ -39,6 +40,15 @@ const Tab = createBottomTabNavigator();
 // The "+" tab never shows a screen: pressing it opens the create-project flow over the tabs.
 function NoScreen() {
   return null;
+}
+
+// shortcut: placeholder for Explorar / Mis Proyectos until their screens exist.
+function ComingSoon() {
+  return (
+    <View style={styles.comingSoon}>
+      <Text style={styles.comingSoonText}>Próximamente</Text>
+    </View>
+  );
 }
 
 function CreateProjectFlow() {
@@ -66,16 +76,27 @@ function ContentTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.muted,
+        tabBarLabelStyle: styles.tabLabel,
+        // KORA screens are always light; without this the bar follows the phone's dark mode.
+        tabBarStyle: { backgroundColor: "#FFFFFF", borderTopColor: colors.border },
       }}
     >
       <Tab.Screen
         name="Home"
         component={isLoggedIn ? ProductListScreen : GuestHomeScreen}
         options={{
-          tabBarLabel: "Home",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="house" size={24} color={color} iconStyle="solid" />
-          ),
+          tabBarLabel: "Inicio",
+          tabBarIcon: ({ color }) => <Feather name="home" size={24} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Explore"
+        component={ComingSoon}
+        options={{
+          tabBarLabel: "Explorar",
+          tabBarIcon: ({ color }) => <Feather name="compass" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -88,24 +109,26 @@ function ContentTabs() {
           },
         })}
         options={{
-          tabBarLabel: () => null,
+          tabBarLabel: "Crear",
           tabBarAccessibilityLabel: "Crear proyecto",
           tabBarButtonTestID: "create-project-tab",
-          tabBarIcon: () => (
-            <View style={styles.createTab}>
-              <FontAwesome6 name="plus" size={22} color="#FFFFFF" iconStyle="solid" />
-            </View>
-          ),
+          tabBarIcon: ({ color }) => <Feather name="plus-circle" size={24} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="MyProjects"
+        component={ComingSoon}
+        options={{
+          tabBarLabel: "Mis Proyectos",
+          tabBarIcon: ({ color }) => <Feather name="bookmark" size={24} color={color} />,
         }}
       />
       <Tab.Screen
         name="Profile"
         component={isLoggedIn ? SettingScreen : GuestProfileScreen}
         options={{
-          tabBarLabel: "Profile",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="user" size={24} color={color} iconStyle="solid" />
-          ),
+          tabBarLabel: "Mi Perfil",
+          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
         }}
       />
     </Tab.Navigator>
@@ -179,12 +202,7 @@ export default function AuthFlow() {
 }
 
 const styles = StyleSheet.create({
-  createTab: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: "#4500B5",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  tabLabel: { fontSize: 12, fontWeight: "700" },
+  comingSoon: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
+  comingSoonText: { color: colors.muted, fontSize: 16, fontWeight: "600" },
 });
