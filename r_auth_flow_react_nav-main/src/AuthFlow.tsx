@@ -5,7 +5,10 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 
 import { useAuth } from "./features/auth/presentation/context/authContext";
+import AccountRequiredScreen from "./features/auth/presentation/screens/AccountRequiredScreen";
 import ForgotPasswordScreen from "./features/auth/presentation/screens/ForgotPasswordScreen";
+import GuestHomeScreen from "./features/auth/presentation/screens/GuestHomeScreen";
+import GuestProfileScreen from "./features/auth/presentation/screens/GuestProfileScreen";
 import LoginScreen from "./features/auth/presentation/screens/LoginScreen";
 import SignupScreen from "./features/auth/presentation/screens/SignupScreen";
 import { ProductProvider } from "./features/products/presentation/context/productContext";
@@ -55,7 +58,10 @@ function CreateProjectFlow() {
   );
 }
 
+// Without a session the same tabs work as guest mode: account-only actions open AccountRequired.
 function ContentTabs() {
+  const { isLoggedIn } = useAuth();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -64,7 +70,7 @@ function ContentTabs() {
     >
       <Tab.Screen
         name="Home"
-        component={ProductListScreen}
+        component={isLoggedIn ? ProductListScreen : GuestHomeScreen}
         options={{
           tabBarLabel: "Home",
           tabBarIcon: ({ color }) => (
@@ -78,7 +84,7 @@ function ContentTabs() {
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault();
-            navigation.navigate("CreateProject");
+            navigation.navigate(isLoggedIn ? "CreateProject" : "AccountRequired");
           },
         })}
         options={{
@@ -94,7 +100,7 @@ function ContentTabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={SettingScreen}
+        component={isLoggedIn ? SettingScreen : GuestProfileScreen}
         options={{
           tabBarLabel: "Profile",
           tabBarIcon: ({ color }) => (
@@ -159,6 +165,8 @@ export default function AuthFlow() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          <Stack.Screen name="GuestApp" component={ContentTabs} />
+          <Stack.Screen name="AccountRequired" component={AccountRequiredScreen} />
           <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
           <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
           <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
