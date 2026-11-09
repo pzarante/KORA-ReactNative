@@ -210,6 +210,9 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+    if (response.status === 429) {
+      throw new Error("Hay muchos invitados nuevos desde esta red. Inténtalo en unos minutos o crea una cuenta.");
+    }
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data.accessToken) {
       throw new Error(`No se pudieron cargar los proyectos de la comunidad: ${data.message ?? response.status}`);

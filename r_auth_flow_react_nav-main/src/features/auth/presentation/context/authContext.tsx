@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { useDI } from "@/src/core/di/DIProvider";
 import { TOKENS } from "@/src/core/di/tokens";
@@ -26,10 +26,13 @@ export type AuthContextType = {
   error: string | null;
   clearError: () => void;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
+  /** Resolves true when the account must be verified with the e-mailed code (VerifyEmail screen). */
+  signup: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<boolean>;
+  /** Verifies the e-mailed code and logs in the account just created; resolves the error message or null. */
   validate: (email: string, validationCode: string) => Promise<string | null>;
+  resendCode: (email: string) => Promise<string | null>;
   getLoggedUser: () => Promise<any | null>;
   profile: ProfileDraft;
   updateProfile: (patch: Partial<ProfileDraft>) => void;
@@ -51,6 +54,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<ProfileDraft>(emptyProfile);
+  // Memory only: lets the VerifyEmail screen log in after the code without asking for the password again.
+  const pendingSignup = useRef<{ email: string; password: string } | null>(null);
 
   const clearError = () => setError(null);
 
@@ -123,7 +128,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearError();
     try {
       setLoading(true);
-      await authRepo.signup(email, password);
+      if (await authRepo.signup(email, password)) {
+        pendingSignup.current = { email, password };
+        return true;
+      }
       // Set before isLoggedIn: without batching, AuthenticatedStack mounts with the stale value.
       setNeedsOnboarding(true);
       setIsLoggedIn(true);
@@ -132,6 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
+    return false;
   };
 
   const logout = async () => {
@@ -165,12 +174,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const validate = async (email: string, validationCode: string) => {
     clearError();
     try {
+      setLoading(true);
       await authRepo.validate(email, validationCode);
+      const pending = pendingSignup.current;
+      if (pending?.email === email) {
+        await authRepo.login(email, pending.password);
+        pendingSignup.current = null;
+        setNeedsOnboarding(true);
+        setIsLoggedIn(true);
+      }
     } catch (err: any) {
-      return err?.message ?? "Validation failed";
+      return err?.message ?? "No pudimos verificar el código";
+    } finally {
+      setLoading(false);
     }
     return null;
-  }
+  };
+
+  const resendCode = async (email: string) => {
+    try {
+      await authRepo.resendCode(email);
+      return null;
+    } catch (err: any) {
+      return err?.message ?? "No pudimos reenviar el código";
+    }
+  };
 
   const getLoggedUser = async () => {
     try {
@@ -181,7 +209,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ loggedUser, isLoggedIn, needsOnboarding, loading, error, clearError, login, signup, logout, forgotPassword, validate, getLoggedUser, profile, updateProfile, completeProfile }}>
+    <AuthContext.Provider value={{ loggedUser, isLoggedIn, needsOnboarding, loading, error, clearError, login, signup, logout, forgotPassword, validate, resendCode, getLoggedUser, profile, updateProfile, completeProfile }}>
       {children}
     </AuthContext.Provider>
   );

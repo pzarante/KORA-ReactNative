@@ -3,7 +3,11 @@ import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 export class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   async login(): Promise<void> {}
 
-  async signUp(): Promise<void> {}
+  async signUp(): Promise<boolean> {
+    return false;
+  }
+
+  async resendCode(): Promise<void> {}
 
   async logOut(): Promise<void> {}
 

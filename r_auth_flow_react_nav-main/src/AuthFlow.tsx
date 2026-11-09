@@ -10,6 +10,7 @@ import ForgotPasswordScreen from "./features/auth/presentation/screens/ForgotPas
 import GuestProfileScreen from "./features/auth/presentation/screens/GuestProfileScreen";
 import LoginScreen from "./features/auth/presentation/screens/LoginScreen";
 import SignupScreen from "./features/auth/presentation/screens/SignupScreen";
+import VerifyEmailScreen from "./features/auth/presentation/screens/VerifyEmailScreen";
 import { ProductProvider } from "./features/products/presentation/context/productContext";
 import AddProductScreen from "./features/products/presentation/screens/AddProductScreen";
 import UpdateProductScreen from "./features/products/presentation/screens/UpdateProductScreen";
@@ -200,6 +201,7 @@ export default function AuthFlow() {
           <Stack.Screen name="Welcome" component={WelcomeScreen} /> 
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
           {/* Same name as the logged-in tabs so "go home" (popTo("App")) works in both modes. */}
           <Stack.Screen name="App" component={ContentTabs} />

@@ -10,11 +10,21 @@ This is a starter project for building React Native apps with [Expo](https://exp
    npm install
    ```
 
-2. Create a `.env` file in the root directory and add your Roble project ID
+2. Create a `.env` file in the root directory (copy `.env.sample`) and add your Roble project ID
 
    ```
    EXPO_PUBLIC_ROBLE_PROJECT_ID=your_project_id_here
+   EXPO_PUBLIC_ROBLE_API_URL=https://roble-api.test-openlab.uninorte.edu.co
+   EXPO_PUBLIC_ROBLE_SIGNUP_ENDPOINT=signup-direct
    ```
+
+   - `EXPO_PUBLIC_ROBLE_API_URL`: the test server is the one that supports guest sessions.
+   - `EXPO_PUBLIC_ROBLE_SIGNUP_ENDPOINT` picks how accounts are created:
+     - `signup-direct` (default): practice mode. No e-mail is sent; the account is ready right away.
+     - `signup`: real e-mails. Roble sends a verification code and the app shows the
+       "Verifica tu correo" screen; the account works only after entering the code.
+
+   Restart with `npx expo start -c` after changing `.env`.
 
 3. Start the app
 

@@ -39,7 +39,7 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
     setEmailError(null);
     setPasswordError(null);
     setConfirmPasswordError(null);
-    await signup(email.trim(), password);
+    if (await signup(email.trim(), password)) navigation.navigate("VerifyEmail", { email: email.trim() });
   };
 
   return (

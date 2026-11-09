@@ -22,6 +22,7 @@ function renderScreen(
     logout: jest.fn().mockResolvedValue(undefined),
     forgotPassword,
     validate: jest.fn().mockResolvedValue(null),
+    resendCode: jest.fn(),
     getLoggedUser: jest.fn().mockResolvedValue(null),
     profile: {
       nombreCompleto: "",

@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
   },
   fieldError: { borderColor: "#C62828" },
   icon: { width: 27 },
-  input: { flex: 1, color: "#211832", fontSize: 15 },
+  // stretch: on web the input is only one text line tall, so most of the pill didn't react to taps.
+  input: { flex: 1, alignSelf: "stretch", color: "#211832", fontSize: 15 },
   error: { marginTop: 4, marginLeft: 16, color: "#C62828", fontSize: 12 },
 });

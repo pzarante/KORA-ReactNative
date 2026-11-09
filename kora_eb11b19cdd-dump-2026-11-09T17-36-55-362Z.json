@@ -1,0 +1,571 @@
+{
+  "database": "kora_eb11b19cdd",
+  "exportedAt": "2026-11-09T17:36:50.459Z",
+  "includeData": true,
+  "tables": [
+    {
+      "name": "Usuario",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": false,
+          "isPrimary": true,
+          "isUnique": false,
+          "defaultValue": "gen_random_uuid()"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": true,
+          "defaultValue": null
+        },
+        {
+          "name": "nombre_completo",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "rol",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "habilidades",
+          "type": "json",
+          "format": "json",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "info_adicional",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "foto_url",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "onboarding_completado",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "_owner",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        }
+      ],
+      "rowCount": 0,
+      "rows": []
+    },
+    {
+      "name": "comentario",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": false,
+          "isPrimary": true,
+          "isUnique": false,
+          "defaultValue": "gen_random_uuid()"
+        },
+        {
+          "name": "proyecto_id",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "autor_id",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "autor_nombre",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "texto",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "respuesta_a",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "_owner",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        }
+      ],
+      "rowCount": 0,
+      "rows": []
+    },
+    {
+      "name": "proyecto",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": false,
+          "isPrimary": true,
+          "isUnique": false,
+          "defaultValue": "gen_random_uuid()"
+        },
+        {
+          "name": "nombre",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "icono",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "descripcion",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "etapa",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "problema",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "objetivo",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "alcance",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "creador_id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "creador_nombre",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "_owner",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "etiquetas",
+          "type": "json",
+          "format": "json",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "roles",
+          "type": "json",
+          "format": "json",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "enlaces",
+          "type": "json",
+          "format": "json",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        }
+      ],
+      "rowCount": 0,
+      "rows": []
+    },
+    {
+      "name": "saved_queries",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": false,
+          "isPrimary": true,
+          "isUnique": false,
+          "defaultValue": "gen_random_uuid()"
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "format": "varchar",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "query",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "format": "bool",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": "true"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": "now()"
+        },
+        {
+          "name": "last_executed_at",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        }
+      ],
+      "rowCount": 0,
+      "rows": []
+    },
+    {
+      "name": "solicitud",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": false,
+          "isPrimary": true,
+          "isUnique": false,
+          "defaultValue": "gen_random_uuid()"
+        },
+        {
+          "name": "proyecto_id",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "usuario_id",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "usuario_nombre",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "rol",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "mensaje",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "estado",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": "'pendiente'::text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "_owner",
+          "type": "text",
+          "format": "text",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        }
+      ],
+      "rowCount": 0,
+      "rows": []
+    },
+    {
+      "name": "user_system",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": false,
+          "isPrimary": true,
+          "isUnique": false,
+          "defaultValue": "gen_random_uuid()"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "format": "uuid",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": true,
+          "defaultValue": null
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": true,
+          "defaultValue": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "format": "text",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "extra",
+          "type": "jsonb",
+          "format": "jsonb",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "format": "timestamptz",
+          "isNullable": false,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": "now()"
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "format": "jsonb",
+          "isNullable": true,
+          "isPrimary": false,
+          "isUnique": false,
+          "defaultValue": null
+        }
+      ],
+      "rowCount": 7,
+      "rows": []
+    }
+  ]
+}
