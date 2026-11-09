@@ -2,20 +2,17 @@ import { Feather } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { useAuth } from "./features/auth/presentation/context/authContext";
 import AccountRequiredScreen from "./features/auth/presentation/screens/AccountRequiredScreen";
 import ForgotPasswordScreen from "./features/auth/presentation/screens/ForgotPasswordScreen";
-import GuestHomeScreen from "./features/auth/presentation/screens/GuestHomeScreen";
 import GuestProfileScreen from "./features/auth/presentation/screens/GuestProfileScreen";
 import LoginScreen from "./features/auth/presentation/screens/LoginScreen";
 import SignupScreen from "./features/auth/presentation/screens/SignupScreen";
 import { ProductProvider } from "./features/products/presentation/context/productContext";
 import AddProductScreen from "./features/products/presentation/screens/AddProductScreen";
-import ProductListScreen from "./features/products/presentation/screens/ProductListScreen";
 import UpdateProductScreen from "./features/products/presentation/screens/UpdateProductScreen";
-import SettingScreen from "./features/settings/SettingScreen";
 import WelcomeScreen from "./features/auth/presentation/screens/WelcomeScreen";
 import OnboardingNameScreen from "./features/auth/presentation/screens/OnboardingNameScreen";
 import OnboardingRoleScreen from "./features/auth/presentation/screens/OnboardingRoleScreen";
@@ -33,6 +30,18 @@ import ProjectProblemScreen from "./features/projects/presentation/screens/Proje
 import ProjectReviewScreen from "./features/projects/presentation/screens/ProjectReviewScreen";
 import ProjectStageScreen from "./features/projects/presentation/screens/ProjectStageScreen";
 import ProjectTeamScreen from "./features/projects/presentation/screens/ProjectTeamScreen";
+import ApplicantProfileScreen from "./features/projects/presentation/screens/ApplicantProfileScreen";
+import CommentsScreen from "./features/projects/presentation/screens/CommentsScreen";
+import ExploreScreen from "./features/projects/presentation/screens/ExploreScreen";
+import HomeFeedScreen from "./features/projects/presentation/screens/HomeFeedScreen";
+import JoinRequestScreen from "./features/projects/presentation/screens/JoinRequestScreen";
+import MemberJoinedScreen from "./features/projects/presentation/screens/MemberJoinedScreen";
+import MyProjectsScreen from "./features/projects/presentation/screens/MyProjectsScreen";
+import RequestSentScreen from "./features/projects/presentation/screens/RequestSentScreen";
+import RequestsScreen from "./features/projects/presentation/screens/RequestsScreen";
+import TeamMembersScreen from "./features/projects/presentation/screens/TeamMembersScreen";
+import CompleteProfileScreen from "./features/auth/presentation/screens/CompleteProfileScreen";
+import MyProfileScreen from "./features/auth/presentation/screens/MyProfileScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -42,14 +51,12 @@ function NoScreen() {
   return null;
 }
 
-// shortcut: placeholder for Explorar / Mis Proyectos until their screens exist.
-function ComingSoon() {
-  return (
-    <View style={styles.comingSoon}>
-      <Text style={styles.comingSoonText}>Próximamente</Text>
-    </View>
-  );
-}
+// Screens a guest can also open from the feed; the rest need an account.
+const publicFeedScreens = [
+  <Stack.Screen key="ProjectDetail" name="ProjectDetail" component={ProjectDetailScreen} />,
+  <Stack.Screen key="TeamMembers" name="TeamMembers" component={TeamMembersScreen} />,
+  <Stack.Screen key="Comments" name="Comments" component={CommentsScreen} />,
+];
 
 function CreateProjectFlow() {
   return (
@@ -85,7 +92,7 @@ function ContentTabs() {
     >
       <Tab.Screen
         name="Home"
-        component={isLoggedIn ? ProductListScreen : GuestHomeScreen}
+        component={HomeFeedScreen}
         options={{
           tabBarLabel: "Inicio",
           tabBarIcon: ({ color }) => <Feather name="home" size={24} color={color} />,
@@ -93,7 +100,7 @@ function ContentTabs() {
       />
       <Tab.Screen
         name="Explore"
-        component={ComingSoon}
+        component={ExploreScreen}
         options={{
           tabBarLabel: "Explorar",
           tabBarIcon: ({ color }) => <Feather name="compass" size={24} color={color} />,
@@ -117,7 +124,7 @@ function ContentTabs() {
       />
       <Tab.Screen
         name="MyProjects"
-        component={ComingSoon}
+        component={MyProjectsScreen}
         options={{
           tabBarLabel: "Mis Proyectos",
           tabBarIcon: ({ color }) => <Feather name="bookmark" size={24} color={color} />,
@@ -125,7 +132,7 @@ function ContentTabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={isLoggedIn ? SettingScreen : GuestProfileScreen}
+        component={isLoggedIn ? MyProfileScreen : GuestProfileScreen}
         options={{
           tabBarLabel: "Mi Perfil",
           tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
@@ -151,7 +158,13 @@ function AuthenticatedStack() {
         <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
         <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
         <Stack.Screen name="CreateProject" component={CreateProjectFlow} />
-        <Stack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
+        {publicFeedScreens}
+        <Stack.Screen name="JoinRequest" component={JoinRequestScreen} />
+        <Stack.Screen name="RequestSent" component={RequestSentScreen} />
+        <Stack.Screen name="Requests" component={RequestsScreen} />
+        <Stack.Screen name="ApplicantProfile" component={ApplicantProfileScreen} />
+        <Stack.Screen name="MemberJoined" component={MemberJoinedScreen} />
+        <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
         <Stack.Screen
           name="AddProductScreen"
           component={AddProductScreen}
@@ -188,7 +201,9 @@ export default function AuthFlow() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="GuestApp" component={ContentTabs} />
+          {/* Same name as the logged-in tabs so "go home" (popTo("App")) works in both modes. */}
+          <Stack.Screen name="App" component={ContentTabs} />
+          {publicFeedScreens}
           <Stack.Screen name="AccountRequired" component={AccountRequiredScreen} />
           <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
           <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
@@ -203,6 +218,4 @@ export default function AuthFlow() {
 
 const styles = StyleSheet.create({
   tabLabel: { fontSize: 12, fontWeight: "700" },
-  comingSoon: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
-  comingSoonText: { color: colors.muted, fontSize: 16, fontWeight: "600" },
 });

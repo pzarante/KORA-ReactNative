@@ -70,6 +70,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // The local draft can belong to another account, so the saved Roble profile wins once logged in.
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    profileDS.getProfile()
+      .then((saved) => {
+        if (saved) {
+          const { userId: _userId, ...draft } = saved;
+          setProfile(draft);
+        }
+      })
+      .catch(() => {});
+  }, [isLoggedIn, profileDS]);
+
   const updateProfile = (patch: Partial<ProfileDraft>) => {
     setProfile((current) => {
       const next = { ...current, ...patch };

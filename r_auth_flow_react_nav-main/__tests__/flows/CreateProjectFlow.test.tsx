@@ -51,7 +51,7 @@ describe("Create project flow", () => {
         fireEvent.changeText(getByTestId("email-input"), "a@a.com");
         fireEvent.changeText(getByTestId("password-input"), "ThePassword!1");
         await act(async () => fireEvent.press(getByTestId("login-button")));
-        await waitFor(() => expect(getByTestId("product-screen")).toBeTruthy());
+        await waitFor(() => expect(getByTestId("home-screen")).toBeTruthy());
 
         await act(async () => fireEvent.press(getByTestId("create-project-tab")));
         await waitFor(() => expect(getByTestId("create-project-intro")).toBeTruthy());
