@@ -17,30 +17,30 @@ El archivo de Figma ("PARCIAL-INTERACCION-KORA-PRIMER-CLUSTER") no se pudo leer 
 
 ### 1.1 Tokens
 
-Los tokens de la app viven en `src/features/projects/presentation/components/projectUi.ts` → `colors`. La columna Figma es la referencia; donde el código difiere, manda Figma.
+Los tokens de la app viven en `src/shared/ui/tokens.ts` → `colors` (estilos de formulario y botones en `src/shared/ui/styles.ts` → `ui`). Ninguna pantalla debe escribir estos colores a mano. La columna Figma es la referencia; donde el código difiere, manda Figma.
 
 | Token | Figma (muestreado) | Código actual | Uso |
 |---|---|---|---|
-| `primary` | `#3C00A0` | `#4500B5` | Botones, links, tab activo, barra de progreso, filtro activo, hero del Home, círculo de éxito |
+| `primary` | `#3C00A0` | `#3C00A0` | Botones, links, tab activo, barra de progreso, filtro activo, hero del Home, círculo de éxito |
 | `primaryGradient` | `#4E11BD → #5F22D9` (horizontal) | — | Relleno de los botones primarios grandes |
-| `text` | `#1E1630` | `#211832` | Títulos y texto principal |
-| `muted` | `#6B6282` | `#756A8E` | Texto secundario, placeholders, íconos y labels inactivos |
-| `border` | lavanda claro | `#E6DDF2` | Bordes de inputs, cards, tab bar, divisores |
-| `soft` | `#F0EBFF` | `#F5EEFF` | Fondo de chips morados, contenedor de ícono, opción seleccionada |
+| `text` | `#1E1630` | `#1E1630` | Títulos y texto principal |
+| `muted` | `#6B6282` | `#6B6282` | Texto secundario, placeholders, íconos y labels inactivos |
+| `border` | lavanda claro | `#E9DCFA` | Bordes de inputs, cards, tab bar, divisores |
+| `soft` | `#F0EBFF` | `#EEE4FC` | Fondo de chips morados, contenedor de ícono, opción seleccionada |
 | `cardHeader` | `#F0E7FC` | — | Cabecera de las cards del grid de Explorar |
 | `filterChip` | `#E3DAEF` | — | Chips de filtro no activos (Explorar) |
-| `card` | `#FBFBFB` – `#FEFCFF` | `#F8F5FC` | Fondo de cards (casi blanco) |
-| `orange` | `#FF6B00` (texto de chip) | `#FF5A00` | Acento de marca, asterisco de requerido, chips de etapa, ícono "salir" |
-| `orangeSoft` | `#FFEBDF` | `#FFEDE3` | Fondo de chips naranja |
+| `card` | `#FBFBFB` – `#FEFCFF` | `#FEFCFF` | Fondo de cards (casi blanco) |
+| `orange` | `#FF6B00` (texto de chip) | `#E96212` | Acento de marca, asterisco de requerido, chips de etapa, ícono "salir" |
+| `orangeSoft` | `#FFEBDF` | `#FFE8D8` | Fondo de chips naranja |
 | `error` | — | `#C62828` | Errores de formulario |
 | `progressTrack` | `#E8D9FA` | `#EADFFB` | Pista de la barra de pasos |
 | `disabled` | `#E5E0E8` | `#E4E0EA` / texto `#A49DB0` | Botón "Siguiente" sin completar |
 | `scrim` | ≈ `rgba(33,24,50,0.53)` | `rgba(33,24,50,0.5)` | Fondo detrás de popups y sheets |
 | `background` | `#FFFFFF` | `#FFFFFF` | Fondo de todas las pantallas |
 
-**Logo "K"** (`AuthBrand.tsx`): trazo vertical `#5700C9`, brazo superior `#7217F1`, brazo inferior `#FF5A00`.
+**Logo "K"** (`src/shared/ui/BrandLogo.tsx`, imagen `assets/images/kora-k.png`): trazo vertical `#5700C9`, brazo superior `#7217F1`, brazo inferior `#FF5A00`.
 
-**Manchas de fondo** (`AuthSurface.tsx`): círculos difusos detrás del contenido. Morado `#E5CEFF` arriba a la derecha (opacidad .72), `#E9D6FF` a media altura, durazno `#FFD4C8` abajo a la izquierda (.7). Aparecen en casi todas las pantallas de Figma, también encima de los modales y sheets.
+**Manchas de fondo** (`src/shared/ui/ScreenSurface.tsx`; `BrandBlob.tsx` para manchas difusas sueltas): círculos difusos detrás del contenido. Morado `#E5CEFF` arriba a la derecha (opacidad .72), `#E9D6FF` a media altura, durazno `#FFD4C8` abajo a la izquierda (.7). Aparecen en casi todas las pantallas de Figma, también encima de los modales y sheets.
 
 ### 1.2 Tema de react-native-paper (no coincide)
 
@@ -144,7 +144,7 @@ Los chips **no** van en mayúsculas (excepción: badge de etapa "IDEA" en Revisa
 | Bottom sheet | `AddRolesSheet`, Nuevo/Responder comentario | Radio superior 32, título `headline-md` + "×" en círculo, contenido, botón primario a todo el ancho (o a la derecha con ícono de enviar), "Cancelar" como link. |
 | Modal centrado | `ProjectStepLayout`, `IconPickerModal` | Radio 32, ilustración arriba, título centrado, texto `muted`, botón primario + contorno apilados. |
 | Pantalla de éxito | Proyecto creado, Solicitud enviada, Miembro unido | Círculo `primary` de 120 con ✓ blanco, título `display`, texto `muted`, CTA primario + link o contorno. |
-| Tab bar | `AppTabBar` | Fondo blanco sólido, borde superior `border`. 5 tabs (Inicio, Explorar, Crear, Mis Proyectos, Mi Perfil), ícono 24 + label 12/700, activo `primary`, inactivo `muted`, sin pill de fondo. "Crear" abre el flujo, no es un tab. |
+| Tab bar | `src/navigation/AppTabsNavigator.tsx` + copia `src/navigation/AppTabBar.tsx` | Fondo blanco sólido, borde superior `border`. 5 tabs (Inicio, Explorar, Crear, Mis Proyectos, Mi Perfil), ícono 24 + label 12/700, activo `primary`, inactivo `muted`, sin pill de fondo. "Crear" abre el flujo, no es un tab. |
 | Hero | Home | Card `primary`, radio 32, overline blanco + titular blanco 24/800. |
 | Header de detalle | Detalle, Comentarios, Equipo | Atrás a la izquierda, logo K al centro, "Inicio" (casa) a la derecha; botones circulares. |
 
@@ -206,7 +206,7 @@ Siempre siguen: Habilidades (chips), Contacto (WhatsApp + email) e Información 
 
 ## 8. Diferencias pendientes entre Figma y código
 
-1. **Morado primario:** Figma `#3C00A0` con degradado en los botones; el código usa `#4500B5` plano. Además hay ~10 morados sueltos en pantallas (`#4A0E95`, `#3F00A0`, `#7C3AED`, `#A04BFF`, `#6750A4`…) que deberían usar `colors` de `projectUi.ts`.
+1. **Morado primario:** el código ya usa `#3C00A0` de Figma vía `colors.primary`, pero plano: falta el degradado de los botones. Quedan morados sueltos que no son token: `#A04BFF` (eyebrow de Login, Registro y Verificar correo) y `#6750A4` (Products, plantilla). `soft`, `orange` y `orangeSoft` aún difieren de Figma (ver tabla).
 2. **Fuente:** Figma usa Plus Jakarta Sans; el código usa la del sistema.
 3. **Cards:** Figma casi blanco (`#FBFBFB`); el código usa `#F8F5FC`.
 4. **Tema de Paper ámbar**, sin relación con la marca (`src/theme/*.json`).

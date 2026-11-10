@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { StyleSheet, Text, TextInput, TextInputProps, TouchableOpacity, View } from "react-native";
+import { colors } from "@/src/shared/ui/tokens";
 
 type Props = TextInputProps & {
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
@@ -14,11 +15,11 @@ export default function AuthField({ icon, error, rightElement, ...props }: Props
   return (
     <View>
       <View style={[styles.field, error ? styles.fieldError : undefined]}>
-        <MaterialCommunityIcons name={icon} size={20} color="#756A8E" style={styles.icon} />
+        <MaterialCommunityIcons name={icon} size={20} color={colors.muted} style={styles.icon} />
         <TextInput
           {...props}
           secureTextEntry={props.secureTextEntry && hidden}
-          placeholderTextColor="#756A8E"
+          placeholderTextColor={colors.muted}
           style={styles.input}
         />
         {props.secureTextEntry ? (
@@ -29,7 +30,7 @@ export default function AuthField({ icon, error, rightElement, ...props }: Props
             hitSlop={12}
             testID={props.testID ? `${props.testID}-toggle` : undefined}
           >
-            <MaterialCommunityIcons name={hidden ? "eye-outline" : "eye-off-outline"} size={22} color="#756A8E" />
+            <MaterialCommunityIcons name={hidden ? "eye-outline" : "eye-off-outline"} size={22} color={colors.muted} />
           </TouchableOpacity>
         ) : null}
         {rightElement}
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
   field: {
     minHeight: 56,
     borderWidth: 1,
-    borderColor: "#E6DDF2",
+    borderColor: colors.border,
     borderRadius: 28,
     backgroundColor: "rgba(255,255,255,0.88)",
     flexDirection: "row",
@@ -53,6 +54,6 @@ const styles = StyleSheet.create({
   fieldError: { borderColor: "#C62828" },
   icon: { width: 27 },
   // stretch: on web the input is only one text line tall, so most of the pill didn't react to taps.
-  input: { flex: 1, alignSelf: "stretch", color: "#211832", fontSize: 15 },
+  input: { flex: 1, alignSelf: "stretch", color: colors.text, fontSize: 15 },
   error: { marginTop: 4, marginLeft: 16, color: "#C62828", fontSize: 12 },
 });

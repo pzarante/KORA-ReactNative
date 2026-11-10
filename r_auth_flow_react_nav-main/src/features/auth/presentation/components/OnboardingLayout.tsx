@@ -6,6 +6,7 @@ import { ProfileDraft, useAuth } from "../context/authContext";
 import BrandLogo from "@/src/shared/ui/BrandLogo";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import ProfileProgress from "./ProfileProgress";
+import { colors } from "@/src/shared/ui/tokens";
 
 export const ONBOARDING_STEPS = 5;
 
@@ -79,8 +80,8 @@ const styles = StyleSheet.create({
   progress: { marginBottom: 24 },
   skip: { alignItems: "center", marginTop: 14, paddingBottom: 12 },
   skipButton: { minHeight: 44, paddingHorizontal: 16, justifyContent: "center" },
-  skipText: { color: "#4500B5", fontSize: 15, fontWeight: "700", textDecorationLine: "underline" },
+  skipText: { color: colors.primary, fontSize: 15, fontWeight: "700", textDecorationLine: "underline" },
   skipDisabled: { color: "#B7AECB" },
-  hint: { color: "#756A8E", fontSize: 13 },
+  hint: { color: colors.muted, fontSize: 13 },
   error: { color: "#B42318", marginTop: 8, textAlign: "center" },
 });

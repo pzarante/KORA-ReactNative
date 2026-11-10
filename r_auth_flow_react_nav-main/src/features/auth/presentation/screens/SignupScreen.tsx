@@ -6,6 +6,7 @@ import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
+import { colors } from "@/src/shared/ui/tokens";
 
 export default function SignupScreen({ navigation }: { navigation: any }) {
   const { signup, error, loading } = useAuth();
@@ -131,15 +132,15 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 48 },
   heading: { marginTop: 18, marginBottom: 27 },
   eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
-  title: { color: "#211832", fontSize: 32, fontWeight: "800", marginTop: 5 },
+  title: { color: colors.text, fontSize: 32, fontWeight: "800", marginTop: 5 },
   form: { gap: 8 },
-  label: { color: "#211832", fontSize: 14, fontWeight: "700", marginTop: 9 },
+  label: { color: colors.text, fontSize: 14, fontWeight: "700", marginTop: 9 },
   terms: { flexDirection: "row", alignItems: "center", gap: 11, marginVertical: 21 },
-  checkbox: { width: 22, height: 22, borderWidth: 1, borderColor: "#4500B5", borderRadius: 6, alignItems: "center", justifyContent: "center" },
-  checkboxChecked: { backgroundColor: "#4500B5" },
+  checkbox: { width: 22, height: 22, borderWidth: 1, borderColor: colors.primary, borderRadius: 6, alignItems: "center", justifyContent: "center" },
+  checkboxChecked: { backgroundColor: colors.primary },
   checkmark: { color: "#FFFFFF", fontWeight: "800" },
-  termsText: { flex: 1, color: "#211832", fontSize: 13, fontWeight: "600" },
-  link: { color: "#4500B5", fontWeight: "800", textDecorationLine: "underline" },
+  termsText: { flex: 1, color: colors.text, fontSize: 13, fontWeight: "600" },
+  link: { color: colors.primary, fontWeight: "800", textDecorationLine: "underline" },
   footer: { flexDirection: "row", gap: 5, marginTop: 22 },
-  footerText: { color: "#756A8E", fontSize: 13, fontWeight: "600" },
+  footerText: { color: colors.muted, fontSize: 13, fontWeight: "600" },
 });

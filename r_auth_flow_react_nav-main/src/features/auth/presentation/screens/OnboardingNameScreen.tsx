@@ -5,6 +5,7 @@ import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import OnboardingLayout from "../components/OnboardingLayout";
 import { useAuth } from "../context/authContext";
+import { colors } from "@/src/shared/ui/tokens";
 
 export default function OnboardingNameScreen({ navigation }: { navigation: any }) {
   const [name, setName] = useState("");
@@ -49,7 +50,7 @@ export default function OnboardingNameScreen({ navigation }: { navigation: any }
 
 const styles = StyleSheet.create({
   heading: { alignItems: "center", marginTop: 32, marginBottom: 22 },
-  title: { color: "#211832", fontSize: 32, fontWeight: "800", textAlign: "center" },
-  subtitle: { color: "#756A8E", fontSize: 15, fontWeight: "600", marginTop: 7, textAlign: "center" },
+  title: { color: colors.text, fontSize: 32, fontWeight: "800", textAlign: "center" },
+  subtitle: { color: colors.muted, fontSize: 15, fontWeight: "600", marginTop: 7, textAlign: "center" },
   button: { marginTop: 37 },
 });

@@ -6,6 +6,7 @@ import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
+import { colors } from "@/src/shared/ui/tokens";
 
 // Only reached with EXPO_PUBLIC_ROBLE_SIGNUP_ENDPOINT=signup (real e-mails): Roble mails a code after signup.
 export default function VerifyEmailScreen({ navigation, route }: { navigation: any; route: any }) {
@@ -95,14 +96,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 48 },
   heading: { marginTop: 18, marginBottom: 27 },
   eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
-  title: { color: "#211832", fontSize: 32, fontWeight: "800", marginTop: 5 },
-  description: { color: "#756A8E", fontSize: 15, fontWeight: "600", lineHeight: 22, marginTop: 8 },
-  email: { color: "#211832", fontWeight: "800" },
+  title: { color: colors.text, fontSize: 32, fontWeight: "800", marginTop: 5 },
+  description: { color: colors.muted, fontSize: 15, fontWeight: "600", lineHeight: 22, marginTop: 8 },
+  email: { color: colors.text, fontWeight: "800" },
   form: { gap: 8 },
-  label: { color: "#211832", fontSize: 14, fontWeight: "700", marginTop: 9 },
-  status: { color: "#756A8E", fontSize: 12, lineHeight: 18, marginLeft: 16 },
+  label: { color: colors.text, fontSize: 14, fontWeight: "700", marginTop: 9 },
+  status: { color: colors.muted, fontSize: 12, lineHeight: 18, marginLeft: 16 },
   button: { marginTop: 28 },
-  link: { color: "#4500B5", fontWeight: "800", textDecorationLine: "underline" },
+  link: { color: colors.primary, fontWeight: "800", textDecorationLine: "underline" },
   footer: { flexDirection: "row", gap: 5, marginTop: 22 },
-  footerText: { color: "#756A8E", fontSize: 13, fontWeight: "600" },
+  footerText: { color: colors.muted, fontSize: 13, fontWeight: "600" },
 });
