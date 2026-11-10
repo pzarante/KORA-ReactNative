@@ -17,23 +17,25 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
   return (
     <ScreenSurface scroll>
       <View style={styles.container} testID="welcome-screen">
-        <View style={styles.brand}>
-          <Image
-            accessibilityLabel="Kora"
-            source={require("../../../../../assets/images/kora-wordmark.png")}
-            resizeMode="contain"
-            style={styles.wordmark}
-          />
-          <View style={styles.badge}>
-            <BrandLogo size={44} />
+        <View style={styles.top}>
+          <View style={styles.brand}>
+            <Image
+              accessibilityLabel="Kora"
+              source={require("../../../../../assets/images/kora-wordmark.png")}
+              resizeMode="contain"
+              style={styles.wordmark}
+            />
+            <View style={styles.badge}>
+              <BrandLogo size={44} />
+            </View>
           </View>
-        </View>
 
-        <View style={styles.texts}>
-          <Text style={[styles.title, font("Sora_800ExtraBold", "800")]}>¿Ya tienes cuenta?</Text>
-          <Text style={[styles.subtitle, font("Sora_600SemiBold", "600")]}>
-            Inicia sesión para acceder a tu espacio o crea una cuenta nueva para comenzar.
-          </Text>
+          <View style={styles.texts}>
+            <Text style={[styles.title, font("Sora_800ExtraBold", "800")]}>¿Ya tienes cuenta?</Text>
+            <Text style={[styles.subtitle, font("Sora_600SemiBold", "600")]}>
+              Inicia sesión para acceder a tu espacio o crea una cuenta nueva para comenzar.
+            </Text>
+          </View>
         </View>
 
         <View style={styles.actions}>
@@ -75,8 +77,9 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
 
 const styles = StyleSheet.create({
   container: { flexGrow: 1, paddingVertical: 24 },
-  // Takes the spare height so the texts and buttons sit low, as in the design.
-  brand: { flex: 1, alignItems: "center", justifyContent: "center", gap: 56, paddingVertical: 24 },
+  // Logo and texts take the spare height and stay centered above the buttons, as in the design.
+  top: { flex: 1, justifyContent: "center", gap: 20 },
+  brand: { alignItems: "center", gap: 48 },
   wordmark: { width: 256, maxWidth: "100%", aspectRatio: 511 / 127 },
   badge: {
     width: 120,
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
   texts: { gap: 12 },
   title: { color: colors.text, textAlign: "center", fontSize: 36, lineHeight: 43, letterSpacing: -1.5 },
   subtitle: { color: colors.muted, textAlign: "center", fontSize: 15, lineHeight: 22.5 },
-  actions: { gap: 16, marginTop: 40 },
+  actions: { gap: 16, marginTop: 32 },
   button: { minHeight: 56, borderRadius: 28, alignItems: "center", justifyContent: "center" },
   primaryButton: {
     flexDirection: "row",
