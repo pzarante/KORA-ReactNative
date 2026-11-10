@@ -5,6 +5,9 @@ import OnboardingNameScreen from "@/src/features/auth/presentation/screens/Onboa
 import { act, fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
+// The header bell needs navigation and DI, which these screen tests do not provide.
+jest.mock("@/src/features/projects/presentation/components/NotificationBell", () => () => null);
+
 const emptyProfile = { nombreCompleto: "", rol: "", habilidades: [], infoAdicional: "", onboardingCompletado: false };
 
 const createAuth = (overrides: Partial<AuthContextType> = {}): AuthContextType => ({

@@ -4,10 +4,8 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-nativ
 
 import AddRolesSheet from "../components/AddRolesSheet";
 import ProjectStepLayout from "../components/ProjectStepLayout";
-import { colors, ui } from "../components/projectUi";
+import { colors, ui, URL_PATTERN } from "../components/projectUi";
 import { useCreateProject } from "../context/createProjectContext";
-
-const URL_PATTERN = /^https?:\/\/\S+\.\S+$/i;
 
 export default function ProjectTeamScreen() {
   const { draft, update } = useCreateProject();

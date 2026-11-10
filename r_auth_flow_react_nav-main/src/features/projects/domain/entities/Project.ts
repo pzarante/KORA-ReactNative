@@ -13,8 +13,13 @@ export type NewProject = {
   enlaces: string[];
 };
 
+/** What a member can change from "Editar proyecto". */
+export type ProjectChanges = Partial<NewProject> & { buscandoPersonas?: boolean };
+
 export type Project = NewProject & {
   id: string;
+  /** Off: the project stops taking join requests. */
+  buscandoPersonas: boolean;
   creadorId: string;
   creadorNombre: string;
   createdAt: string;

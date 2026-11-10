@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 
 import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
+import NotificationBell from "../components/NotificationBell";
 import { Initial, memberCount, Message, ProjectRow, useFeed } from "../components/feed";
 import { colors } from "../components/projectUi";
 
@@ -16,6 +17,7 @@ export default function HomeFeedScreen({ navigation }: { navigation: any }) {
     <AuthSurface>
       <ScrollView contentContainerStyle={styles.content} testID="home-screen" showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
+          <NotificationBell />
           {isLoggedIn ? (
             <TouchableOpacity accessibilityLabel="Mi perfil" onPress={() => navigation.navigate("Profile")} style={styles.avatar}>
               <Initial name={profile.nombreCompleto || "K"} size={48} />
@@ -51,7 +53,7 @@ export default function HomeFeedScreen({ navigation }: { navigation: any }) {
 
 const styles = StyleSheet.create({
   content: { paddingBottom: 32 },
-  header: { flexDirection: "row", justifyContent: "flex-end", minHeight: 56, paddingTop: 8 },
+  header: { flexDirection: "row", justifyContent: "flex-end", gap: 12, minHeight: 56, paddingTop: 8 },
   avatar: { borderRadius: 24, borderWidth: 1.5, borderColor: colors.primary },
   banner: { marginTop: 12, borderRadius: 32, backgroundColor: "#3F00A0", padding: 26 },
   kicker: { color: "#D9C4FF", fontSize: 13, fontWeight: "800" },

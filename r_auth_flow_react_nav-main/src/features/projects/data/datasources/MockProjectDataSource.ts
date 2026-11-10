@@ -1,4 +1,5 @@
-import { JoinRequest, NewProject, Project, ProjectComment, RequestStatus } from "../../domain/entities/Project";
+import { AppNotification, NewNotification } from "../../domain/entities/Notification";
+import { JoinRequest, NewProject, Project, ProjectChanges, ProjectComment, RequestStatus } from "../../domain/entities/Project";
 import { ProjectDataSource } from "./ProjectDataSource";
 
 const ME = "mock-user";
@@ -18,6 +19,7 @@ export class MockProjectDataSource implements ProjectDataSource {
       alcance: "Campus principal durante el próximo semestre.",
       roles: ["Diseño UI/UX", "Análisis de datos"],
       enlaces: [],
+      buscandoPersonas: true,
       creadorId: "other-user",
       creadorNombre: "María López",
       createdAt: "2026-08-10T12:00:00.000Z",
@@ -25,19 +27,43 @@ export class MockProjectDataSource implements ProjectDataSource {
   ];
   private comments: ProjectComment[] = [];
   private requests: JoinRequest[] = [];
+  private notifications: (AppNotification & { para: string })[] = [];
 
   async currentUserId() {
     return ME;
   }
 
   async createProject(project: NewProject, creadorNombre: string): Promise<Project> {
-    const created = { ...project, id: `p${Date.now()}`, creadorId: ME, creadorNombre, createdAt: new Date().toISOString() };
+    const created = { ...project, id: `p${Date.now()}`, buscandoPersonas: true, creadorId: ME, creadorNombre, createdAt: new Date().toISOString() };
     this.projects.unshift(created);
     return created;
   }
 
   async listProjects() {
     return [...this.projects];
+  }
+
+  async updateProject(id: string, changes: ProjectChanges) {
+    this.projects = this.projects.map((p) => (p.id === id ? { ...p, ...changes } : p));
+  }
+
+  async archiveProject(id: string) {
+    this.projects = this.projects.filter((p) => p.id !== id);
+  }
+
+  async listNotifications() {
+    return this.notifications.filter((n) => n.para === ME);
+  }
+
+  async notify({ para, detalle = "", ...rest }: NewNotification) {
+    const createdAt = new Date().toISOString();
+    for (const id of new Set(para)) {
+      if (id && id !== ME) this.notifications.unshift({ ...rest, detalle, para: id, id: `n${this.notifications.length + 1}`, leida: false, createdAt });
+    }
+  }
+
+  async markNotificationsRead(ids: string[]) {
+    this.notifications = this.notifications.map((n) => (ids.includes(n.id) ? { ...n, leida: true } : n));
   }
 
   async listComments(proyectoId?: string) {

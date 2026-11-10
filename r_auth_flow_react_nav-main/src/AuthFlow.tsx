@@ -26,6 +26,7 @@ import { CreateProjectProvider } from "./features/projects/presentation/context/
 import CreateProjectIntroScreen from "./features/projects/presentation/screens/CreateProjectIntroScreen";
 import ProjectBasicInfoScreen from "./features/projects/presentation/screens/ProjectBasicInfoScreen";
 import ProjectCreatedScreen from "./features/projects/presentation/screens/ProjectCreatedScreen";
+import EditProjectScreen from "./features/projects/presentation/screens/EditProjectScreen";
 import ProjectDetailScreen from "./features/projects/presentation/screens/ProjectDetailScreen";
 import ProjectGoalScreen from "./features/projects/presentation/screens/ProjectGoalScreen";
 import ProjectProblemScreen from "./features/projects/presentation/screens/ProjectProblemScreen";
@@ -146,6 +147,7 @@ function AuthenticatedStack() {
         <Stack.Screen name="JoinRequest" component={JoinRequestScreen} />
         <Stack.Screen name="RequestSent" component={RequestSentScreen} />
         <Stack.Screen name="Requests" component={RequestsScreen} />
+        <Stack.Screen name="EditProject" component={EditProjectScreen} />
         <Stack.Screen name="ApplicantProfile" component={ApplicantProfileScreen} />
         <Stack.Screen name="MemberJoined" component={MemberJoinedScreen} />
         <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />

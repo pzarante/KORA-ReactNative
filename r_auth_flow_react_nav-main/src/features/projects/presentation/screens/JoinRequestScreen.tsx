@@ -23,6 +23,7 @@ export default function JoinRequestScreen({ navigation, route }: { navigation: a
     setError(null);
     try {
       await ds.sendRequest({ proyectoId: project.id, rol, mensaje: mensaje.trim(), usuarioNombre: profile.nombreCompleto });
+      void ds.notify({ para: [project.creadorId], tipo: "solicitud", proyectoId: project.id, actorNombre: profile.nombreCompleto, detalle: rol });
       navigation.replace("RequestSent");
     } catch (err: any) {
       setError(err?.message ?? "No se pudo enviar la solicitud");

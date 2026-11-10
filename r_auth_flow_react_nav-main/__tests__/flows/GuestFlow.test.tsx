@@ -16,7 +16,7 @@ describe("Guest mode", () => {
     });
 
     it("lets a guest browse the tabs and asks for an account to create a project", async () => {
-        const { getByTestId } = render(
+        const { getByTestId, getByLabelText, queryByTestId } = render(
             <DIProvider>
                 <AuthProvider>
                     <PaperProvider>
@@ -31,6 +31,12 @@ describe("Guest mode", () => {
         await waitFor(() => expect(getByTestId("welcome-screen")).toBeTruthy());
         await act(async () => fireEvent.press(getByTestId("welcome-guest-button")));
         await waitFor(() => expect(getByTestId("home-screen")).toBeTruthy());
+
+        // Guests never get notifications, only the reminder to log in or sign up.
+        await act(async () => fireEvent.press(getByTestId("notifications-button")));
+        expect(getByTestId("notifications-guest")).toBeTruthy();
+        expect(queryByTestId("notifications-mark-all")).toBeNull();
+        await act(async () => fireEvent.press(getByLabelText("Cerrar")));
 
         await act(async () => fireEvent.press(getByTestId("create-project-tab")));
         await waitFor(() => expect(getByTestId("account-required-screen")).toBeTruthy());

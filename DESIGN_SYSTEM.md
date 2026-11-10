@@ -178,6 +178,8 @@ Todas en `src/features/*/presentation/screens/`.
 | `comousuarioinvitado`, `comousuarioqueomitio` | `auth/AccountRequiredScreen` (sin cuenta / perfil incompleto) |
 | `miperfil-invitado` | `auth/GuestProfileScreen` |
 | `miperfil-estudiante`, `-docente`, `-egresado` | `auth/MyProfileScreen` + `ProfileView` |
+| `Editar proyecto/editarinformacion…`, `editarproyectorecursos`, `salirsinguardar` | `projects/EditProjectScreen` (solo integrantes; "Eliminar" solo el creador) |
+| `notificaciones-sinnotificaciones` | `projects/components/NotificationBell` (panel lateral; tipos en `notificationTypes.ts`) |
 
 ### Variantes de perfil por rol
 

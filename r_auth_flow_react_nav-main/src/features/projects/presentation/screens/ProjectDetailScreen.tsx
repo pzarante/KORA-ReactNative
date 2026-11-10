@@ -46,6 +46,13 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   const userId = data?.userId ?? null;
   const isCreator = !!userId && userId === project.creadorId;
   const myRequest = data?.requests.find((r) => r.usuarioId === userId);
+  const isMember = isCreator || myRequest?.estado === "aceptada";
+  const editButton = (
+    <TouchableOpacity onPress={() => navigation.navigate("EditProject", { project })} style={[ui.primaryButton, styles.editButton]} testID="edit-project-button">
+      <MaterialCommunityIcons name="pencil-outline" size={20} color="#FFFFFF" />
+      <Text style={ui.primaryButtonText}>Editar proyecto</Text>
+    </TouchableOpacity>
+  );
   const members = [creador, ...(data?.requests.filter((r) => r.estado === "aceptada").map((r) => r.usuarioNombre) ?? [])];
   const pending = data?.requests.filter((r) => r.estado === "pendiente").length ?? 0;
 
@@ -169,13 +176,18 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 
       <View style={styles.footer}>
         {isCreator ? (
-          <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
-            <Text style={ui.outlineButtonText}>Ver solicitudes{pending ? ` (${pending})` : ""}</Text>
-          </TouchableOpacity>
-        ) : myRequest?.estado === "aceptada" ? (
-          <Text style={styles.status}>Eres parte del equipo</Text>
+          <>
+            <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
+              <Text style={ui.outlineButtonText}>Solicitudes{pending ? ` (${pending})` : ""}</Text>
+            </TouchableOpacity>
+            {editButton}
+          </>
+        ) : isMember ? (
+          editButton
         ) : myRequest ? (
           <Text style={styles.status}>{myRequest.estado === "pendiente" ? "Solicitud enviada, esperando respuesta" : "Tu solicitud fue rechazada"}</Text>
+        ) : !project.buscandoPersonas ? (
+          <Text style={styles.status}>Este proyecto no está buscando integrantes</Text>
         ) : (
           <TouchableOpacity onPress={askToJoin} style={ui.primaryButton} testID="join-project-button">
             <Text style={ui.primaryButtonText}>Solicitar unirme</Text>
@@ -221,5 +233,6 @@ const styles = StyleSheet.create({
   commentsTitle: { flex: 1, color: colors.text, fontSize: 18, lineHeight: 24, fontWeight: "700" },
   // No top border: the tab bar right below already draws one.
   footer: { flexDirection: "row", gap: 12, paddingHorizontal: 24, paddingVertical: 12 },
+  editButton: { paddingHorizontal: 16 },
   status: { flex: 1, color: colors.primary, fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },
 });

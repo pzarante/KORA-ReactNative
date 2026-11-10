@@ -5,7 +5,7 @@ import AccountPrompt from "@/src/features/auth/presentation/components/AccountPr
 import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project } from "../../domain/entities/Project";
-import { memberCount, Message, ProjectRow, useFeed } from "../components/feed";
+import { memberCount, Message, ProjectRow, TopBar, useFeed } from "../components/feed";
 import { colors } from "../components/projectUi";
 
 const STATUS = { pendiente: "Pendiente", rechazada: "Rechazada", aceptada: "Aceptada" };
@@ -44,6 +44,7 @@ export default function MyProjectsScreen({ navigation }: { navigation: any }) {
   const { isLoggedIn } = useAuth();
   return (
     <AuthSurface>
+      <TopBar />
       {isLoggedIn ? (
         <Logged navigation={navigation} />
       ) : (
