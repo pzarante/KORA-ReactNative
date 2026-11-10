@@ -2,7 +2,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors, ui } from "@/src/features/projects/presentation/components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 import { UserProfile } from "../../domain/entities/UserProfile";
 
 const ROLE_ICONS: Record<string, any> = { Estudiante: "school-outline", Docente: "briefcase-outline", Egresado: "briefcase-outline" };

@@ -1,4 +1,4 @@
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 import { ProjectRemoteDataSourceImp } from "@/src/features/projects/data/datasources/ProjectRemoteDataSourceImp";
 import { NewProject } from "@/src/features/projects/domain/entities/Project";
@@ -9,6 +9,7 @@ const draft: NewProject = {
   icono: "leaf",
   nombre: "EcoCampus",
   descripcion: "Campus sostenible",
+  sobre: "",
   etiquetas: ["Sostenibilidad"],
   etapa: "Idea",
   problema: "Mucho plástico",

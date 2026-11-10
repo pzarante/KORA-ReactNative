@@ -1,5 +1,5 @@
 import { DIProvider } from "@/src/core/di/DIProvider";
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { ProfileRemoteDataSourceImp } from "@/src/features/auth/data/datasources/ProfileRemoteDataSourceImp";
 import { AuthContextType, AuthProvider, useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { act, render, waitFor } from "@testing-library/react-native";

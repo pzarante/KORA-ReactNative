@@ -1,17 +1,22 @@
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
-import { UserProfile } from "../../domain/entities/UserProfile";
+import { canJoinProjects, UserProfile } from "../../domain/entities/UserProfile";
+import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 import { ProfileDataSource } from "./ProfileDataSource";
 
-type RemoteProfile = UserProfile & { _id?: string };
+type RemoteProfile = { _id?: string; user_id?: string; onboarding_completado?: string | null };
 
 export class ProfileRemoteDataSourceImp implements ProfileDataSource {
   private readonly baseUrl: string;
   private readonly prefs = LocalPreferencesAsyncStorage.getInstance();
 
-  constructor(projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID) {
+  constructor(
+    projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID,
+    // Optional so tests can build it alone; the app passes it so an expired token gets refreshed.
+    private readonly authService?: AuthRemoteDataSource,
+  ) {
     if (!projectId) throw new Error("Missing EXPO_PUBLIC_ROBLE_PROJECT_ID env var");
-    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.openlab.uninorte.edu.co").replace(/\/$/, "");
+    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.test-openlab.uninorte.edu.co").replace(/\/$/, "");
     this.baseUrl = `${apiUrl}/database/${projectId}`;
   }
 
@@ -21,21 +26,19 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
 
     const userId = userIdFromToken(token);
     const completeProfile: UserProfile = { ...profile, userId };
-    const existing = await this.findProfile(userId, token);
+    const existing = await this.findProfile(userId);
     const response = existing
-      ? await fetch(`${this.baseUrl}/update`, {
+      ? await this.send(`${this.baseUrl}/update`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({
             tableName: "Usuario",
             idColumn: "_id",
             idValue: existing._id,
-            updates: this.toRecord(completeProfile),
+            updates: this.toRecord(completeProfile, existing.onboarding_completado),
           }),
         })
-      : await fetch(`${this.baseUrl}/insert`, {
+      : await this.send(`${this.baseUrl}/insert`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ tableName: "Usuario", records: [this.toRecord(completeProfile)] }),
         });
 
@@ -48,25 +51,37 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
   async getProfile(userId?: string): Promise<UserProfile | null> {
     const token = await this.prefs.retrieveData<string>("token");
     if (!token) return null;
-    const row: any = await this.findProfile(userId ?? userIdFromToken(token), token);
+    const row: any = await this.findProfile(userId ?? userIdFromToken(token));
     if (!row) return null;
+    const nombreCompleto = row.nombre_completo ?? "";
+    const rol = row.rol ?? "";
     return {
       userId: row.user_id,
-      nombreCompleto: row.nombre_completo ?? "",
-      rol: row.rol ?? "",
+      nombreCompleto,
+      rol,
       habilidades: Array.isArray(row.habilidades) ? row.habilidades : [],
       infoAdicional: row.info_adicional ?? "",
       whatsapp: row.whatsapp ?? "",
       correoContacto: row.correo_contacto ?? "",
-      onboardingCompletado: !!row.onboarding_completado,
+      // Derived from the data, not the column: onboarding_completado is always filled (see toRecord).
+      onboardingCompletado: canJoinProjects({ nombreCompleto, rol }),
     };
   }
 
-  private async findProfile(userId: string, token: string): Promise<RemoteProfile | undefined> {
-    const response = await fetch(
-      `${this.baseUrl}/read?tableName=Usuario&user_id=${encodeURIComponent(userId)}`,
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
+  /** Sends with the session token; on 401 refreshes it once and retries, like RobleDatabase. */
+  private async send(url: string, init: RequestInit = {}): Promise<Response> {
+    const request = async () => {
+      const token = await this.prefs.retrieveData<string>("token");
+      return fetch(url, { ...init, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
+    };
+    const response = await request();
+    if (response.status !== 401 || !this.authService) return response;
+    const refreshed = await this.authService.refreshToken().catch(() => false);
+    return refreshed ? request() : response;
+  }
+
+  private async findProfile(userId: string): Promise<RemoteProfile | undefined> {
+    const response = await this.send(`${this.baseUrl}/read?tableName=Usuario&user_id=${encodeURIComponent(userId)}`);
     if (response.status === 404) return undefined;
     if (!response.ok) {
       throw new Error(`No se pudo consultar la tabla Usuario: ${response.status}`);
@@ -76,7 +91,7 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
     return rows.find((row) => row.user_id === userId);
   }
 
-  private toRecord(profile: UserProfile) {
+  private toRecord(profile: UserProfile, completedAt?: string | null) {
     return {
       user_id: profile.userId,
       nombre_completo: profile.nombreCompleto,
@@ -85,8 +100,9 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       info_adicional: profile.infoAdicional,
       whatsapp: profile.whatsapp,
       correo_contacto: profile.correoContacto,
-      // The Roble column is a timestamp (NOT NULL): store when onboarding was completed.
-      onboarding_completado: profile.onboardingCompletado ? new Date().toISOString() : null,
+      // Roble keeps this column NOT NULL and its SQL console can't change that, so it always holds a
+      // date: when the profile was first saved. Whether onboarding is done is derived on read.
+      onboarding_completado: completedAt || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
   }

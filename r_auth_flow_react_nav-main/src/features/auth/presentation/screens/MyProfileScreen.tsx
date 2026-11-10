@@ -3,9 +3,10 @@ import React from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { RoundButton, TopBar, useFeed } from "@/src/features/projects/presentation/components/feed";
-import { colors, ui } from "@/src/features/projects/presentation/components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 import { profileCompletion } from "../../domain/entities/UserProfile";
-import AuthSurface from "../components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import ProfileProgress from "../components/ProfileProgress";
 import ProfileView from "../components/ProfileView";
 import { useAuth } from "../context/authContext";
@@ -23,7 +24,7 @@ export default function MyProfileScreen({ navigation }: { navigation: any }) {
   const edit = () => navigation.navigate("EditProfile");
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <TopBar right={<RoundButton icon="logout" label="Cerrar sesión" color={colors.orange} onPress={logout} testID="logout-button" />} />
       <ScrollView contentContainerStyle={styles.content} testID="my-profile-screen" showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Mi perfil</Text>
@@ -58,7 +59,7 @@ export default function MyProfileScreen({ navigation }: { navigation: any }) {
           }
         />
       </ScrollView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

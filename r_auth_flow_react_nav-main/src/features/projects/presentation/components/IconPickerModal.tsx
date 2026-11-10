@@ -2,7 +2,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { colors, PROJECT_ICONS, ui } from "./projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
+import { PROJECT_ICONS } from "@/src/features/projects/presentation/components/projectIcons";
 
 type Props = {
   visible: boolean;

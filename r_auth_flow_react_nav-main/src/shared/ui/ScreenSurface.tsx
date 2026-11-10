@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 /** `scroll`: the content scrolls only when it doesn't fit (small phones, open keyboard); otherwise it fills the screen as before. */
-export default function AuthSurface({ children, scroll }: { children: React.ReactNode; scroll?: boolean }) {
+export default function ScreenSurface({ children, scroll }: { children: React.ReactNode; scroll?: boolean }) {
   return (
     <SafeAreaView style={styles.surface}>
       <StatusBar style="dark" backgroundColor="#FFFFFF" />

@@ -7,9 +7,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { AppNotification } from "../../domain/entities/Notification";
 import { Project } from "../../domain/entities/Project";
-import { RoundButton, timeAgo, useProjectDS } from "./feed";
+import { RoundButton, timeAgo, useProjectUseCases } from "./feed";
 import { NOTIFICATION_TYPES } from "./notificationTypes";
-import { colors } from "./projectUi";
+import { colors } from "@/src/shared/ui/tokens";
 
 type Row = AppNotification & { project: Project };
 
@@ -26,7 +26,7 @@ export function withProjects(notifications: AppNotification[], projects: Project
 export default function NotificationBell() {
   const { isLoggedIn } = useAuth();
   const navigation = useNavigation<any>();
-  const ds = useProjectDS();
+  const ds = useProjectUseCases();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Row[]>([]);
   const [error, setError] = useState<string | null>(null);

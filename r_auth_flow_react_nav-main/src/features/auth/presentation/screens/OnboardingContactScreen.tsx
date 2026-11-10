@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors, ui } from "@/src/features/projects/presentation/components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 import { contactError } from "../../domain/entities/UserProfile";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import ContactFields from "../components/ContactFields";

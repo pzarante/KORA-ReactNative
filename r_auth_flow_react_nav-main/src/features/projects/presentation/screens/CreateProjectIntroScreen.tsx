@@ -2,16 +2,17 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AuthBrand from "@/src/features/auth/presentation/components/AuthBrand";
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
-import { colors, ui } from "../components/projectUi";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function CreateProjectIntroScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface scroll>
+    <ScreenSurface scroll>
       <View style={styles.container} testID="create-project-intro">
         <View style={styles.brand}>
-          <AuthBrand />
+          <BrandLogo />
         </View>
         <View style={styles.illustration}>
           <MaterialCommunityIcons name="folder-plus-outline" size={120} color={colors.primary} />
@@ -29,7 +30,7 @@ export default function CreateProjectIntroScreen({ navigation }: { navigation: a
           </TouchableOpacity>
         </View>
       </View>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

@@ -1,10 +1,23 @@
 export const TOKENS = {
+  // Auth
   AuthRemoteDS: Symbol("AuthRemoteDS"),
   AuthRepo: Symbol("AuthRepo"),
+  AuthUseCases: Symbol("AuthUseCases"),
+  // Profile
+  ProfileDataSource: Symbol("ProfileDataSource"),
+  ProfileRepository: Symbol("ProfileRepository"),
+  ProfileUseCases: Symbol("ProfileUseCases"),
+  // Products
   LocalProductCacheDS: Symbol("LocalProductCacheDS"),
   ProductRemoteDS: Symbol("ProductRemoteDS"),
   ProductRepo: Symbol("ProductRepo"),
-  ProfileDataSource: Symbol("ProfileDataSource"),
+  ProductUseCases: Symbol("ProductUseCases"),
+  // Projects
   ProjectDataSource: Symbol("ProjectDataSource"),
-  // Add Product tokens if you want to DI those too...
+  ProjectRepository: Symbol("ProjectRepository"),
+  ProjectUseCases: Symbol("ProjectUseCases"),
+  // KORA NODE
+  KoraNodeDataSource: Symbol("KoraNodeDataSource"),
+  KoraNodeRepository: Symbol("KoraNodeRepository"),
+  KoraNodeUseCases: Symbol("KoraNodeUseCases"),
 } as const;

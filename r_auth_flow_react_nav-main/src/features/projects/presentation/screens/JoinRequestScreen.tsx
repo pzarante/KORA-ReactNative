@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project } from "../../domain/entities/Project";
-import { ProjectSummary, TopBar, useProjectDS } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { ProjectSummary, TopBar, useProjectUseCases } from "../components/feed";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function JoinRequestScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
-  const ds = useProjectDS();
+  const useCases = useProjectUseCases();
   const { profile } = useAuth();
   const [mensaje, setMensaje] = useState("");
   const [rol, setRol] = useState(project.roles.length === 0 ? "Colaborador" : "");
@@ -22,8 +23,8 @@ export default function JoinRequestScreen({ navigation, route }: { navigation: a
     setSending(true);
     setError(null);
     try {
-      await ds.sendRequest({ proyectoId: project.id, rol, mensaje: mensaje.trim(), usuarioNombre: profile.nombreCompleto });
-      void ds.notify({ para: [project.creadorId], tipo: "solicitud", proyectoId: project.id, actorNombre: profile.nombreCompleto, detalle: rol });
+      await useCases.sendRequest({ proyectoId: project.id, rol, mensaje: mensaje.trim(), usuarioNombre: profile.nombreCompleto });
+      void useCases.notify({ para: [project.creadorId], tipo: "solicitud", proyectoId: project.id, actorNombre: profile.nombreCompleto, detalle: rol });
       navigation.replace("RequestSent");
     } catch (err: any) {
       setError(err?.message ?? "No se pudo enviar la solicitud");
@@ -32,7 +33,7 @@ export default function JoinRequestScreen({ navigation, route }: { navigation: a
   };
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <TopBar onBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.content} testID="join-request-screen">
         <Text style={styles.title}>Solicitar unirme</Text>
@@ -78,7 +79,7 @@ export default function JoinRequestScreen({ navigation, route }: { navigation: a
           <Text style={[ui.primaryButtonText, !ready && ui.primaryButtonTextDisabled]}>{sending ? "Enviando..." : "Enviar solicitud"}</Text>
         </TouchableOpacity>
       </View>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

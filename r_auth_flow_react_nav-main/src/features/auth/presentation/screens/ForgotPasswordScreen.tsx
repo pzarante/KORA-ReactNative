@@ -11,9 +11,10 @@ import {
   View,
 } from "react-native";
 
-import AuthBrand from "../components/AuthBrand";
-import AuthSurface from "../components/AuthSurface";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
+import { colors } from "@/src/shared/ui/tokens";
 
 export default function ForgotPasswordScreen({ navigation }: { navigation: any }) {
   const { forgotPassword, error, loading, clearError } = useAuth();
@@ -42,7 +43,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
   };
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.keyboard}
@@ -53,7 +54,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
           showsVerticalScrollIndicator={false}
         >
           <View testID="forgot-password-screen" style={styles.container}>
-            <AuthBrand />
+            <BrandLogo />
 
             <View style={styles.heading}>
               <Text style={styles.eyebrow}>¿OLVIDASTE TU CONTRASEÑA?</Text>
@@ -70,7 +71,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
                 <MaterialCommunityIcons
                   name="email-outline"
                   size={17}
-                  color="#756A8E"
+                  color={colors.muted}
                 />
                 <TextInput
                   accessibilityLabel="Correo Electrónico"
@@ -144,7 +145,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 
@@ -160,20 +161,20 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
   eyebrow: {
-    color: "#3C00A0",
+    color: colors.primary,
     fontSize: 13,
     fontWeight: "700",
     letterSpacing: 0.2,
   },
   title: {
-    color: "#1E1630",
+    color: colors.text,
     fontSize: 32,
     fontWeight: "800",
     letterSpacing: -0.32,
     marginTop: 10,
   },
   description: {
-    color: "#6B6282",
+    color: colors.muted,
     fontSize: 15,
     fontWeight: "600",
     lineHeight: 22.5,
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
     marginTop: 82,
   },
   label: {
-    color: "#1E1630",
+    color: colors.text,
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 5,
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   sendLinkText: {
-    color: "#3C00A0",
+    color: colors.primary,
     fontSize: 13,
     fontWeight: "600",
     textDecorationLine: "underline",
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 21,
   },
   status: {
-    color: "#6B6282",
+    color: colors.muted,
     fontSize: 12,
     lineHeight: 18,
     marginTop: 8,
@@ -236,14 +237,14 @@ const styles = StyleSheet.create({
   backButton: {
     minHeight: 54,
     borderRadius: 28,
-    backgroundColor: "#3C00A0",
+    backgroundColor: colors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 60,
     marginLeft: -3,
     marginRight: 3,
-    shadowColor: "#3C00A0",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.19,
     shadowRadius: 8,

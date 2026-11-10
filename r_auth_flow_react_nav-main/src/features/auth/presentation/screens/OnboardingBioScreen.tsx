@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
-import { ui } from "@/src/features/projects/presentation/components/projectUi";
+import { ui } from "@/src/shared/ui/styles";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import OnboardingLayout from "../components/OnboardingLayout";
 import { useAuth } from "../context/authContext";
+import { colors } from "@/src/shared/ui/tokens";
 
 export default function OnboardingBioScreen({ navigation }: { navigation: any }) {
   const [bio, setBio] = useState("");
@@ -21,7 +22,7 @@ export default function OnboardingBioScreen({ navigation }: { navigation: any })
           <TextInput
             style={[ui.input, ui.textArea, styles.textArea]}
             placeholder="Cuéntanos algo más sobre ti (intereses, metas, etc.)"
-            placeholderTextColor="#756A8E"
+            placeholderTextColor={colors.muted}
             multiline
             value={bio}
             onChangeText={setBio}
@@ -40,7 +41,7 @@ export default function OnboardingBioScreen({ navigation }: { navigation: any })
 
 const styles = StyleSheet.create({
   heading: { alignItems: "center", marginTop: 32, marginBottom: 22 },
-  title: { color: "#211832", fontSize: 32, fontWeight: "800", textAlign: "center" },
-  subtitle: { color: "#756A8E", fontSize: 15, fontWeight: "600", marginTop: 7, textAlign: "center" },
+  title: { color: colors.text, fontSize: 32, fontWeight: "800", textAlign: "center" },
+  subtitle: { color: colors.muted, fontSize: 15, fontWeight: "600", marginTop: 7, textAlign: "center" },
   textArea: { minHeight: 170, backgroundColor: "rgba(255,255,255,0.88)", marginBottom: 30 },
 });

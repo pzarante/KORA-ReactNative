@@ -4,7 +4,9 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-nativ
 
 import AddRolesSheet from "../components/AddRolesSheet";
 import ProjectStepLayout from "../components/ProjectStepLayout";
-import { colors, ui, URL_PATTERN } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
+import { URL_PATTERN } from "../../domain/entities/Project";
 import { useCreateProject } from "../context/createProjectContext";
 
 export default function ProjectTeamScreen() {

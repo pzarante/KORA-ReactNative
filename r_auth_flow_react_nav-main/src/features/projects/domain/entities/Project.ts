@@ -1,9 +1,12 @@
+export const URL_PATTERN = /^https?:\/\/\S+\.\S+$/i;
+
 export const PROJECT_STAGES = ["Idea", "Formación de equipo", "Investigación", "Prototipo", "Pruebas"];
 
 export type NewProject = {
   icono: string;
   nombre: string;
   descripcion: string;
+  sobre: string;
   etiquetas: string[];
   etapa: string;
   problema: string;

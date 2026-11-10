@@ -1,4 +1,4 @@
-import AuthFlow from "@/src/AuthFlow";
+import RootNavigator from "@/src/navigation/RootNavigator";
 import { DIProvider } from "@/src/core/di/DIProvider";
 import { AuthProvider } from "@/src/features/auth/presentation/context/authContext";
 import { NavigationContainer } from "@react-navigation/native";
@@ -16,7 +16,7 @@ async function enterAsGuest() {
             <AuthProvider>
                 <PaperProvider>
                     <NavigationContainer>
-                        <AuthFlow />
+                        <RootNavigator />
                     </NavigationContainer>
                 </PaperProvider>
             </AuthProvider>

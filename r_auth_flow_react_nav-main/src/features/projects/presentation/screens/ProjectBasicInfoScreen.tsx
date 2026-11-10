@@ -4,7 +4,9 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-nativ
 
 import IconPickerModal from "../components/IconPickerModal";
 import ProjectStepLayout from "../components/ProjectStepLayout";
-import { colors, PROJECT_ICONS, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
+import { PROJECT_ICONS } from "@/src/features/projects/presentation/components/projectIcons";
 import { useCreateProject } from "../context/createProjectContext";
 
 const MAX_DESCRIPTION = 150;
@@ -77,6 +79,19 @@ export default function ProjectBasicInfoScreen() {
           style={[ui.input, ui.textArea]}
           testID="project-description-input"
           value={draft.descripcion}
+        />
+      </View>
+
+      <View>
+        <Text style={ui.label}>Sobre el proyecto</Text>
+        <TextInput
+          multiline
+          onChangeText={(sobre) => update({ sobre })}
+          placeholder="Cuenta los detalles y el contexto de tu proyecto..."
+          placeholderTextColor={colors.muted}
+          style={[ui.input, ui.textArea]}
+          testID="project-about-input"
+          value={draft.sobre}
         />
       </View>
 

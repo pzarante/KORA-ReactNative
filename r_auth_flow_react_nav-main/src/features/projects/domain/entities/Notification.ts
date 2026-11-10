@@ -8,7 +8,8 @@ export type NotificationType =
   | "solicitud_rechazada"
   | "comentario"
   | "respuesta_comentario"
-  | "edicion";
+  | "edicion"
+  | "reunion";
 
 export type AppNotification = {
   id: string;

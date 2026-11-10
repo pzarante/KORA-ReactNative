@@ -31,7 +31,7 @@ describe("AuthRemoteDataSourceImpl", () => {
 
     await expect(new AuthRemoteDataSourceImpl("test-project", "signup").signUp("a@a.com", "secret1")).resolves.toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0][0]).toBe("https://roble-api.openlab.uninorte.edu.co/auth/test-project/signup");
+    expect(fetchMock.mock.calls[0][0]).toBe("https://roble-api.test-openlab.uninorte.edu.co/auth/test-project/signup");
   });
 
   it("resends the verification code and surfaces Roble's error", async () => {
@@ -80,7 +80,7 @@ describe("AuthRemoteDataSourceImpl", () => {
 
     await expect(dataSource.forgotPassword("test@example.com")).resolves.toBeUndefined();
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://roble-api.openlab.uninorte.edu.co/auth/test-project/forgot-password",
+      "https://roble-api.test-openlab.uninorte.edu.co/auth/test-project/forgot-password",
       {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },

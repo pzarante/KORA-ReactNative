@@ -10,7 +10,7 @@ import React, {
 import { useDI } from "@/src/core/di/DIProvider";
 import { TOKENS } from "@/src/core/di/tokens";
 import { NewProduct, Product } from "@/src/features/products/domain/entities/Product";
-import { ProductRepository } from "../../domain/repositories/ProductRepository";
+import { ProductUseCases } from "../../domain/use-cases/ProductUseCases";
 
 export type ProductContextType = {
   products: Product[];
@@ -31,8 +31,7 @@ export const ProductContext = createContext<ProductContextType | undefined>(unde
 export function ProductProvider({ children }: { children: ReactNode }) {
   const di = useDI();
 
-  // ✅ Directly resolve the repository, no use cases
-  const productRepo = useMemo(() => di.resolve<ProductRepository>(TOKENS.ProductRepo), [di]);
+  const productUseCases = useMemo(() => di.resolve<ProductUseCases>(TOKENS.ProductUseCases), [di]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +48,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      const list = await productRepo.getProducts();
+      const list = await productUseCases.getProducts();
       setProducts(list);
     } catch (e) {
       setError((e as Error).message);
@@ -62,7 +61,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     try {
       setIsRefreshing(true);
       setError(null);
-      const list = await productRepo.forceRefresh();
+      const list = await productUseCases.forceRefresh();
       setProducts(list);
     } catch (e) {
       setError((e as Error).message);
@@ -75,7 +74,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      await productRepo.addProduct(product);
+      await productUseCases.addProduct(product);
       await refreshProducts();
     } catch (e) {
       setError((e as Error).message);
@@ -88,7 +87,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      await productRepo.updateProduct(product);
+      await productUseCases.updateProduct(product);
       await refreshProducts();
     } catch (e) {
       setError((e as Error).message);
@@ -101,7 +100,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      await productRepo.deleteProduct(id);
+      await productUseCases.deleteProduct(id);
       await refreshProducts();
     } catch (e) {
       setError((e as Error).message);
@@ -115,7 +114,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      return await productRepo.getProductById(id);
+      return await productUseCases.getProductById(id);
     } catch (e) {
       setError((e as Error).message);
       return undefined;

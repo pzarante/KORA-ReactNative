@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { colors } from "@/src/shared/ui/tokens";
 
 export default function AuthPrimaryButton({
   label,
@@ -29,10 +30,10 @@ const styles = StyleSheet.create({
   button: {
     minHeight: 57,
     borderRadius: 30,
-    backgroundColor: "#4500B5",
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#4500B5",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.25,
     shadowRadius: 10,

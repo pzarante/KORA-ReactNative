@@ -2,21 +2,22 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { Project } from "../../domain/entities/Project";
-import { Initial, Message, timeAgo, TopBar, useFocusLoad, useProjectDS } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { Initial, Message, timeAgo, TopBar, useFocusLoad, useProjectUseCases } from "../components/feed";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function RequestsScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
-  const ds = useProjectDS();
+  const useCases = useProjectUseCases();
   const { data: requests, error } = useFocusLoad(
-    async () => (await ds.listRequests({ proyectoId: project.id })).filter((r) => r.estado === "pendiente"),
-    [ds, project.id],
+    async () => (await useCases.listRequests({ proyectoId: project.id })).filter((r) => r.estado === "pendiente"),
+    [useCases, project.id],
   );
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <TopBar onBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.content} testID="requests-screen">
         <Text style={styles.title}>Solicitudes para unirse</Text>
@@ -50,7 +51,7 @@ export default function RequestsScreen({ navigation, route }: { navigation: any;
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

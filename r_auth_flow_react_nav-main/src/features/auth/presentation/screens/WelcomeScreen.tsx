@@ -1,157 +1,120 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-native';
+import { Sora_600SemiBold, Sora_700Bold, Sora_800ExtraBold, useFonts } from "@expo-google-fonts/sora";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import BrandLogo from "@/src/shared/ui/BrandLogo";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
+import { colors } from "@/src/shared/ui/tokens";
+
+// Sizes come from the Figma frame (428 x 926) but are not scaled: the column scrolls
+// on short phones or with large system text instead of shrinking or overlapping.
 export default function WelcomeScreen({ navigation }: { navigation: any }) {
+  const [fontsLoaded] = useFonts({ Sora_600SemiBold, Sora_700Bold, Sora_800ExtraBold });
+  // Until Sora loads, the system font with the same weight.
+  const font = (family: string, weight: "600" | "700" | "800") => (fontsLoaded ? { fontFamily: family } : { fontWeight: weight });
+
   return (
-    <SafeAreaView testID="welcome-screen" style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.container} alwaysBounceVertical={false} showsVerticalScrollIndicator={false}>
-      {/* Logo de KORA */}
-      <View style={styles.logoContainer}>
-        <Text style={styles.logoText}>KORA</Text>
+    <ScreenSurface scroll>
+      <View style={styles.container} testID="welcome-screen">
+        <View style={styles.top}>
+          <View style={styles.brand}>
+            <Image
+              accessibilityLabel="Kora"
+              source={require("../../../../../assets/images/kora-wordmark.png")}
+              resizeMode="contain"
+              style={styles.wordmark}
+            />
+            <View style={styles.badge}>
+              <BrandLogo size={44} />
+            </View>
+          </View>
+
+          <View style={styles.texts}>
+            <Text style={[styles.title, font("Sora_800ExtraBold", "800")]}>¿Ya tienes cuenta?</Text>
+            <Text style={[styles.subtitle, font("Sora_600SemiBold", "600")]}>
+              Inicia sesión para acceder a tu espacio o crea una cuenta nueva para comenzar.
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.actions}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Iniciar sesión"
+            testID="welcome-login-button"
+            onPress={() => navigation.navigate("Login")}
+            style={[styles.button, styles.primaryButton]}
+          >
+            <Text style={[styles.primaryButtonText, font("Sora_700Bold", "700")]}>Iniciar Sesión</Text>
+            <MaterialCommunityIcons name="arrow-right" size={18} color="#FFFFFF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Registrarse"
+            testID="welcome-signup-button"
+            onPress={() => navigation.navigate("Signup")}
+            style={[styles.button, styles.secondaryButton]}
+          >
+            <Text style={[styles.secondaryButtonText, font("Sora_700Bold", "700")]}>Registrarse</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Ingresar como invitado"
+            testID="welcome-guest-button"
+            onPress={() => navigation.navigate("App")}
+            style={styles.guestButton}
+          >
+            <Text style={[styles.guestText, font("Sora_700Bold", "700")]}>Ingresar como invitado</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      {/* Círculo con icono central */}
-      <View style={styles.iconCircle}>
-        <Text style={styles.avatarPlaceholder}>👤</Text>
-      </View>
-
-      {/* Textos principales */}
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>¿Ya tienes cuenta?</Text>
-        <Text style={styles.subtitle}>
-          Inicia sesión para acceder a tu espacio o crea una cuenta nueva para comenzar.
-        </Text>
-      </View>
-
-      {/* Botones de acción */}
-      <View style={styles.buttonContainer}>
-        {/* Botón Iniciar Sesión (lleva al LoginScreen existente) */}
-        <TouchableOpacity 
-          style={styles.primaryButton} 
-          testID="welcome-login-button"
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.primaryButtonText}>Iniciar Sesión →</Text>
-        </TouchableOpacity>
-
-        {/* Botón Registrarse (lleva al SignupScreen existente) */}
-        <TouchableOpacity 
-          style={styles.secondaryButton} 
-          testID="welcome-signup-button"
-          onPress={() => navigation.navigate('Signup')}
-        >
-          <Text style={styles.secondaryButtonText}>Registrarse</Text>
-        </TouchableOpacity>
-
-        {/* Ingresar como invitado */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('App')}
-          style={styles.guestLink}
-          testID="welcome-guest-button"
-        >
-          <Text style={styles.guestText}>Ingresar como invitado</Text>
-        </TouchableOpacity>
-      </View>
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenSurface>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#FFFFFF' },
-  // flexGrow: fills the screen like before, and scrolls only on phones too short for it.
-  container: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
+  container: { flexGrow: 1, paddingVertical: 24 },
+  // Logo and texts take the spare height and stay centered above the buttons, as in the design.
+  top: { flex: 1, justifyContent: "center", gap: 20 },
+  brand: { alignItems: "center", gap: 48 },
+  wordmark: { width: 256, maxWidth: "100%", aspectRatio: 511 / 127 },
+  badge: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E9E3F5",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.19,
+    shadowRadius: 24,
+    elevation: 8,
   },
-  logoContainer: {
-    marginTop: 20,
-  },
-  logoText: {
-    fontSize: 42,
-    fontWeight: '900',
-    color: '#4A0E95', // Color morado característico
-    letterSpacing: 2,
-  },
-  iconCircle: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: '#F8F6FC',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#4A0E95',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  avatarPlaceholder: {
-    fontSize: 45,
-  },
-  textContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 10,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666666',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  buttonContainer: {
-    width: '100%',
-    gap: 14,
-  },
+  texts: { gap: 12 },
+  title: { color: colors.text, textAlign: "center", fontSize: 36, lineHeight: 43, letterSpacing: -1.5 },
+  subtitle: { color: colors.muted, textAlign: "center", fontSize: 15, lineHeight: 22.5 },
+  actions: { gap: 16, marginTop: 32 },
+  button: { minHeight: 56, borderRadius: 28, alignItems: "center", justifyContent: "center" },
   primaryButton: {
-    backgroundColor: '#4A0E95',
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#4A0E95',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 4,
+    flexDirection: "row",
+    gap: 8,
+    backgroundColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.19,
+    shadowRadius: 16,
+    elevation: 6,
   },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  secondaryButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#4A0E95',
-  },
-  secondaryButtonText: {
-    color: '#4A0E95',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  guestLink: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  guestText: {
-    color: '#4A0E95',
-    fontSize: 14,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
+  primaryButtonText: { color: "#FFFFFF", fontSize: 16 },
+  secondaryButton: { backgroundColor: "#FFFFFF", borderWidth: 2, borderColor: colors.primary },
+  secondaryButtonText: { color: colors.primary, fontSize: 16 },
+  // 44 pt: minimum touch area from DESIGN_SYSTEM.md, even though the text is small.
+  guestButton: { minHeight: 44, alignItems: "center", justifyContent: "center" },
+  guestText: { color: colors.primary, fontSize: 13, textDecorationLine: "underline" },
 });

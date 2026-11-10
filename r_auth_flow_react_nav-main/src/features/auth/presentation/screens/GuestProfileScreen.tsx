@@ -1,14 +1,14 @@
 import React from "react";
 import { StyleSheet, Text } from "react-native";
 
-import { colors } from "@/src/features/projects/presentation/components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
 import { TopBar } from "@/src/features/projects/presentation/components/feed";
 import AccountPrompt from "../components/AccountPrompt";
-import AuthSurface from "../components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 
 export default function GuestProfileScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface scroll>
+    <ScreenSurface scroll>
       <TopBar />
       <Text style={styles.title} testID="guest-profile-screen">Mi perfil</Text>
       <AccountPrompt
@@ -19,7 +19,7 @@ export default function GuestProfileScreen({ navigation }: { navigation: any }) 
         secondaryLabel="Ya tengo una cuenta"
         onSecondary={() => navigation.navigate("Login")}
       />
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

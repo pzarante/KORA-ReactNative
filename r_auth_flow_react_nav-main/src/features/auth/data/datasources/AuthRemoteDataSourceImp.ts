@@ -1,5 +1,5 @@
-import { ILocalPreferences } from "@/src/core/iLocalPreferences";
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { ILocalPreferences } from "@/src/shared/storage/iLocalPreferences";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 
 export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -17,7 +17,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw new Error("Configura el Project ID real de Roble en el archivo .env");
     }
     this.projectId = projectId;
-    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.openlab.uninorte.edu.co").replace(/\/$/, "");
+    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.test-openlab.uninorte.edu.co").replace(/\/$/, "");
     this.baseUrl = `${apiUrl}/auth/${this.projectId}`;
     this.prefs = LocalPreferencesAsyncStorage.getInstance();
   }

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "@/src/features/projects/presentation/components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
 
 /** Purple bar with the percentage of the profile filled in; `label` goes on the left (e.g. "Paso 2 de 4"). */
 export default function ProfileProgress({ value, label }: { value: number; label: string }) {

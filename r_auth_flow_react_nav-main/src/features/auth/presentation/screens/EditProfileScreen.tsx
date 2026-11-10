@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { TopBar } from "@/src/features/projects/presentation/components/feed";
-import { colors, ui } from "@/src/features/projects/presentation/components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { contactError, PROFILE_ROLES, PROFILE_SKILLS, profileCompletion } from "../../domain/entities/UserProfile";
 import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
-import AuthSurface from "../components/AuthSurface";
 import ContactFields from "../components/ContactFields";
 import OptionPill from "../components/OptionPill";
 import ProfileProgress from "../components/ProfileProgress";
@@ -44,7 +45,7 @@ export default function EditProfileScreen({ navigation }: { navigation: any }) {
   };
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <TopBar onBack={() => navigation.goBack()} />
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} testID="edit-profile-screen">
@@ -114,7 +115,7 @@ export default function EditProfileScreen({ navigation }: { navigation: any }) {
           {error ? <Text style={ui.error}>{error}</Text> : null}
         </ScrollView>
       </KeyboardAvoidingView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

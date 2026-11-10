@@ -2,15 +2,15 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 
 import AccountPrompt from "../components/AccountPrompt";
-import AuthBrand from "../components/AuthBrand";
-import AuthSurface from "../components/AuthSurface";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 
 // Shown when a guest tries something that needs an account (crear o postularse a un proyecto).
 export default function AccountRequiredScreen({ navigation }: { navigation: any }) {
   return (
-    <AuthSurface scroll>
+    <ScreenSurface scroll>
       <View style={styles.brand} testID="account-required-screen">
-        <AuthBrand />
+        <BrandLogo />
       </View>
       <AccountPrompt
         title="Crea una cuenta para unirte"
@@ -20,7 +20,7 @@ export default function AccountRequiredScreen({ navigation }: { navigation: any 
         secondaryLabel="Volver"
         onSecondary={() => navigation.goBack()}
       />
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

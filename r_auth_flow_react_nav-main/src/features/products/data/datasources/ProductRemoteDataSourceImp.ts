@@ -1,5 +1,5 @@
-import { ILocalPreferences } from "@/src/core/iLocalPreferences";
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { ILocalPreferences } from "@/src/shared/storage/iLocalPreferences";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 import { NewProduct, Product } from "../../domain/entities/Product";
 import { ProductDataSource } from "./ProductDataSource";
@@ -20,7 +20,7 @@ export class ProductRemoteDataSourceImp implements ProductDataSource {
     }
     this.prefs = LocalPreferencesAsyncStorage.getInstance();
     this.projectId = projectId;
-    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.openlab.uninorte.edu.co").replace(/\/$/, "");
+    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.test-openlab.uninorte.edu.co").replace(/\/$/, "");
     this.baseUrl = `${apiUrl}/database/${this.projectId}`;
   }
 

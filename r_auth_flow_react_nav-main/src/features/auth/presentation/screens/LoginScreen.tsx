@@ -6,11 +6,12 @@ import {
   View,
 } from "react-native";
 
-import AuthBrand from "../components/AuthBrand";
+import BrandLogo from "@/src/shared/ui/BrandLogo";
 import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
-import AuthSurface from "../components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
+import { colors } from "@/src/shared/ui/tokens";
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
   const { login, error, loading } = useAuth();
@@ -44,9 +45,9 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
   };
 
   return (
-    <AuthSurface scroll>
+    <ScreenSurface scroll>
         <View testID="login-screen" style={styles.container}>
-          <AuthBrand />
+          <BrandLogo />
           <View style={styles.heading}>
             <Text style={styles.eyebrow}>¡HOLA DE NUEVO!</Text>
             <Text style={styles.title}>Iniciar Sesión</Text>
@@ -112,7 +113,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
             <View style={styles.line} />
           </View>
         </View>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 
@@ -120,12 +121,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 48 },
   heading: { marginTop: 18, marginBottom: 27 },
   eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
-  title: { color: "#211832", fontSize: 32, fontWeight: "800", marginTop: 5 },
+  title: { color: colors.text, fontSize: 32, fontWeight: "800", marginTop: 5 },
   form: { gap: 8 },
-  label: { color: "#211832", fontSize: 14, fontWeight: "700", marginTop: 9 },
+  label: { color: colors.text, fontSize: 14, fontWeight: "700", marginTop: 9 },
   forgot: { alignSelf: "flex-end", marginTop: 14, marginBottom: 31 },
-  link: { color: "#4500B5", fontSize: 13, fontWeight: "800", textDecorationLine: "underline" },
+  link: { color: colors.primary, fontSize: 13, fontWeight: "800", textDecorationLine: "underline" },
   footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 24 },
-  line: { height: 1, backgroundColor: "#E6DDF2", flex: 1 },
-  footerText: { color: "#756A8E", fontSize: 13, fontWeight: "600" },
+  line: { height: 1, backgroundColor: colors.border, flex: 1 },
+  footerText: { color: colors.muted, fontSize: 13, fontWeight: "600" },
 });

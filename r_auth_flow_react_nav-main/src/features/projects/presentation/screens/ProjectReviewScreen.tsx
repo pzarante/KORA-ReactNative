@@ -3,7 +3,8 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import ProjectStepLayout from "../components/ProjectStepLayout";
-import { colors, ui } from "../components/projectUi";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 import { useCreateProject } from "../context/createProjectContext";
 
 const VISIBLE_ROLES = 3;
@@ -45,6 +46,7 @@ export default function ProjectReviewScreen({ navigation }: { navigation: any })
           <Text style={styles.value}>{draft.nombre}</Text>
         </View>
         <Text style={styles.muted} numberOfLines={3}>{draft.descripcion}</Text>
+        {draft.sobre ? <Text style={styles.muted} numberOfLines={3}>{draft.sobre}</Text> : null}
         {draft.etiquetas.length > 0 ? <Text style={styles.muted}>#{draft.etiquetas.join("  #")}</Text> : null}
       </ReviewCard>
 

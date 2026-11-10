@@ -1,5 +1,4 @@
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
-import { userIdFromToken } from "@/src/core/userIdFromToken";
+import { RobleDatabase } from "@/src/core/roble/RobleDatabase";
 import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 import { AppNotification, NewNotification } from "../../domain/entities/Notification";
 import { JoinRequest, NewProject, Project, ProjectChanges, ProjectComment, RequestStatus } from "../../domain/entities/Project";
@@ -11,6 +10,7 @@ const PROJECT_COLUMNS: Record<keyof ProjectChanges, string> = {
   icono: "icono",
   nombre: "nombre",
   descripcion: "descripcion",
+  sobre: "sobre",
   etiquetas: "etiquetas",
   etapa: "etapa",
   problema: "problema",
@@ -25,24 +25,14 @@ const newestFirst = <T extends { createdAt: string }>(rows: T[]) =>
   rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
 export class ProjectRemoteDataSourceImp implements ProjectDataSource {
-  private readonly baseUrl: string;
-  private readonly authUrl: string;
-  private readonly prefs = LocalPreferencesAsyncStorage.getInstance();
-  private guestSession?: Promise<string>;
+  private readonly db: RobleDatabase;
 
-  constructor(
-    private authService: AuthRemoteDataSource,
-    projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID,
-  ) {
-    if (!projectId) throw new Error("Missing EXPO_PUBLIC_ROBLE_PROJECT_ID env var");
-    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.openlab.uninorte.edu.co").replace(/\/$/, "");
-    this.baseUrl = `${apiUrl}/database/${projectId}`;
-    this.authUrl = `${apiUrl}/auth/${projectId}`;
+  constructor(authService: AuthRemoteDataSource, projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID) {
+    this.db = new RobleDatabase(authService, projectId);
   }
 
-  async currentUserId(): Promise<string | null> {
-    const token = await this.prefs.retrieveData<string>("token");
-    return token ? userIdFromToken(token) : null;
+  currentUserId(): Promise<string | null> {
+    return this.db.currentUserId();
   }
 
   async createProject(draft: NewProject, creadorNombre: string): Promise<Project> {
@@ -50,18 +40,19 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
     if (!creadorId) throw new Error("No hay una sesión activa para crear el proyecto");
 
     const project: Project = { ...draft, id: "", buscandoPersonas: true, creadorId, creadorNombre, createdAt: new Date().toISOString() };
-    const inserted = await this.insert("proyecto", this.toRecord(project), "No se pudo crear el proyecto");
+    const inserted = await this.db.insert("proyecto", this.toRecord(project), "No se pudo crear el proyecto");
     return { ...project, id: inserted?._id ?? "" };
   }
 
   async listProjects(): Promise<Project[]> {
-    const rows = await this.read("proyecto", {});
+    const rows = await this.db.read("proyecto", {});
     return newestFirst(
       rows.filter((row) => !row.archivado).map((row) => ({
         id: row._id,
         icono: row.icono || "lightbulb-outline",
         nombre: row.nombre ?? "",
         descripcion: row.descripcion ?? "",
+        sobre: row.sobre ?? "",
         etiquetas: list(row.etiquetas),
         etapa: row.etapa ?? "",
         problema: row.problema ?? "",
@@ -82,17 +73,17 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
     const updates = Object.fromEntries(
       Object.entries(changes).map(([field, value]) => [PROJECT_COLUMNS[field as keyof ProjectChanges], value]),
     );
-    await this.update("proyecto", id, updates, "No se pudo guardar el proyecto");
+    await this.db.update("proyecto", id, updates, "No se pudo guardar el proyecto");
   }
 
   async archiveProject(id: string) {
-    await this.update("proyecto", id, { archivado: true }, "No se pudo eliminar el proyecto");
+    await this.db.update("proyecto", id, { archivado: true }, "No se pudo eliminar el proyecto");
   }
 
   async listNotifications(): Promise<AppNotification[]> {
     const me = await this.currentUserId();
     if (!me) return [];
-    const rows = await this.read("notificacion", { destinatario_id: me });
+    const rows = await this.db.read("notificacion", { destinatario_id: me });
     return newestFirst(
       rows.map((row) => ({
         id: row._id,
@@ -112,7 +103,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
       const recipients = [...new Set(para)].filter((id) => id && id !== me);
       if (recipients.length === 0) return;
       const createdAt = new Date().toISOString();
-      await this.insert(
+      await this.db.insert(
         "notificacion",
         recipients.map((id) => ({
           destinatario_id: id,
@@ -132,11 +123,11 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
 
   async markNotificationsRead(ids: string[]) {
     // shortcut: Roble updates one row per call; fine for a personal inbox, batch it if inboxes get large.
-    await Promise.all(ids.map((id) => this.update("notificacion", id, { leida: true }, "No se pudo marcar la notificación")));
+    await Promise.all(ids.map((id) => this.db.update("notificacion", id, { leida: true }, "No se pudo marcar la notificación")));
   }
 
   async listComments(proyectoId?: string): Promise<ProjectComment[]> {
-    const rows = await this.read("comentario", proyectoId ? { proyecto_id: proyectoId } : {});
+    const rows = await this.db.read("comentario", proyectoId ? { proyecto_id: proyectoId } : {});
     return rows
       .map((row) => ({
         id: row._id,
@@ -153,7 +144,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
   async addComment(comment: { proyectoId: string; texto: string; respuestaA: string | null; autorNombre: string }) {
     const autorId = await this.currentUserId();
     const createdAt = new Date().toISOString();
-    const inserted = await this.insert(
+    const inserted = await this.db.insert(
       "comentario",
       {
         proyecto_id: comment.proyectoId,
@@ -172,7 +163,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
     const query: Record<string, string> = {};
     if (filter.proyectoId) query.proyecto_id = filter.proyectoId;
     if (filter.usuarioId) query.usuario_id = filter.usuarioId;
-    const rows = await this.read("solicitud", query);
+    const rows = await this.db.read("solicitud", query);
     return newestFirst(
       rows.map((row) => ({
         id: row._id,
@@ -190,7 +181,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
   async sendRequest(request: { proyectoId: string; rol: string; mensaje: string; usuarioNombre: string }) {
     const usuarioId = await this.currentUserId();
     if (!usuarioId) throw new Error("Necesitas una cuenta para unirte a un proyecto");
-    await this.insert(
+    await this.db.insert(
       "solicitud",
       {
         proyecto_id: request.proyectoId,
@@ -206,103 +197,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
   }
 
   async setRequestStatus(id: string, estado: RequestStatus) {
-    await this.update("solicitud", id, { estado }, "No se pudo actualizar la solicitud");
-  }
-
-  private async update(table: string, id: string, updates: object, errorPrefix: string) {
-    const response = await this.authorized(`${this.baseUrl}/update`, {
-      method: "PUT",
-      body: JSON.stringify({ tableName: table, idColumn: "_id", idValue: id, updates }),
-    });
-    await this.ensureOk(response, errorPrefix);
-  }
-
-  private async read(table: string, filter: Record<string, string>): Promise<any[]> {
-    const params = new URLSearchParams({ tableName: table, ...filter });
-    const response = await this.authorized(`${this.baseUrl}/read?${params}`, { method: "GET" });
-    // Roble answers 404 when no row matches the filter.
-    if (response.status === 404) return [];
-    await this.ensureOk(response, `No se pudo leer ${table}`);
-    const rows = await response.json();
-    return Array.isArray(rows) ? rows : [];
-  }
-
-  private async insert(table: string, record: object | object[], errorPrefix: string): Promise<any> {
-    const response = await this.authorized(`${this.baseUrl}/insert`, {
-      method: "POST",
-      body: JSON.stringify({ tableName: table, records: Array.isArray(record) ? record : [record] }),
-    });
-    await this.ensureOk(response, errorPrefix);
-    const body = await response.json().catch(() => ({}));
-    return body?.inserted?.[0];
-  }
-
-  private async authorized(url: string, init: RequestInit): Promise<Response> {
-    const send = (accessToken: string) =>
-      fetch(url, { ...init, headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` } });
-
-    const token = await this.prefs.retrieveData<string>("token");
-    if (!token) {
-      const session = this.guestAccessToken();
-      const response = await send(await session);
-      if (response.status !== 401) return response;
-      // Renew once; if a parallel request already renewed it, reuse that one.
-      return send(await this.guestAccessToken(this.guestSession === session));
-    }
-
-    let response = await send(token);
-    // Long forms can outlast the access token, so refresh once instead of losing what was typed.
-    if (response.status === 401 && (await this.authService.refreshToken())) {
-      response = await send((await this.prefs.retrieveData<string>("token")) ?? token);
-    }
-    return response;
-  }
-
-  // Roble needs a token even to read, so guests get their own anonymous session (read-only role in Roble).
-  // One shared promise so parallel loads don't each open a session.
-  private guestAccessToken(renew = false): Promise<string> {
-    if (renew || !this.guestSession) {
-      this.guestSession = this.loadGuestToken(renew);
-      // Don't cache a failure, so the next screen load retries.
-      this.guestSession.catch(() => (this.guestSession = undefined));
-    }
-    return this.guestSession;
-  }
-
-  // Roble allows only 3 guest sign-ins per hour per IP, so the session is stored and refreshed, not recreated.
-  // Kept apart from "token" so the app still treats the person as a guest.
-  private async loadGuestToken(renew: boolean): Promise<string> {
-    const saved = await this.prefs.retrieveData<string>("guestToken");
-    if (saved && !renew) return saved;
-
-    const refreshToken = await this.prefs.retrieveData<string>("guestRefreshToken");
-    const refreshed = renew && refreshToken ? await this.postAuth("refresh-token", { refreshToken }).catch(() => null) : null;
-    const session = refreshed ?? (await this.postAuth("signin-anonymous", {}));
-    await this.prefs.storeData("guestToken", session.accessToken);
-    if (session.refreshToken) await this.prefs.storeData("guestRefreshToken", session.refreshToken);
-    return session.accessToken;
-  }
-
-  private async postAuth(path: string, body: object): Promise<{ accessToken: string; refreshToken?: string }> {
-    const response = await fetch(`${this.authUrl}/${path}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (response.status === 429) {
-      throw new Error("Hay muchos invitados nuevos desde esta red. Inténtalo en unos minutos o crea una cuenta.");
-    }
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data.accessToken) {
-      throw new Error(`No se pudieron cargar los proyectos de la comunidad: ${data.message ?? response.status}`);
-    }
-    return data;
-  }
-
-  private async ensureOk(response: Response, errorPrefix: string) {
-    if (response.ok) return;
-    const body = await response.json().catch(() => ({}));
-    throw new Error(`${errorPrefix}: ${body.message ?? response.status}`);
+    await this.db.update("solicitud", id, { estado }, "No se pudo actualizar la solicitud");
   }
 
   private toRecord(project: Project) {
@@ -310,6 +205,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
       nombre: project.nombre,
       icono: project.icono,
       descripcion: project.descripcion,
+      sobre: project.sobre,
       etiquetas: project.etiquetas,
       etapa: project.etapa,
       problema: project.problema,

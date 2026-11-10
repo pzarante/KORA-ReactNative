@@ -2,17 +2,18 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import AuthSurface from "@/src/features/auth/presentation/components/AuthSurface";
+import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project, ProjectComment } from "../../domain/entities/Project";
-import { Initial, Message, ProjectSummary, timeAgo, TopBar, useFocusLoad, useProjectDS } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { Initial, Message, ProjectSummary, timeAgo, TopBar, useFocusLoad, useProjectUseCases } from "../components/feed";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
 
 export default function CommentsScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
-  const ds = useProjectDS();
+  const useCases = useProjectUseCases();
   const { isLoggedIn, profile } = useAuth();
-  const { data: comments, error, reload } = useFocusLoad(() => ds.listComments(project.id), [ds, project.id]);
+  const { data: comments, error, reload } = useFocusLoad(() => useCases.listComments(project.id), [useCases, project.id]);
   const [text, setText] = useState("");
   const [guestName, setGuestName] = useState("");
   const [replyTo, setReplyTo] = useState<ProjectComment | null>(null);
@@ -27,11 +28,11 @@ export default function CommentsScreen({ navigation, route }: { navigation: any;
     setSending(true);
     setSendError(null);
     try {
-      await ds.addComment({ proyectoId: project.id, texto: text.trim(), respuestaA: replyTo?.id ?? null, autorNombre: author });
+      await useCases.addComment({ proyectoId: project.id, texto: text.trim(), respuestaA: replyTo?.id ?? null, autorNombre: author });
       // A reply to the creator's own comment only sends them the "respondió" notification.
       const repliedTo = replyTo?.autorId ?? null;
-      if (repliedTo) void ds.notify({ para: [repliedTo], tipo: "respuesta_comentario", proyectoId: project.id, actorNombre: author });
-      if (project.creadorId !== repliedTo) void ds.notify({ para: [project.creadorId], tipo: "comentario", proyectoId: project.id, actorNombre: author });
+      if (repliedTo) void useCases.notify({ para: [repliedTo], tipo: "respuesta_comentario", proyectoId: project.id, actorNombre: author });
+      if (project.creadorId !== repliedTo) void useCases.notify({ para: [project.creadorId], tipo: "comentario", proyectoId: project.id, actorNombre: author });
       setText("");
       setReplyTo(null);
       reload();
@@ -71,7 +72,7 @@ export default function CommentsScreen({ navigation, route }: { navigation: any;
   );
 
   return (
-    <AuthSurface>
+    <ScreenSurface>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <TopBar onBack={() => navigation.goBack()} />
         <ScrollView contentContainerStyle={styles.content} testID="comments-screen">
@@ -131,7 +132,7 @@ export default function CommentsScreen({ navigation, route }: { navigation: any;
           </View>
         </View>
       </KeyboardAvoidingView>
-    </AuthSurface>
+    </ScreenSurface>
   );
 }
 

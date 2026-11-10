@@ -4,6 +4,19 @@ import { ProjectDataSource } from "./ProjectDataSource";
 
 const ME = "mock-user";
 
+const MINE = {
+  sobre: "",
+  etiquetas: ["Sostenibilidad"],
+  problema: "",
+  objetivo: "",
+  alcance: "",
+  roles: [],
+  enlaces: [],
+  buscandoPersonas: true,
+  creadorId: ME,
+  creadorNombre: "Ana Torres",
+};
+
 // In-memory data so EXPO_PUBLIC_AUTH_MODE=mock shows a populated feed.
 export class MockProjectDataSource implements ProjectDataSource {
   private projects: Project[] = [
@@ -12,6 +25,7 @@ export class MockProjectDataSource implements ProjectDataSource {
       icono: "sprout",
       nombre: "EcoCampus",
       descripcion: "Una iniciativa para hacer de la universidad un espacio más sostenible.",
+      sobre: "Desarrollar una estrategia participativa que promueva hábitos sostenibles en la comunidad universitaria a través de actividades, recursos y herramientas digitales.",
       etiquetas: ["Sostenibilidad", "Campus"],
       etapa: "Investigación",
       problema: "La falta de hábitos sostenibles en el campus genera un alto impacto ambiental.",
@@ -24,9 +38,30 @@ export class MockProjectDataSource implements ProjectDataSource {
       creadorNombre: "María López",
       createdAt: "2026-08-10T12:00:00.000Z",
     },
+    // Projects of the mock user: p2 already has a KORA NODE with meetings, p3 does not (see MockKoraNodeDataSource).
+    {
+      ...MINE,
+      id: "p2",
+      icono: "leaf",
+      nombre: "Campus Sostenible",
+      descripcion: "Acciones concretas para reducir residuos en el campus.",
+      etapa: "Prototipo",
+      createdAt: "2026-09-01T12:00:00.000Z",
+    },
+    {
+      ...MINE,
+      id: "p3",
+      icono: "rocket-launch-outline",
+      nombre: "Ecosistema KORA",
+      descripcion: "La plataforma para conectar proyectos y talento en la universidad.",
+      etapa: "Idea",
+      createdAt: "2026-10-01T12:00:00.000Z",
+    },
   ];
   private comments: ProjectComment[] = [];
-  private requests: JoinRequest[] = [];
+  private requests: JoinRequest[] = [
+    { id: "r-p2", proyectoId: "p2", usuarioId: "luis", usuarioNombre: "Luis Rojas", rol: "Diseño UI/UX", mensaje: "", estado: "aceptada", createdAt: "2026-09-02T12:00:00.000Z" },
+  ];
   private notifications: (AppNotification & { para: string })[] = [];
 
   async currentUserId() {

@@ -1,6 +1,6 @@
 // src/features/product/data/datasources/cache/LocalProductCacheSource.ts
-import { ILocalPreferences } from "@/src/core/iLocalPreferences";
-import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
+import { ILocalPreferences } from "@/src/shared/storage/iLocalPreferences";
+import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { Product } from "../../../domain/entities/Product";
 
 export class LocalProductCacheSource {

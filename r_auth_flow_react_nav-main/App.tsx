@@ -3,12 +3,13 @@ import React from "react";
 import { useColorScheme } from "react-native";
 import { PaperProvider } from "react-native-paper";
 
-import AuthFlow from "./src/AuthFlow";
 import { DIProvider } from "./src/core/di/DIProvider";
 import { AuthProvider } from "./src/features/auth/presentation/context/authContext";
+import RootNavigator from "./src/navigation/RootNavigator";
+import { installWebInputStyles } from "./src/shared/ui/webInputStyles";
 import { darkTheme, lightTheme } from "./src/theme/theme";
 
-
+installWebInputStyles();
 
 export default function App() {
   const scheme = useColorScheme();
@@ -35,7 +36,7 @@ export default function App() {
         {/* ✅ ProductProvider removed from here */}
         <PaperProvider theme={theme}>
           <NavigationContainer theme={navigationTheme}>
-            <AuthFlow />
+            <RootNavigator />
           </NavigationContainer>
         </PaperProvider>
       </AuthProvider>

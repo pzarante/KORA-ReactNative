@@ -1,19 +1,28 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
-import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import AppTabBar from "@/src/AppTabBar";
+import AppTabBar from "@/src/navigation/AppTabBar";
+import BrandBlob from "@/src/shared/ui/BrandBlob";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project, PROJECT_STAGES } from "../../domain/entities/Project";
-import { Initial, ProjectIcon, RoundButton, Tags, TopBar, useFocusLoad, useProjectDS } from "../components/feed";
-import { colors, ui } from "../components/projectUi";
+import { Initial, ProjectIcon, RoundButton, Tags, TopBar, useFocusLoad, useProjectUseCases } from "../components/feed";
+import { colors } from "@/src/shared/ui/tokens";
+import { ui } from "@/src/shared/ui/styles";
+import { formatDate } from "@/src/shared/utils/dates";
 
-const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-
-function formatDate(iso: string) {
-  const date = new Date(iso);
-  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+/** The design shows friendly titles for links ("Plan de sostenibilidad Uninorte"), so one is derived from the URL. */
+function linkTitle(url: string) {
+  try {
+    const parsed = new URL(url);
+    const segment = parsed.pathname.split("/").filter(Boolean).pop();
+    const source = segment ?? parsed.hostname.replace(/^www\./, "");
+    const pretty = decodeURIComponent(source).replace(/[-_]+/g, " ").trim();
+    return pretty ? pretty.replace(/\b\w/g, (char) => char.toUpperCase()) : parsed.hostname;
+  } catch {
+    return url;
+  }
 }
 
 function Section({ icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
@@ -35,13 +44,13 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   const stageIndex = PROJECT_STAGES.indexOf(project.etapa);
   const creador = project.creadorNombre || "Tú";
   const { isLoggedIn, profile } = useAuth();
-  const ds = useProjectDS();
+  const useCases = useProjectUseCases();
   const { data } = useFocusLoad(async () => {
-    const userId = await ds.currentUserId();
+    const userId = await useCases.currentUserId();
     // Guests can't read Roble, so they only see the creator.
-    const requests = userId && project.id ? await ds.listRequests({ proyectoId: project.id }) : [];
+    const requests = userId && project.id ? await useCases.listRequests({ proyectoId: project.id }) : [];
     return { userId, requests };
-  }, [ds, project.id]);
+  }, [useCases, project.id]);
 
   const userId = data?.userId ?? null;
   const isCreator = !!userId && userId === project.creadorId;
@@ -51,6 +60,13 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
     <TouchableOpacity onPress={() => navigation.navigate("EditProject", { project })} style={[ui.primaryButton, styles.editButton]} testID="edit-project-button">
       <MaterialCommunityIcons name="pencil-outline" size={20} color="#FFFFFF" />
       <Text style={ui.primaryButtonText}>Editar proyecto</Text>
+    </TouchableOpacity>
+  );
+  const koraNodeButton = (
+    <TouchableOpacity onPress={() => navigation.navigate("KoraNode", { project })} style={[ui.primaryButton, styles.nodeButton]} testID="kora-node-button">
+      <Image source={require("../../../../../assets/kora-node/device.png")} resizeMode="contain" style={styles.nodeIcon} tintColor="#FFFFFF" />
+      {/* No arrow (unlike Figma): beside "Solicitudes" it doesn't fit on 360 pt phones. */}
+      <Text adjustsFontSizeToFit numberOfLines={1} style={[ui.primaryButtonText, styles.nodeText]}>KORA NODE</Text>
     </TouchableOpacity>
   );
   const members = [creador, ...(data?.requests.filter((r) => r.estado === "aceptada").map((r) => r.usuarioNombre) ?? [])];
@@ -64,6 +80,9 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.container} testID="project-detail-screen">
+      {/* Atmósfera de marca: los blobs decorativos del diseño, detrás del contenido. */}
+      <BrandBlob blur={20} color="#A855F7" diameter={200} style={styles.blobTopRight} />
+      <BrandBlob blur={22.5} color="#FF6B3D" diameter={220} style={styles.blobBottomLeft} />
       <View style={styles.topBar}>
         <TopBar
           onBack={() => navigation.goBack()}
@@ -89,7 +108,10 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
           </View>
           <View style={styles.dots}>
             {PROJECT_STAGES.map((stage, index) => (
-              <View key={stage} style={[styles.dot, index <= stageIndex && styles.dotActive]} />
+              <React.Fragment key={stage}>
+                {index > 0 ? <View style={[styles.dash, index <= stageIndex && styles.dashActive]} /> : null}
+                <View style={[styles.dot, index <= stageIndex && styles.dotActive]} />
+              </React.Fragment>
             ))}
           </View>
         </View>
@@ -107,6 +129,12 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
             <Text style={styles.strong}>{formatDate(project.createdAt)}</Text>
           </View>
         </View>
+
+        {project.sobre ? (
+          <Section icon="lightbulb-outline" title="Sobre el proyecto">
+            <Text style={styles.body}>{project.sobre}</Text>
+          </Section>
+        ) : null}
 
         {project.problema ? (
           <Section icon="alert-outline" title="Problema">
@@ -141,9 +169,9 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
         {project.enlaces.length > 0 ? (
           <Section icon="layers-outline" title="Referencias y recursos">
             {project.enlaces.map((url) => (
-              <TouchableOpacity key={url} onPress={() => Linking.openURL(url)} style={styles.link}>
+              <TouchableOpacity key={url} accessibilityLabel={linkTitle(url)} onPress={() => Linking.openURL(url)} style={styles.link}>
                 <MaterialCommunityIcons name="link-variant" size={18} color={colors.primary} />
-                <Text numberOfLines={1} style={styles.linkText}>{url}</Text>
+                <Text numberOfLines={1} style={styles.linkText}>{linkTitle(url)}</Text>
                 <MaterialCommunityIcons name="open-in-new" size={18} color={colors.primary} />
               </TouchableOpacity>
             ))}
@@ -175,15 +203,18 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
       </ScrollView>
 
       <View style={styles.footer}>
-        {isCreator ? (
-          <>
-            <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
-              <Text style={ui.outlineButtonText}>Solicitudes{pending ? ` (${pending})` : ""}</Text>
-            </TouchableOpacity>
+        {isMember ? (
+          <View style={styles.memberActions}>
+            <View style={styles.footerRow}>
+              {isCreator ? (
+                <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex, styles.requestsButton]} testID="view-requests-button">
+                  <Text style={ui.outlineButtonText}>Solicitudes{pending ? ` (${pending})` : ""}</Text>
+                </TouchableOpacity>
+              ) : null}
+              {koraNodeButton}
+            </View>
             {editButton}
-          </>
-        ) : isMember ? (
-          editButton
+          </View>
         ) : myRequest ? (
           <Text style={styles.status}>{myRequest.estado === "pendiente" ? "Solicitud enviada, esperando respuesta" : "Tu solicitud fue rechazada"}</Text>
         ) : !project.buscandoPersonas ? (
@@ -211,9 +242,11 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
   small: { color: colors.muted, fontSize: 13 },
   strong: { color: colors.text, fontSize: 17, fontWeight: "800", marginTop: 2 },
-  dots: { flexDirection: "row", gap: 4 },
-  dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 1.5, borderColor: "#B9AEDA" },
+  dots: { flexDirection: "row", alignItems: "center" },
+  dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 1, borderColor: "#D5C1E9", backgroundColor: "#FFFFFF" },
   dotActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  dash: { width: 8, height: 2, borderRadius: 1, backgroundColor: "#D5C1E9" },
+  dashActive: { backgroundColor: colors.primary },
   divider: { width: 1, alignSelf: "stretch", backgroundColor: colors.border },
   section: { flexDirection: "row", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
   sectionIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
@@ -231,8 +264,16 @@ const styles = StyleSheet.create({
   pillText: { color: colors.primary, fontSize: 14, fontWeight: "800" },
   commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
   commentsTitle: { flex: 1, color: colors.text, fontSize: 18, lineHeight: 24, fontWeight: "700" },
-  // No top border: the tab bar right below already draws one.
-  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 24, paddingVertical: 12 },
+  // No top border: the tab bar right below already draws one. White so the blobs don't show through.
+  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 24, paddingVertical: 12, backgroundColor: "#FFFFFF" },
   editButton: { paddingHorizontal: 16 },
+  memberActions: { flex: 1, gap: 12 },
+  footerRow: { flexDirection: "row", gap: 12 },
+  nodeButton: { gap: 5, paddingHorizontal: 10 },
+  nodeIcon: { width: 24, height: 12 },
+  nodeText: { fontSize: 15 },
+  requestsButton: { paddingHorizontal: 12 },
+  blobTopRight: { position: "absolute", top: -70, right: -80 },
+  blobBottomLeft: { position: "absolute", bottom: 101, left: -175 },
   status: { flex: 1, color: colors.primary, fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },
 });
