@@ -10,13 +10,13 @@ import ProjectReviewScreen from "@/src/features/projects/presentation/screens/Pr
 import ProjectStageScreen from "@/src/features/projects/presentation/screens/ProjectStageScreen";
 import ProjectTeamScreen from "@/src/features/projects/presentation/screens/ProjectTeamScreen";
 
-import { Stack } from "./stack";
+import { Stack, stackOptions, successOptions } from "./stack";
 
 /** The multi-step "create project" flow, opened as a modal over the tabs. */
 export default function CreateProjectNavigator() {
   return (
     <CreateProjectProvider>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={stackOptions}>
         <Stack.Screen name="CreateProjectIntro" component={CreateProjectIntroScreen} />
         <Stack.Screen name="ProjectStage" component={ProjectStageScreen} />
         <Stack.Screen name="ProjectBasicInfo" component={ProjectBasicInfoScreen} />
@@ -24,7 +24,7 @@ export default function CreateProjectNavigator() {
         <Stack.Screen name="ProjectGoal" component={ProjectGoalScreen} />
         <Stack.Screen name="ProjectTeam" component={ProjectTeamScreen} />
         <Stack.Screen name="ProjectReview" component={ProjectReviewScreen} />
-        <Stack.Screen name="ProjectCreated" component={ProjectCreatedScreen} />
+        <Stack.Screen name="ProjectCreated" component={ProjectCreatedScreen} options={successOptions} />
       </Stack.Navigator>
     </CreateProjectProvider>
   );

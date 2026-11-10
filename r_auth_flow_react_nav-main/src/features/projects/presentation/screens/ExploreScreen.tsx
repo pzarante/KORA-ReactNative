@@ -3,8 +3,7 @@ import React, { useMemo, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
-import BrandLogo from "@/src/shared/ui/BrandLogo";
-import { commentCount, memberCount, Message, useFeed } from "../components/feed";
+import { commentCount, memberCount, Message, TopBar, useFeed } from "../components/feed";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 
@@ -25,9 +24,7 @@ export default function ExploreScreen({ navigation }: { navigation: any }) {
 
   return (
     <ScreenSurface>
-      <View style={styles.brand}>
-        <BrandLogo />
-      </View>
+      <TopBar />
       <Text style={styles.title}>Explorar</Text>
       <View style={styles.segment}>
         {(["projects", "people"] as const).map((key) => (
@@ -110,7 +107,6 @@ export default function ExploreScreen({ navigation }: { navigation: any }) {
 }
 
 const styles = StyleSheet.create({
-  brand: { alignItems: "center", paddingTop: 8 },
   title: { color: colors.text, fontSize: 34, fontWeight: "800" },
   segment: { flexDirection: "row", backgroundColor: colors.soft, borderRadius: 28, padding: 4, marginTop: 14 },
   segmentItem: { flex: 1, alignItems: "center", paddingVertical: 10, borderRadius: 24 },

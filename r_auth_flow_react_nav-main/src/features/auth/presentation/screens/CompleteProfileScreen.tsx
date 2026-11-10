@@ -6,7 +6,7 @@ import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 
 export default function CompleteProfileScreen({ navigation }: { navigation: any }) {
   return (
-    <ScreenSurface>
+    <ScreenSurface scroll>
       <View style={{ flex: 1 }} testID="complete-profile-screen">
         <AccountPrompt
           icon="pencil"

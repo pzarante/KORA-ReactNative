@@ -39,7 +39,7 @@ export default function OnboardingNameScreen({ navigation }: { navigation: any }
           onPress={() => {
             if (!name.trim()) return setError("Tu nombre es obligatorio");
             updateProfile({ nombreCompleto: name.trim() });
-            navigation.navigate("OnboardingRole");
+            navigation.navigate("OnboardingIntro");
           }}
         />
       </View>

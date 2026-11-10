@@ -1,4 +1,5 @@
-import { JoinRequest, NewProject, Project, ProjectComment, RequestStatus } from "../../domain/entities/Project";
+import { AppNotification, NewNotification } from "../../domain/entities/Notification";
+import { JoinRequest, NewProject, Project, ProjectChanges, ProjectComment, RequestStatus } from "../../domain/entities/Project";
 import { ProjectRepository } from "../../domain/repositories/ProjectRepository";
 import { ProjectDataSource } from "../datasources/ProjectDataSource";
 
@@ -12,6 +13,14 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   listProjects(): Promise<Project[]> {
     return this.dataSource.listProjects();
+  }
+
+  updateProject(id: string, changes: ProjectChanges): Promise<void> {
+    return this.dataSource.updateProject(id, changes);
+  }
+
+  archiveProject(id: string): Promise<void> {
+    return this.dataSource.archiveProject(id);
   }
 
   listComments(proyectoId?: string): Promise<ProjectComment[]> {
@@ -32,6 +41,18 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   setRequestStatus(id: string, estado: RequestStatus): Promise<void> {
     return this.dataSource.setRequestStatus(id, estado);
+  }
+
+  listNotifications(): Promise<AppNotification[]> {
+    return this.dataSource.listNotifications();
+  }
+
+  notify(notification: NewNotification): Promise<void> {
+    return this.dataSource.notify(notification);
+  }
+
+  markNotificationsRead(ids: string[]): Promise<void> {
+    return this.dataSource.markNotificationsRead(ids);
   }
 
   currentUserId(): Promise<string | null> {

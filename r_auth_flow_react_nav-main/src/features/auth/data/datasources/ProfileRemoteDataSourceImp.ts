@@ -56,6 +56,8 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       rol: row.rol ?? "",
       habilidades: Array.isArray(row.habilidades) ? row.habilidades : [],
       infoAdicional: row.info_adicional ?? "",
+      whatsapp: row.whatsapp ?? "",
+      correoContacto: row.correo_contacto ?? "",
       onboardingCompletado: !!row.onboarding_completado,
     };
   }
@@ -70,7 +72,8 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       throw new Error(`No se pudo consultar la tabla Usuario: ${response.status}`);
     }
     const rows = (await response.json()) as RemoteProfile[];
-    return rows[0];
+    // Never trust rows[0]: if the filter is ignored, it would be another user's profile.
+    return rows.find((row) => row.user_id === userId);
   }
 
   private toRecord(profile: UserProfile) {
@@ -80,6 +83,8 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       rol: profile.rol,
       habilidades: profile.habilidades,
       info_adicional: profile.infoAdicional,
+      whatsapp: profile.whatsapp,
+      correo_contacto: profile.correoContacto,
       // The Roble column is a timestamp (NOT NULL): store when onboarding was completed.
       onboarding_completado: profile.onboardingCompletado ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),

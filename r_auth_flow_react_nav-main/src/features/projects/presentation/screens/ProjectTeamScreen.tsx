@@ -6,9 +6,8 @@ import AddRolesSheet from "../components/AddRolesSheet";
 import ProjectStepLayout from "../components/ProjectStepLayout";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import { URL_PATTERN } from "../../domain/entities/Project";
 import { useCreateProject } from "../context/createProjectContext";
-
-const URL_PATTERN = /^https?:\/\/\S+\.\S+$/i;
 
 export default function ProjectTeamScreen() {
   const { draft, update } = useCreateProject();

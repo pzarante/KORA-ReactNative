@@ -9,13 +9,13 @@ import { UserProfile } from "../../domain/entities/UserProfile";
 const ROLE_ICONS: Record<string, any> = { Estudiante: "school-outline", Docente: "briefcase-outline", Egresado: "briefcase-outline" };
 
 type Props = {
-  profile: Pick<UserProfile, "nombreCompleto" | "rol" | "habilidades" | "infoAdicional">;
+  profile: Pick<UserProfile, "nombreCompleto" | "rol" | "habilidades" | "infoAdicional"> & Partial<Pick<UserProfile, "whatsapp" | "correoContacto">>;
   stats?: { created: number; joined: number };
   /** Rendered under the name, e.g. "Editar perfil". */
   action?: React.ReactNode;
 };
 
-// shortcut: carrera, semestre, teléfono and correo from the design are not stored in Usuario yet; add the columns and an onboarding step to show them.
+// shortcut: carrera and semestre from the design are not stored in Usuario yet; add the columns and an onboarding step to show them.
 export default function ProfileView({ profile, stats, action }: Props) {
   const name = profile.nombreCompleto || "Sin nombre";
   return (
@@ -68,6 +68,26 @@ export default function ProfileView({ profile, stats, action }: Props) {
         </>
       ) : null}
 
+      {profile.whatsapp || profile.correoContacto ? (
+        <>
+          <Text style={styles.section}>Contacto</Text>
+          <View style={styles.contact}>
+            {profile.whatsapp ? (
+              <View style={styles.box}>
+                <MaterialCommunityIcons name="whatsapp" size={26} color={colors.primary} />
+                <Text style={styles.boxText}>{profile.whatsapp}</Text>
+              </View>
+            ) : null}
+            {profile.correoContacto ? (
+              <View style={styles.box}>
+                <MaterialCommunityIcons name="email-outline" size={26} color={colors.primary} />
+                <Text style={styles.boxText}>{profile.correoContacto}</Text>
+              </View>
+            ) : null}
+          </View>
+        </>
+      ) : null}
+
       {profile.infoAdicional ? (
         <>
           <Text style={styles.section}>Información adicional</Text>
@@ -93,6 +113,7 @@ const styles = StyleSheet.create({
   statLabel: { color: colors.text, fontSize: 14 },
   section: { color: colors.text, fontSize: 22, fontWeight: "800", marginTop: 26, marginBottom: 12 },
   box: { flexDirection: "row", alignItems: "center", gap: 14, borderWidth: 1, borderColor: colors.border, borderRadius: 26, padding: 18 },
+  contact: { gap: 10 },
   boxStrong: { color: colors.text, fontSize: 17, fontWeight: "800" },
   boxText: { flex: 1, color: colors.text, fontSize: 15, lineHeight: 21 },
   skill: { fontWeight: "500" },

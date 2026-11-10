@@ -10,6 +10,7 @@ import { JoinRequest, Project, ProjectComment } from "../../domain/entities/Proj
 import { ProjectUseCases } from "../../domain/use-cases/ProjectUseCases";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import NotificationBell from "./NotificationBell";
 
 export function useProjectUseCases() {
   const di = useDI();
@@ -85,13 +86,16 @@ export function RoundButton({ icon, label, onPress, color = colors.primary, test
   );
 }
 
-/** Back arrow, logo and an optional button on the right, as in every detail screen of the design. */
+/** Back arrow, logo, the notifications bell and an optional button on the right, as in every detail screen of the design. */
 export function TopBar({ onBack, right }: { onBack?: () => void; right?: React.ReactNode }) {
   return (
     <View style={styles.topBar}>
-      {onBack ? <RoundButton icon="arrow-left" label="Volver" onPress={onBack} /> : <View style={styles.spacer} />}
+      <View style={styles.side}>{onBack ? <RoundButton icon="arrow-left" label="Volver" onPress={onBack} /> : null}</View>
       <BrandLogo />
-      {right ?? <View style={styles.spacer} />}
+      <View style={[styles.side, styles.sideRight]}>
+        <NotificationBell />
+        {right}
+      </View>
     </View>
   );
 }
@@ -165,7 +169,9 @@ const styles = StyleSheet.create({
   initialText: { color: colors.primary, fontWeight: "800" },
   roundButton: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
   topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 8 },
-  spacer: { width: 48 },
+  // Equal sides keep the logo centered when the right side has two buttons.
+  side: { flex: 1, flexDirection: "row" },
+  sideRight: { justifyContent: "flex-end", gap: 8 },
   smallChip: { paddingHorizontal: 10, paddingVertical: 4 },
   smallChipText: { fontSize: 12 },
   orangeChip: { backgroundColor: colors.orangeSoft },

@@ -9,7 +9,7 @@ import { ui } from "@/src/shared/ui/styles";
 
 export default function RequestSentScreen({ navigation }: { navigation: any }) {
   return (
-    <ScreenSurface>
+    <ScreenSurface scroll>
       <TopBar right={<RoundButton icon="home-variant-outline" label="Ir al inicio" color={colors.text} onPress={() => navigation.popTo("App", { screen: "Home" })} />} />
       <View style={styles.container} testID="request-sent-screen">
         <View style={styles.check}>

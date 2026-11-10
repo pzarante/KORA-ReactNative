@@ -5,10 +5,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import AppTabBar from "@/src/navigation/AppTabBar";
 import BrandBlob from "@/src/shared/ui/BrandBlob";
-import BrandLogo from "@/src/shared/ui/BrandLogo";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project, PROJECT_STAGES } from "../../domain/entities/Project";
-import { Initial, ProjectIcon, Tags, useFocusLoad, useProjectUseCases } from "../components/feed";
+import { Initial, ProjectIcon, RoundButton, Tags, TopBar, useFocusLoad, useProjectUseCases } from "../components/feed";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 
@@ -62,6 +61,13 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   const userId = data?.userId ?? null;
   const isCreator = !!userId && userId === project.creadorId;
   const myRequest = data?.requests.find((r) => r.usuarioId === userId);
+  const isMember = isCreator || myRequest?.estado === "aceptada";
+  const editButton = (
+    <TouchableOpacity onPress={() => navigation.navigate("EditProject", { project })} style={[ui.primaryButton, styles.editButton]} testID="edit-project-button">
+      <MaterialCommunityIcons name="pencil-outline" size={20} color="#FFFFFF" />
+      <Text style={ui.primaryButtonText}>Editar proyecto</Text>
+    </TouchableOpacity>
+  );
   const members = [creador, ...(data?.requests.filter((r) => r.estado === "aceptada").map((r) => r.usuarioNombre) ?? [])];
   const pending = data?.requests.filter((r) => r.estado === "pendiente").length ?? 0;
 
@@ -77,13 +83,10 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
       <BrandBlob blur={20} color="#A855F7" diameter={200} style={styles.blobTopRight} />
       <BrandBlob blur={22.5} color="#FF6B3D" diameter={220} style={styles.blobBottomLeft} />
       <View style={styles.topBar}>
-        <TouchableOpacity accessibilityLabel="Volver" onPress={() => navigation.goBack()} style={styles.roundButton}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
-        </TouchableOpacity>
-        <BrandLogo />
-        <TouchableOpacity accessibilityLabel="Ir al inicio" onPress={() => navigation.popTo("App")} style={styles.roundButton}>
-          <MaterialCommunityIcons name="home-variant-outline" size={24} color={colors.text} />
-        </TouchableOpacity>
+        <TopBar
+          onBack={() => navigation.goBack()}
+          right={<RoundButton icon="home-variant-outline" label="Ir al inicio" onPress={() => navigation.popTo("App")} />}
+        />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -200,13 +203,18 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 
       <View style={styles.footer}>
         {isCreator ? (
-          <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
-            <Text style={ui.outlineButtonText}>Ver solicitudes{pending ? ` (${pending})` : ""}</Text>
-          </TouchableOpacity>
-        ) : myRequest?.estado === "aceptada" ? (
-          <Text style={styles.status}>Eres parte del equipo</Text>
+          <>
+            <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
+              <Text style={ui.outlineButtonText}>Solicitudes{pending ? ` (${pending})` : ""}</Text>
+            </TouchableOpacity>
+            {editButton}
+          </>
+        ) : isMember ? (
+          editButton
         ) : myRequest ? (
           <Text style={styles.status}>{myRequest.estado === "pendiente" ? "Solicitud enviada, esperando respuesta" : "Tu solicitud fue rechazada"}</Text>
+        ) : !project.buscandoPersonas ? (
+          <Text style={styles.status}>Este proyecto no está buscando integrantes</Text>
         ) : (
           <TouchableOpacity onPress={askToJoin} style={ui.primaryButton} testID="join-project-button">
             <Text style={ui.primaryButtonText}>Solicitar unirme</Text>
@@ -221,14 +229,13 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FFFFFF" },
   flex: { flex: 1 },
-  topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 8 },
-  roundButton: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
-  content: { padding: 20, gap: 16 },
+  topBar: { paddingHorizontal: 24 },
+  content: { padding: 24, gap: 16 },
   hero: { flexDirection: "row", gap: 16 },
   heroText: { flex: 1 },
-  name: { color: colors.text, fontSize: 30, fontWeight: "800" },
-  description: { color: colors.muted, fontSize: 15, marginTop: 6, lineHeight: 21 },
-  row: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18, backgroundColor: colors.card },
+  name: { color: colors.text, fontSize: 26, lineHeight: 34, fontWeight: "800", letterSpacing: -0.5 },
+  description: { color: colors.muted, fontSize: 15, marginTop: 6, lineHeight: 22 },
+  row: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
   small: { color: colors.muted, fontSize: 13 },
   strong: { color: colors.text, fontSize: 17, fontWeight: "800", marginTop: 2 },
   dots: { flexDirection: "row", alignItems: "center" },
@@ -237,12 +244,12 @@ const styles = StyleSheet.create({
   dash: { width: 8, height: 2, borderRadius: 1, backgroundColor: "#D5C1E9" },
   dashActive: { backgroundColor: colors.primary },
   divider: { width: 1, alignSelf: "stretch", backgroundColor: colors.border },
-  section: { flexDirection: "row", gap: 14, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18, backgroundColor: colors.card },
-  sectionIcon: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
+  section: { flexDirection: "row", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
+  sectionIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
   sectionBody: { flex: 1, gap: 8 },
-  sectionTitle: { color: colors.text, fontSize: 20, fontWeight: "800" },
+  sectionTitle: { color: colors.text, fontSize: 18, lineHeight: 24, fontWeight: "700" },
   subTitle: { color: colors.text, fontSize: 15, fontWeight: "800" },
-  body: { color: colors.muted, fontSize: 15, lineHeight: 21 },
+  body: { color: colors.muted, fontSize: 14, lineHeight: 20 },
   separator: { height: 1, backgroundColor: colors.border, marginVertical: 4 },
   link: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.soft, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
   linkText: { flex: 1, color: colors.text, fontSize: 14 },
@@ -251,9 +258,11 @@ const styles = StyleSheet.create({
   more: { color: colors.primary, fontWeight: "800", marginLeft: 4 },
   pill: { flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1.5, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginLeft: "auto" },
   pillText: { color: colors.primary, fontSize: 14, fontWeight: "800" },
-  commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18, backgroundColor: colors.card },
-  commentsTitle: { flex: 1, color: colors.text, fontSize: 18, fontWeight: "800" },
-  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: "#FFFFFF" },
+  commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
+  commentsTitle: { flex: 1, color: colors.text, fontSize: 18, lineHeight: 24, fontWeight: "700" },
+  // No top border: the tab bar right below already draws one. White so the blobs don't show through.
+  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 24, paddingVertical: 12, backgroundColor: "#FFFFFF" },
+  editButton: { paddingHorizontal: 16 },
   blobTopRight: { position: "absolute", top: -70, right: -80 },
   blobBottomLeft: { position: "absolute", bottom: 101, left: -175 },
   status: { flex: 1, color: colors.primary, fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },

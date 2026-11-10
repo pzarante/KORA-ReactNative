@@ -8,7 +8,7 @@ import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 // Shown when a guest tries something that needs an account (crear o postularse a un proyecto).
 export default function AccountRequiredScreen({ navigation }: { navigation: any }) {
   return (
-    <ScreenSurface>
+    <ScreenSurface scroll>
       <View style={styles.brand} testID="account-required-screen">
         <BrandLogo />
       </View>

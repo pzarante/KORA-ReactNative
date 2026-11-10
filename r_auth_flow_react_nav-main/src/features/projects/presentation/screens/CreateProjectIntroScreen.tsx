@@ -9,7 +9,7 @@ import { ui } from "@/src/shared/ui/styles";
 
 export default function CreateProjectIntroScreen({ navigation }: { navigation: any }) {
   return (
-    <ScreenSurface>
+    <ScreenSurface scroll>
       <View style={styles.container} testID="create-project-intro">
         <View style={styles.brand}>
           <BrandLogo />

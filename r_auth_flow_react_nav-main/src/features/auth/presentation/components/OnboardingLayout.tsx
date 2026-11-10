@@ -7,7 +7,7 @@ import BrandLogo from "@/src/shared/ui/BrandLogo";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import ProfileProgress from "./ProfileProgress";
 
-export const ONBOARDING_STEPS = 4;
+export const ONBOARDING_STEPS = 5;
 
 type StepProps = {
   /** 1-based step; shows the progress bar and "Completar perfil después". */
@@ -19,7 +19,7 @@ type StepProps = {
 
 export default function OnboardingLayout({ children, ...stepProps }: { children: React.ReactNode } & Partial<StepProps>) {
   return (
-    <ScreenSurface>
+    <ScreenSurface scroll>
       <View style={[styles.container, stepProps.step ? styles.withProgress : undefined]}>
         {stepProps.step ? <StepProgress {...(stepProps as StepProps)} /> : null}
         <BrandLogo />

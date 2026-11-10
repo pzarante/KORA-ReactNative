@@ -1,6 +1,8 @@
 import React from "react";
 
 import OnboardingBioScreen from "@/src/features/auth/presentation/screens/OnboardingBioScreen";
+import OnboardingContactScreen from "@/src/features/auth/presentation/screens/OnboardingContactScreen";
+import OnboardingIntroScreen from "@/src/features/auth/presentation/screens/OnboardingIntroScreen";
 import OnboardingNameScreen from "@/src/features/auth/presentation/screens/OnboardingNameScreen";
 import OnboardingRoleScreen from "@/src/features/auth/presentation/screens/OnboardingRoleScreen";
 import OnboardingSkillsScreen from "@/src/features/auth/presentation/screens/OnboardingSkillsScreen";
@@ -9,7 +11,7 @@ import CommentsScreen from "@/src/features/projects/presentation/screens/Comment
 import ProjectDetailScreen from "@/src/features/projects/presentation/screens/ProjectDetailScreen";
 import TeamMembersScreen from "@/src/features/projects/presentation/screens/TeamMembersScreen";
 
-import { Stack } from "./stack";
+import { Stack, successOptions } from "./stack";
 
 /** Screens a guest can also open from the feed; the rest need an account. */
 export const publicFeedScreens = [
@@ -21,8 +23,10 @@ export const publicFeedScreens = [
 /** Onboarding is reachable from both the logged-out and logged-in stacks. */
 export const onboardingScreens = [
   <Stack.Screen key="OnboardingName" name="OnboardingName" component={OnboardingNameScreen} />,
+  <Stack.Screen key="OnboardingIntro" name="OnboardingIntro" component={OnboardingIntroScreen} />,
   <Stack.Screen key="OnboardingRole" name="OnboardingRole" component={OnboardingRoleScreen} />,
   <Stack.Screen key="OnboardingSkills" name="OnboardingSkills" component={OnboardingSkillsScreen} />,
   <Stack.Screen key="OnboardingBio" name="OnboardingBio" component={OnboardingBioScreen} />,
-  <Stack.Screen key="OnboardingSuccess" name="OnboardingSuccess" component={OnboardingSuccessScreen} />,
+  <Stack.Screen key="OnboardingContact" name="OnboardingContact" component={OnboardingContactScreen} />,
+  <Stack.Screen key="OnboardingSuccess" name="OnboardingSuccess" component={OnboardingSuccessScreen} options={successOptions} />,
 ];

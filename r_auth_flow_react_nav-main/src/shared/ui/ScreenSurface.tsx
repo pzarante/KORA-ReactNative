@@ -1,16 +1,30 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function ScreenSurface({ children }: { children: React.ReactNode }) {
+/** `scroll`: the content scrolls only when it doesn't fit (small phones, open keyboard); otherwise it fills the screen as before. */
+export default function ScreenSurface({ children, scroll }: { children: React.ReactNode; scroll?: boolean }) {
   return (
     <SafeAreaView style={styles.surface}>
       <StatusBar style="dark" backgroundColor="#FFFFFF" />
       <View pointerEvents="none" style={styles.purpleGlow} />
       <View pointerEvents="none" style={styles.middleGlow} />
       <View pointerEvents="none" style={styles.orangeGlow} />
-      <View style={styles.content}>{children}</View>
+      {scroll ? (
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            alwaysBounceVertical={false}
+            showsVerticalScrollIndicator={false}
+          >
+            {children}
+          </ScrollView>
+        </KeyboardAvoidingView>
+      ) : (
+        <View style={styles.content}>{children}</View>
+      )}
     </SafeAreaView>
   );
 }
@@ -18,6 +32,8 @@ export default function ScreenSurface({ children }: { children: React.ReactNode 
 const styles = StyleSheet.create({
   surface: { flex: 1, backgroundColor: "#FFFFFF" },
   content: { flex: 1, paddingHorizontal: 24 },
+  flex: { flex: 1 },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 24 },
   purpleGlow: {
     position: "absolute",
     top: -70,

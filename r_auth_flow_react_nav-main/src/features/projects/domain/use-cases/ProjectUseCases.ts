@@ -1,4 +1,5 @@
-import { JoinRequest, NewProject, Project, ProjectComment, RequestStatus } from "../entities/Project";
+import { AppNotification, NewNotification } from "../entities/Notification";
+import { JoinRequest, NewProject, Project, ProjectChanges, ProjectComment, RequestStatus } from "../entities/Project";
 import { ProjectRepository } from "../repositories/ProjectRepository";
 
 /**
@@ -14,6 +15,14 @@ export class ProjectUseCases {
 
   listProjects(): Promise<Project[]> {
     return this.repository.listProjects();
+  }
+
+  updateProject(id: string, changes: ProjectChanges): Promise<void> {
+    return this.repository.updateProject(id, changes);
+  }
+
+  archiveProject(id: string): Promise<void> {
+    return this.repository.archiveProject(id);
   }
 
   listComments(proyectoId?: string): Promise<ProjectComment[]> {
@@ -34,6 +43,18 @@ export class ProjectUseCases {
 
   setRequestStatus(id: string, estado: RequestStatus): Promise<void> {
     return this.repository.setRequestStatus(id, estado);
+  }
+
+  listNotifications(): Promise<AppNotification[]> {
+    return this.repository.listNotifications();
+  }
+
+  notify(notification: NewNotification): Promise<void> {
+    return this.repository.notify(notification);
+  }
+
+  markNotificationsRead(ids: string[]): Promise<void> {
+    return this.repository.markNotificationsRead(ids);
   }
 
   currentUserId(): Promise<string | null> {

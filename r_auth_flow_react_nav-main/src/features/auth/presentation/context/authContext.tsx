@@ -16,6 +16,8 @@ const emptyProfile: ProfileDraft = {
   rol: "",
   habilidades: [],
   infoAdicional: "",
+  whatsapp: "",
+  correoContacto: "",
   onboardingCompletado: false,
 };
 
@@ -84,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .then((saved) => {
         if (saved) {
           const { userId: _userId, ...draft } = saved;
-          setProfile(draft);
+          setProfile({ ...emptyProfile, ...draft });
         }
       })
       .catch(() => {});
@@ -98,7 +100,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const completeProfile = async (patch: Partial<ProfileDraft> = {}) => {
+  // The profile (memory + draft) belongs to one account: drop it whenever the account changes.
+  const resetProfile = () => {
+    setProfile(emptyProfile);
+    void prefs.removeData("profile_draft");
+  };
+
+  const completeProfile = async(patch: Partial<ProfileDraft> = {}) => {
     clearError();
     const merged = { ...profile, ...patch };
     const completed = { ...merged, onboardingCompletado: canJoinProjects(merged) };
@@ -118,6 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       await authUseCases.login(email, password);
+      resetProfile();
       setNeedsOnboarding(false);
       setIsLoggedIn(true);
     } catch (err: any) {
@@ -135,6 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         pendingSignup.current = { email, password };
         return true;
       }
+      resetProfile();
       // Set before isLoggedIn: without batching, AuthenticatedStack mounts with the stale value.
       setNeedsOnboarding(true);
       setIsLoggedIn(true);
@@ -151,6 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       await authUseCases.logout();
+      resetProfile();
       setIsLoggedIn(false);
       setNeedsOnboarding(false);
     } catch (err: any) {
@@ -183,6 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (pending?.email === email) {
         await authUseCases.login(email, pending.password);
         pendingSignup.current = null;
+        resetProfile();
         setNeedsOnboarding(true);
         setIsLoggedIn(true);
       }

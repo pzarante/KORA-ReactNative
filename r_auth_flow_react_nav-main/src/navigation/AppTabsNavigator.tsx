@@ -35,6 +35,7 @@ export default function AppTabsNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        animation: "fade",
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
         tabBarLabelStyle: styles.tabLabel,

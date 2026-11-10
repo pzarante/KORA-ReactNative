@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import BrandLogo from "@/src/shared/ui/BrandLogo";
 import AuthField from "../components/AuthField";
@@ -43,11 +43,7 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
   };
 
   return (
-    <ScreenSurface>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.keyboard}
-      >
+    <ScreenSurface scroll>
         <View testID="signup-screen" style={styles.container}>
           <BrandLogo />
           <View style={styles.heading}>
@@ -127,13 +123,11 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
             </TouchableOpacity>
           </View>
         </View>
-      </KeyboardAvoidingView>
     </ScreenSurface>
   );
 }
 
 const styles = StyleSheet.create({
-  keyboard: { flex: 1 },
   container: { flex: 1, paddingTop: 48 },
   heading: { marginTop: 18, marginBottom: 27 },
   eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },

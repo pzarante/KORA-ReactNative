@@ -19,13 +19,15 @@ describe("ProfileRemoteDataSourceImp", () => {
       rol: "Estudiante",
       habilidades: ["Diseño"],
       infoAdicional: "",
+      whatsapp: "+57 3001234567",
+      correoContacto: "",
       onboardingCompletado: true,
     });
 
     const [url, options] = fetchMock.mock.calls[1];
     expect(url).toContain("/database/test-project/insert");
     const record = JSON.parse((options as RequestInit).body as string).records[0];
-    expect(record).toMatchObject({ user_id: "user-1", nombre_completo: "Nancy", habilidades: ["Diseño"] });
+    expect(record).toMatchObject({ user_id: "user-1", nombre_completo: "Nancy", habilidades: ["Diseño"], whatsapp: "+57 3001234567", correo_contacto: "" });
     expect(Number.isNaN(Date.parse(record.onboarding_completado))).toBe(false);
   });
 });
