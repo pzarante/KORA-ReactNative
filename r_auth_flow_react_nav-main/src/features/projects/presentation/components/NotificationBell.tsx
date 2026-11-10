@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Animated, Easing, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
@@ -30,9 +30,19 @@ export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Row[]>([]);
   const [error, setError] = useState<string | null>(null);
+  // 0 = hidden, 1 = shown: the panel slides in from the right edge while the scrim fades.
+  const slide = useRef(new Animated.Value(0)).current;
+  const panelX = slide.interpolate({ inputRange: [0, 1], outputRange: [420, 0] });
+
+  const close = (then?: () => void) =>
+    Animated.timing(slide, { toValue: 0, duration: 200, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(() => {
+      setOpen(false);
+      then?.();
+    });
 
   const show = async () => {
     setOpen(true);
+    Animated.timing(slide, { toValue: 1, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
     if (!isLoggedIn) return;
     try {
       const [notifications, projects] = await Promise.all([ds.listNotifications(), ds.listProjects()]);
@@ -50,88 +60,88 @@ export default function NotificationBell() {
     ds.markNotificationsRead(unreadIds).catch((err) => setError(err?.message ?? "No se pudieron marcar las notificaciones"));
   };
 
-  const go = (route: string) => {
-    setOpen(false);
-    navigation.navigate(route);
-  };
+  const go = (route: string) => close(() => navigation.navigate(route));
 
   const unread = items.filter((n) => !n.leida).length;
 
   return (
     <>
       <RoundButton icon="bell-outline" label="Notificaciones" color={colors.text} onPress={show} testID="notifications-button" />
-      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+      <Modal visible={open} transparent animationType="none" onRequestClose={() => close()}>
         <View style={styles.backdrop}>
-          <Pressable accessibilityLabel="Cerrar notificaciones" style={styles.scrim} onPress={() => setOpen(false)} />
-          <SafeAreaView style={styles.panel} testID="notifications-panel">
-            <View pointerEvents="none" style={styles.purpleGlow} />
-            <View pointerEvents="none" style={styles.orangeGlow} />
-            <View style={styles.header}>
-              <Text style={styles.title}>Notificaciones</Text>
-              <TouchableOpacity accessibilityLabel="Cerrar" onPress={() => setOpen(false)} style={styles.close}>
-                <MaterialCommunityIcons name="close" size={26} color={colors.primary} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.statusRow}>
-              <Text style={styles.status}>{unread > 0 ? `${unread} sin leer` : "Estás al día"}</Text>
-              {isLoggedIn ? (
-                <TouchableOpacity onPress={() => markRead(items.map((n) => n.id))} style={styles.markAll} testID="notifications-mark-all">
-                  <View style={styles.check}>
-                    <MaterialCommunityIcons name="check" size={18} color={colors.primary} />
-                  </View>
-                  <Text style={styles.markAllText}>Marcar todas</Text>
+          <Animated.View style={[StyleSheet.absoluteFill, { opacity: slide }]}>
+            <Pressable accessibilityLabel="Cerrar notificaciones" style={styles.scrim} onPress={() => close()} />
+          </Animated.View>
+          <Animated.View style={[styles.panelWrap, { transform: [{ translateX: panelX }] }]}>
+            <SafeAreaView style={styles.panel} testID="notifications-panel">
+              <View pointerEvents="none" style={styles.purpleGlow} />
+              <View pointerEvents="none" style={styles.orangeGlow} />
+              <View style={styles.header}>
+                <Text style={styles.title}>Notificaciones</Text>
+                <TouchableOpacity accessibilityLabel="Cerrar" onPress={() => close()} style={styles.close}>
+                  <MaterialCommunityIcons name="close" size={26} color={colors.primary} />
                 </TouchableOpacity>
-              ) : null}
-            </View>
-
-            {items.length > 0 && isLoggedIn ? (
-              <ScrollView contentContainerStyle={styles.list}>
-                {items.map((n) => {
-                  const isUnread = !n.leida;
-                  const look = NOTIFICATION_TYPES[n.tipo];
-                  return (
-                    <TouchableOpacity
-                      key={n.id}
-                      onPress={() => {
-                        markRead([n.id]);
-                        setOpen(false);
-                        navigation.navigate(look.screen, { project: n.project });
-                      }}
-                      style={[styles.item, isUnread && styles.itemUnread]}
-                      testID={`notification-${n.id}`}
-                    >
-                      <View style={styles.itemIcon}>
-                        <MaterialCommunityIcons name={look.icon as any} size={22} color={colors.primary} />
-                      </View>
-                      <View style={styles.itemText}>
-                        <Text style={styles.itemTitle}>{look.text(n, n.project.nombre)}</Text>
-                        <Text style={styles.itemTime}>{timeAgo(n.createdAt)}</Text>
-                      </View>
-                      {isUnread ? <View style={styles.dot} /> : null}
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
-            ) : (
-              <View style={styles.empty} testID="notifications-empty">
-                <Text style={styles.emptyTitle}>No hay nada nuevo</Text>
-                <Text style={styles.emptyText}>
-                  {error ?? "Aquí verás postulaciones, respuestas, comentarios y actualizaciones de tus proyectos."}
-                </Text>
-                {!isLoggedIn ? (
-                  <View style={styles.guest} testID="notifications-guest">
-                    <Text style={styles.guestText}>No olvides iniciar sesión o crear una cuenta para recibir notificaciones.</Text>
-                    <TouchableOpacity onPress={() => go("Login")} style={styles.guestPrimary}>
-                      <Text style={styles.guestPrimaryText}>Iniciar sesión</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => go("Signup")} style={styles.guestOutline}>
-                      <Text style={styles.guestOutlineText}>Crear cuenta</Text>
-                    </TouchableOpacity>
-                  </View>
+              </View>
+              <View style={styles.statusRow}>
+                <Text style={styles.status}>{unread > 0 ? `${unread} sin leer` : "Estás al día"}</Text>
+                {isLoggedIn ? (
+                  <TouchableOpacity onPress={() => markRead(items.map((n) => n.id))} style={styles.markAll} testID="notifications-mark-all">
+                    <View style={styles.check}>
+                      <MaterialCommunityIcons name="check" size={18} color={colors.primary} />
+                    </View>
+                    <Text style={styles.markAllText}>Marcar todas</Text>
+                  </TouchableOpacity>
                 ) : null}
               </View>
-            )}
-          </SafeAreaView>
+
+              {items.length > 0 && isLoggedIn ? (
+                <ScrollView contentContainerStyle={styles.list}>
+                  {items.map((n) => {
+                    const isUnread = !n.leida;
+                    const look = NOTIFICATION_TYPES[n.tipo];
+                    return (
+                      <TouchableOpacity
+                        key={n.id}
+                        onPress={() => {
+                          markRead([n.id]);
+                          close(() => navigation.navigate(look.screen, { project: n.project }));
+                        }}
+                        style={[styles.item, isUnread && styles.itemUnread]}
+                        testID={`notification-${n.id}`}
+                      >
+                        <View style={styles.itemIcon}>
+                          <MaterialCommunityIcons name={look.icon as any} size={22} color={colors.primary} />
+                        </View>
+                        <View style={styles.itemText}>
+                          <Text style={styles.itemTitle}>{look.text(n, n.project.nombre)}</Text>
+                          <Text style={styles.itemTime}>{timeAgo(n.createdAt)}</Text>
+                        </View>
+                        {isUnread ? <View style={styles.dot} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              ) : (
+                <View style={styles.empty} testID="notifications-empty">
+                  <Text style={styles.emptyTitle}>No hay nada nuevo</Text>
+                  <Text style={styles.emptyText}>
+                    {error ?? "Aquí verás postulaciones, respuestas, comentarios y actualizaciones de tus proyectos."}
+                  </Text>
+                  {!isLoggedIn ? (
+                    <View style={styles.guest} testID="notifications-guest">
+                      <Text style={styles.guestText}>No olvides iniciar sesión o crear una cuenta para recibir notificaciones.</Text>
+                      <TouchableOpacity onPress={() => go("Login")} style={styles.guestPrimary}>
+                        <Text style={styles.guestPrimaryText}>Iniciar sesión</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => go("Signup")} style={styles.guestOutline}>
+                        <Text style={styles.guestOutlineText}>Crear cuenta</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : null}
+                </View>
+              )}
+            </SafeAreaView>
+          </Animated.View>
         </View>
       </Modal>
     </>
@@ -139,9 +149,10 @@ export default function NotificationBell() {
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, flexDirection: "row" },
+  backdrop: { flex: 1, flexDirection: "row", justifyContent: "flex-end" },
   scrim: { flex: 1, backgroundColor: "rgba(33,24,50,0.53)" },
-  panel: { width: "76%", maxWidth: 420, backgroundColor: "#FFFFFF", borderTopLeftRadius: 32, borderBottomLeftRadius: 32, overflow: "hidden", paddingHorizontal: 16 },
+  panelWrap: { width: "76%", maxWidth: 420 },
+  panel: { flex: 1, backgroundColor: "#FFFFFF", borderTopLeftRadius: 32, borderBottomLeftRadius: 32, overflow: "hidden", paddingHorizontal: 16 },
   purpleGlow: { position: "absolute", top: -80, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: "#E5CEFF", opacity: 0.6 },
   orangeGlow: { position: "absolute", bottom: "22%", left: -120, width: 220, height: 220, borderRadius: 110, backgroundColor: "#FFD4C8", opacity: 0.5 },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 16 },

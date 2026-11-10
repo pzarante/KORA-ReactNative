@@ -7,7 +7,7 @@ import AuthBrand from "./AuthBrand";
 import AuthSurface from "./AuthSurface";
 import ProfileProgress from "./ProfileProgress";
 
-export const ONBOARDING_STEPS = 4;
+export const ONBOARDING_STEPS = 5;
 
 type StepProps = {
   /** 1-based step; shows the progress bar and "Completar perfil después". */

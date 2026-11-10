@@ -29,7 +29,8 @@ function renderScreen(
       rol: "",
       habilidades: [],
       infoAdicional: "",
-     
+      whatsapp: "",
+      correoContacto: "",
       onboardingCompletado: false,
     },
     updateProfile: jest.fn(),
