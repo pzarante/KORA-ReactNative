@@ -55,6 +55,28 @@ describe("ProfileRemoteDataSourceImp", () => {
     expect(body.updates).toMatchObject({ nombre_completo: "Nancy R.", onboarding_completado: "2026-11-01T10:00:00.000Z" });
   });
 
+  it("'Hacerlo más tarde' (name, no role) still sends a date: Roble's column is NOT NULL", async () => {
+    const fetchMock = jest.spyOn(global, "fetch")
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => [] } as unknown as Response)
+      .mockResolvedValueOnce({ ok: true, status: 201 } as Response);
+
+    await new ProfileRemoteDataSourceImp("test-project").saveProfile({ ...edited, rol: "", onboardingCompletado: false });
+
+    const record = JSON.parse((fetchMock.mock.calls[1][1] as RequestInit).body as string).records[0];
+    expect(Number.isNaN(Date.parse(record.onboarding_completado))).toBe(false);
+  });
+
+  it("reads onboarding as done only with a name and a role", async () => {
+    const row = { _id: "row-1", user_id: "user-1", nombre_completo: "Nancy", habilidades: [], onboarding_completado: "2026-11-01T10:00:00.000Z" };
+    const ds = new ProfileRemoteDataSourceImp("test-project");
+
+    jest.spyOn(global, "fetch").mockResolvedValueOnce({ ok: true, status: 200, json: async () => [{ ...row, rol: "" }] } as unknown as Response);
+    expect((await ds.getProfile())?.onboardingCompletado).toBe(false);
+
+    jest.spyOn(global, "fetch").mockResolvedValueOnce({ ok: true, status: 200, json: async () => [{ ...row, rol: "Estudiante" }] } as unknown as Response);
+    expect((await ds.getProfile())?.onboardingCompletado).toBe(true);
+  });
+
   it("refreshes an expired token once and retries", async () => {
     const authService = { refreshToken: jest.fn(async () => true) } as any;
     const fetchMock = jest.spyOn(global, "fetch")

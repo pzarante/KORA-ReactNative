@@ -1,6 +1,6 @@
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
-import { UserProfile } from "../../domain/entities/UserProfile";
+import { canJoinProjects, UserProfile } from "../../domain/entities/UserProfile";
 import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 import { ProfileDataSource } from "./ProfileDataSource";
 
@@ -53,15 +53,18 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
     if (!token) return null;
     const row: any = await this.findProfile(userId ?? userIdFromToken(token));
     if (!row) return null;
+    const nombreCompleto = row.nombre_completo ?? "";
+    const rol = row.rol ?? "";
     return {
       userId: row.user_id,
-      nombreCompleto: row.nombre_completo ?? "",
-      rol: row.rol ?? "",
+      nombreCompleto,
+      rol,
       habilidades: Array.isArray(row.habilidades) ? row.habilidades : [],
       infoAdicional: row.info_adicional ?? "",
       whatsapp: row.whatsapp ?? "",
       correoContacto: row.correo_contacto ?? "",
-      onboardingCompletado: !!row.onboarding_completado,
+      // Derived from the data, not the column: onboarding_completado is always filled (see toRecord).
+      onboardingCompletado: canJoinProjects({ nombreCompleto, rol }),
     };
   }
 
@@ -97,9 +100,9 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       info_adicional: profile.infoAdicional,
       whatsapp: profile.whatsapp,
       correo_contacto: profile.correoContacto,
-      // The Roble column is a timestamp: when onboarding was first completed. Editing the profile
-      // keeps that date. null (incomplete) needs the column to be nullable in Roble.
-      onboarding_completado: profile.onboardingCompletado ? completedAt || new Date().toISOString() : null,
+      // Roble keeps this column NOT NULL and its SQL console can't change that, so it always holds a
+      // date: when the profile was first saved. Whether onboarding is done is derived on read.
+      onboarding_completado: completedAt || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
   }
