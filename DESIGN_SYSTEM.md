@@ -182,6 +182,13 @@ Todas en `src/features/*/presentation/screens/`.
 | `miperfil-estudiante`, `-docente`, `-egresado` | `auth/MyProfileScreen` + `ProfileView` |
 | `Editar proyecto/editarinformacion…`, `editarproyectorecursos`, `salirsinguardar` | `projects/EditProjectScreen` (solo integrantes; "Eliminar" solo el creador) |
 | `notificaciones-sinnotificaciones` | `projects/components/NotificationBell` (panel lateral; tipos en `notificationTypes.ts`) |
+| `koranode/KORANODE-sincronizarproyecto` | `koranode/KoraNodeScreen` sin aparato vinculado (código `KORA-XXXX`; el aparato se simula y confirma solo) |
+| `koranode/KORANODE-sincronizacionexitosa` | `koranode/KoraNodeSyncedScreen` |
+| `koranode/KORANODE-SIncronizado`, `KORANODE-Iniciarreunion` | `koranode/KoraNodeScreen` con aparato (panel). Las dos vistas de Figma se fusionaron: tenían los mismos pasos y botón |
+| `koranode/KORANODE-Reunionencurso` | `koranode/MeetingInProgressScreen` (cronómetro, pausa, confirmación al salir) |
+| `koranode/KORANODE-Reunionfinalizada` | `koranode/MeetingNoteScreen` con `justFinished`; desde el historial es el detalle de la nota |
+| — (no existe en Figma) | `koranode/EditMeetingScreen`: editar título, objetivo, acuerdos y próximos pasos |
+| `koranode/KORANODE-HIstorialdereuniones` | `koranode/MeetingHistoryScreen` (búsqueda + filtros Todas / Con pendientes / Este mes) |
 
 ### Variantes de perfil por rol
 
@@ -199,7 +206,8 @@ Siempre siguen: Habilidades (chips), Contacto (WhatsApp + email) e Información 
 
 - **Wizard de creación (5 pasos):** header fijo con atrás + título, barra de progreso, contenido con scroll y footer fijo con "Atrás" (contorno) + "Siguiente" (primario, deshabilitado hasta completar los requeridos). El atrás del header abre el popup "¿Abandonar…?". Desde "Revisar proyecto", el lápiz vuelve al paso y "Siguiente" regresa a Revisar.
 - **Invitado / perfil incompleto:** cualquier acción que requiere cuenta (Crear, Solicitar unirme) lleva a una pantalla con ilustración, CTA principal y "Volver al proyecto".
-- **Dueño vs. ajeno en el detalle:** el dueño ve "Ver solicitudes", "KORA NODE" y "Editar proyecto"; el ajeno ve guardar (bookmark) + "Solicitar unirme".
+- **Dueño vs. ajeno en el detalle:** el dueño ve "Ver solicitudes", "KORA NODE" y "Editar proyecto"; un integrante aceptado ve "KORA NODE" y "Editar proyecto"; el ajeno ve guardar (bookmark) + "Solicitar unirme".
+- **KORA NODE:** un aparato por proyecto. Cualquier integrante lo vincula, inicia reuniones y edita las notas. Cada reunión termina en una nota (resumen de IA simulado) compartida con todo el equipo; los próximos pasos se marcan como hechos desde la nota y se avisa al equipo al guardar una reunión.
 - **Confirmaciones:** pantalla completa de éxito (no toast).
 
 ---
