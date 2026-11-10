@@ -1,5 +1,7 @@
 -- KORA NODE: tablas que la app necesita en Roble (base de datos del proyecto kora_eb11b19cdd).
 -- Mismo estilo que las tablas existentes: ids de referencia en text, listas en json, fechas timestamptz.
+-- La consola SQL de Roble solo acepta SELECT, CREATE TABLE, INSERT, DELETE con WHERE y
+-- ALTER TABLE ADD COLUMN, así que aquí no hay índices ni cambios de restricciones.
 
 -- Un KORA NODE vinculado por proyecto. UNIQUE evita dos vínculos si dos integrantes sincronizan a la vez.
 CREATE TABLE IF NOT EXISTS kora_node (
@@ -29,11 +31,7 @@ CREATE TABLE IF NOT EXISTS reunion (
   updated_at timestamptz,
   _owner text
 );
-CREATE INDEX IF NOT EXISTS reunion_proyecto_idx ON reunion (proyecto_id);
-
--- La app crea notificaciones con tipo = 'reunion'. Solo hace falta tocar algo si
--- notificacion.tipo tiene una restricción CHECK. Para verlo:
-SELECT conname, pg_get_constraintdef(oid)
-FROM pg_constraint
-WHERE conrelid = 'notificacion'::regclass AND contype = 'c';
--- Si sale una restricción sobre tipo, recrearla agregando 'reunion' a la lista.
+-- La app crea notificaciones con tipo = 'reunion'. notificacion.tipo no tiene restricción CHECK
+-- (verificado el 2026-11-10 con la consulta de abajo, 0 filas), así que no hay que cambiar nada.
+-- SELECT conname, pg_get_constraintdef(oid) FROM pg_constraint
+-- WHERE conrelid = 'notificacion'::regclass AND contype = 'c';
