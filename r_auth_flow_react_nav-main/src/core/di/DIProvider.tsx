@@ -13,6 +13,11 @@ import { ProfileRepositoryImpl } from "@/src/features/auth/data/repositories/Pro
 import { AuthUseCases } from "@/src/features/auth/domain/use-cases/AuthUseCases";
 import { ProfileUseCases } from "@/src/features/auth/domain/use-cases/ProfileUseCases";
 import { LocalProductCacheSource } from "@/src/features/products/data/datasources/local/LocalProductCacheSource";
+import { KoraNodeDataSource } from "@/src/features/koranode/data/datasources/KoraNodeDataSource";
+import { KoraNodeRemoteDataSourceImp } from "@/src/features/koranode/data/datasources/KoraNodeRemoteDataSourceImp";
+import { MockKoraNodeDataSource } from "@/src/features/koranode/data/datasources/MockKoraNodeDataSource";
+import { KoraNodeRepositoryImpl } from "@/src/features/koranode/data/repositories/KoraNodeRepositoryImpl";
+import { KoraNodeUseCases } from "@/src/features/koranode/domain/use-cases/KoraNodeUseCases";
 import { MockProductDataSource } from "@/src/features/products/data/datasources/MockProductDataSource";
 import { ProductRemoteDataSourceImp } from "@/src/features/products/data/datasources/ProductRemoteDataSourceImp";
 import { ProductRepositoryImpl } from "@/src/features/products/data/repositories/ProductRepositoryImpl";
@@ -75,6 +80,15 @@ export function DIProvider({ children }: { children: React.ReactNode }) {
         c.register(TOKENS.ProjectDataSource, projectDS)
             .register(TOKENS.ProjectRepository, projectRepo)
             .register(TOKENS.ProjectUseCases, projectUseCases);
+
+        // ── KORA NODE ─────────────────────────────────────────
+        const koraNodeDS: KoraNodeDataSource = useMocks
+            ? new MockKoraNodeDataSource()
+            : new KoraNodeRemoteDataSourceImp(authDS);
+        const koraNodeRepo = new KoraNodeRepositoryImpl(koraNodeDS);
+        c.register(TOKENS.KoraNodeDataSource, koraNodeDS)
+            .register(TOKENS.KoraNodeRepository, koraNodeRepo)
+            .register(TOKENS.KoraNodeUseCases, new KoraNodeUseCases(koraNodeRepo));
 
         return c;
     }, []);

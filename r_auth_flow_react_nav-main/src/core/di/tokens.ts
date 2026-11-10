@@ -16,4 +16,8 @@ export const TOKENS = {
   ProjectDataSource: Symbol("ProjectDataSource"),
   ProjectRepository: Symbol("ProjectRepository"),
   ProjectUseCases: Symbol("ProjectUseCases"),
+  // KORA NODE
+  KoraNodeDataSource: Symbol("KoraNodeDataSource"),
+  KoraNodeRepository: Symbol("KoraNodeRepository"),
+  KoraNodeUseCases: Symbol("KoraNodeUseCases"),
 } as const;
