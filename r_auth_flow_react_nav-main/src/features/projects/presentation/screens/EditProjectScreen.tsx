@@ -14,7 +14,7 @@ import ConfirmModal from "@/src/shared/ui/ConfirmModal";
 import { useConfirmLeave } from "@/src/shared/hooks/useConfirmLeave";
 
 const MAX_TEXT = 250;
-const EDITABLE = ["icono", "nombre", "descripcion", "etiquetas", "etapa", "problema", "objetivo", "alcance", "roles", "enlaces", "buscandoPersonas"] as const;
+const EDITABLE = ["icono", "nombre", "descripcion", "sobre", "etiquetas", "etapa", "problema", "objetivo", "alcance", "roles", "enlaces", "buscandoPersonas"] as const;
 type Draft = Required<ProjectChanges>;
 
 function Card({ icon, title, text, danger, children }: { icon: any; title: string; text: string; danger?: boolean; children?: React.ReactNode }) {
@@ -182,6 +182,17 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
             <TextInput onChangeText={(nombre) => update({ nombre })} style={ui.input} testID="edit-project-name" value={draft.nombre} />
             <Text style={styles.label}>Descripción</Text>
             <LongField value={draft.descripcion} onChange={(descripcion) => update({ descripcion })} />
+            {/* No length limit here: creation has none, so older texts may be longer than MAX_TEXT. */}
+            <Text style={styles.label}>Sobre el proyecto</Text>
+            <TextInput
+              multiline
+              onChangeText={(sobre) => update({ sobre })}
+              placeholder="Cuenta los detalles y el contexto de tu proyecto..."
+              placeholderTextColor={colors.muted}
+              style={[ui.input, styles.textArea]}
+              testID="edit-project-about"
+              value={draft.sobre}
+            />
             <Text style={styles.label}>Etiquetas</Text>
             <View style={ui.chips}>
               {draft.etiquetas.map((tag, index) => (

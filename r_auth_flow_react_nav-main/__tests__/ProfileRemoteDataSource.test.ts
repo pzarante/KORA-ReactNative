@@ -30,4 +30,42 @@ describe("ProfileRemoteDataSourceImp", () => {
     expect(record).toMatchObject({ user_id: "user-1", nombre_completo: "Nancy", habilidades: ["Diseño"], whatsapp: "+57 3001234567", correo_contacto: "" });
     expect(Number.isNaN(Date.parse(record.onboarding_completado))).toBe(false);
   });
+
+  const edited = {
+    nombreCompleto: "Nancy R.",
+    rol: "Estudiante",
+    habilidades: ["Diseño"],
+    infoAdicional: "",
+    whatsapp: "",
+    correoContacto: "",
+    onboardingCompletado: true,
+  };
+
+  it("editing keeps the original onboarding date", async () => {
+    const fetchMock = jest.spyOn(global, "fetch")
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => [{ _id: "row-1", user_id: "user-1", onboarding_completado: "2026-11-01T10:00:00.000Z" }] } as unknown as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200 } as Response);
+
+    await new ProfileRemoteDataSourceImp("test-project").saveProfile(edited);
+
+    const [url, options] = fetchMock.mock.calls[1];
+    expect(url).toContain("/database/test-project/update");
+    const body = JSON.parse((options as RequestInit).body as string);
+    expect(body).toMatchObject({ tableName: "Usuario", idColumn: "_id", idValue: "row-1" });
+    expect(body.updates).toMatchObject({ nombre_completo: "Nancy R.", onboarding_completado: "2026-11-01T10:00:00.000Z" });
+  });
+
+  it("refreshes an expired token once and retries", async () => {
+    const authService = { refreshToken: jest.fn(async () => true) } as any;
+    const fetchMock = jest.spyOn(global, "fetch")
+      .mockResolvedValueOnce({ ok: false, status: 401, json: async () => ({}) } as unknown as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => [{ _id: "row-1", user_id: "user-1", onboarding_completado: "2026-11-01T10:00:00.000Z" }] } as unknown as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200 } as Response);
+
+    await new ProfileRemoteDataSourceImp("test-project", authService).saveProfile(edited);
+
+    expect(authService.refreshToken).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock.mock.calls[2][0]).toContain("/update");
+  });
 });

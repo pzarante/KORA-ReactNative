@@ -51,7 +51,7 @@ export function DIProvider({ children }: { children: React.ReactNode }) {
         // ── Profile ───────────────────────────────────────────
         const profileDS: ProfileDataSource = useMocks
             ? new MockProfileDataSource()
-            : new ProfileRemoteDataSourceImp();
+            : new ProfileRemoteDataSourceImp(undefined, authDS);
         const profileRepo = new ProfileRepositoryImpl(profileDS);
         const profileUseCases = new ProfileUseCases(profileRepo);
         c.register(TOKENS.ProfileDataSource, profileDS)

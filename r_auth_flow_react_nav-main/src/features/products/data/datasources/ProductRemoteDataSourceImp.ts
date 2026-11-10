@@ -20,7 +20,7 @@ export class ProductRemoteDataSourceImp implements ProductDataSource {
     }
     this.prefs = LocalPreferencesAsyncStorage.getInstance();
     this.projectId = projectId;
-    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.openlab.uninorte.edu.co").replace(/\/$/, "");
+    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.test-openlab.uninorte.edu.co").replace(/\/$/, "");
     this.baseUrl = `${apiUrl}/database/${this.projectId}`;
   }
 
