@@ -6,9 +6,10 @@ import { PaperProvider } from "react-native-paper";
 import { DIProvider } from "./src/core/di/DIProvider";
 import { AuthProvider } from "./src/features/auth/presentation/context/authContext";
 import RootNavigator from "./src/navigation/RootNavigator";
+import { installWebInputStyles } from "./src/shared/ui/webInputStyles";
 import { darkTheme, lightTheme } from "./src/theme/theme";
 
-
+installWebInputStyles();
 
 export default function App() {
   const scheme = useColorScheme();
