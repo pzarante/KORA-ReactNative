@@ -63,10 +63,10 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
     </TouchableOpacity>
   );
   const koraNodeButton = (
-    <TouchableOpacity onPress={() => navigation.navigate("KoraNode", { project })} style={ui.primaryButton} testID="kora-node-button">
+    <TouchableOpacity onPress={() => navigation.navigate("KoraNode", { project })} style={[ui.primaryButton, styles.nodeButton]} testID="kora-node-button">
       <Image source={require("../../../../../assets/kora-node/device.png")} resizeMode="contain" style={styles.nodeIcon} tintColor="#FFFFFF" />
-      <Text style={ui.primaryButtonText}>KORA NODE</Text>
-      <MaterialCommunityIcons name="arrow-right" size={20} color="#FFFFFF" />
+      {/* No arrow (unlike Figma): beside "Solicitudes" it doesn't fit on 360 pt phones. */}
+      <Text adjustsFontSizeToFit numberOfLines={1} style={[ui.primaryButtonText, styles.nodeText]}>KORA NODE</Text>
     </TouchableOpacity>
   );
   const members = [creador, ...(data?.requests.filter((r) => r.estado === "aceptada").map((r) => r.usuarioNombre) ?? [])];
@@ -207,7 +207,7 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
           <View style={styles.memberActions}>
             <View style={styles.footerRow}>
               {isCreator ? (
-                <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
+                <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex, styles.requestsButton]} testID="view-requests-button">
                   <Text style={ui.outlineButtonText}>Solicitudes{pending ? ` (${pending})` : ""}</Text>
                 </TouchableOpacity>
               ) : null}
@@ -269,7 +269,10 @@ const styles = StyleSheet.create({
   editButton: { paddingHorizontal: 16 },
   memberActions: { flex: 1, gap: 12 },
   footerRow: { flexDirection: "row", gap: 12 },
-  nodeIcon: { width: 40, height: 20 },
+  nodeButton: { gap: 5, paddingHorizontal: 10 },
+  nodeIcon: { width: 24, height: 12 },
+  nodeText: { fontSize: 15 },
+  requestsButton: { paddingHorizontal: 12 },
   blobTopRight: { position: "absolute", top: -70, right: -80 },
   blobBottomLeft: { position: "absolute", bottom: 101, left: -175 },
   status: { flex: 1, color: colors.primary, fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },
