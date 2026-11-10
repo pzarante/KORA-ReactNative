@@ -93,6 +93,7 @@ describe("Project feed", () => {
         await act(async () => fireEvent.press(getByTestId("comment-send-button")));
         await waitFor(() => expect(within(getByTestId("comments-screen")).getByText("¡Me encanta!")).toBeTruthy());
         expect(tables.comentario[0]).toMatchObject({ proyecto_id: "p1", autor_id: "ana", autor_nombre: "Ana", respuesta_a: null });
+        await waitFor(() => expect(tables.notificacion?.[0]).toMatchObject({ destinatario_id: "creator", tipo: "comentario", actor_nombre: "Ana" }));
 
         // Stacked screens stay mounted; the focused one's back button is the last.
         await act(async () => fireEvent.press(utils.getAllByLabelText("Volver").at(-1)!));
@@ -105,6 +106,7 @@ describe("Project feed", () => {
         await act(async () => fireEvent.press(getByTestId("send-request-button")));
         await waitFor(() => expect(getByTestId("request-sent-screen")).toBeTruthy());
         expect(tables.solicitud[0]).toMatchObject({ proyecto_id: "p1", usuario_id: "ana", usuario_nombre: "Ana", rol: "Diseño UI/UX", estado: "pendiente" });
+        await waitFor(() => expect(tables.notificacion[1]).toMatchObject({ destinatario_id: "creator", tipo: "solicitud", detalle: "Diseño UI/UX" }));
     });
 
     it("shows the tab bar on the project detail and switches tabs from it", async () => {
@@ -142,8 +144,56 @@ describe("Project feed", () => {
         await act(async () => fireEvent.press(getByTestId("accept-request-button")));
         await waitFor(() => expect(getByTestId("member-joined-screen")).toBeTruthy());
         expect(tables.solicitud[0].estado).toBe("aceptada");
+        await waitFor(() => expect(tables.notificacion?.[0]).toMatchObject({ destinatario_id: "ana", tipo: "solicitud_aceptada" }));
 
         await act(async () => fireEvent.press(getByTestId("member-joined-team-button")));
         await waitFor(() => expect(within(getByTestId("team-members-screen")).getByText("Ana")).toBeTruthy());
+    });
+
+    it("lets a team member edit the project, notifies the creator and asks before dropping changes", async () => {
+        const accepted = { _id: "s1", proyecto_id: "p1", usuario_id: "ana", usuario_nombre: "Ana", rol: "Diseño UI/UX", mensaje: "", estado: "aceptada", created_at: "2026-08-11T00:00:00.000Z" };
+        const tables: Record<string, any[]> = {
+            proyecto: [{ ...project }], Usuario: [profileRow("ana", "Ana")], comentario: [], solicitud: [accepted], notificacion: [],
+        };
+        globalThis.fetch = fakeRoble("ana", tables) as unknown as typeof fetch;
+        const utils = renderApp();
+        const { getByTestId, queryByTestId } = utils;
+        await loginAs(utils);
+
+        await act(async () => fireEvent.press(getByTestId("project-row-p1")));
+        await waitFor(() => expect(getByTestId("edit-project-button")).toBeTruthy());
+        await act(async () => fireEvent.press(getByTestId("edit-project-button")));
+        await waitFor(() => expect(getByTestId("edit-project-screen")).toBeTruthy());
+        // Only the creator can delete.
+        expect(queryByTestId("edit-project-delete")).toBeNull();
+
+        fireEvent.changeText(getByTestId("edit-project-name"), "EcoCampus 2");
+        await act(async () => fireEvent.press(getByTestId("edit-project-back")));
+        await waitFor(() => expect(utils.getByText("¿Salir sin guardar los cambios?")).toBeTruthy());
+        await act(async () => fireEvent.press(utils.getByText("Seguir editando")));
+
+        await act(async () => fireEvent.press(getByTestId("edit-project-save")));
+        await waitFor(() => expect(queryByTestId("edit-project-screen")).toBeNull());
+        expect(tables.proyecto[0].nombre).toBe("EcoCampus 2");
+        await waitFor(() => expect(tables.notificacion).toEqual([expect.objectContaining({ destinatario_id: "creator", tipo: "edicion", actor_nombre: "Ana" })]));
+        await waitFor(() => expect(within(getByTestId("project-detail-screen")).getByText("EcoCampus 2")).toBeTruthy());
+    });
+
+    it("shows the creator their notifications and marks them read", async () => {
+        const tables: Record<string, any[]> = {
+            proyecto: [project], Usuario: [profileRow("creator", "María")], comentario: [], solicitud: [],
+            notificacion: [{ _id: "n1", destinatario_id: "creator", tipo: "edicion", proyecto_id: "p1", actor_nombre: "Ana", leida: false, created_at: "2026-08-12T00:00:00.000Z" }],
+        };
+        globalThis.fetch = fakeRoble("creator", tables) as unknown as typeof fetch;
+        const utils = renderApp();
+        const { getAllByTestId, getByTestId } = utils;
+        await loginAs(utils);
+
+        await act(async () => fireEvent.press(getAllByTestId("notifications-button")[0]));
+        await waitFor(() => expect(utils.getByText("Ana editó el proyecto EcoCampus")).toBeTruthy());
+        expect(utils.getByText("1 sin leer")).toBeTruthy();
+        await act(async () => fireEvent.press(getByTestId("notifications-mark-all")));
+        await waitFor(() => expect(tables.notificacion[0].leida).toBe(true));
+        expect(utils.getByText("Estás al día")).toBeTruthy();
     });
 });

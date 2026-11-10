@@ -52,3 +52,5 @@ export const ui = StyleSheet.create({
   outlineButtonText: { color: colors.primary, fontSize: 16, fontWeight: "800" },
   error: { color: colors.error, marginTop: 12, textAlign: "center" },
 });
+
+export const URL_PATTERN = /^https?:\/\/\S+\.\S+$/i;

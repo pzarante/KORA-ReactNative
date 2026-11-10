@@ -22,7 +22,7 @@ const createMockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthCo
     validate: jest.fn(),
     resendCode: jest.fn(),
     getLoggedUser: jest.fn(),
-    profile: { nombreCompleto: "", rol: "", habilidades: [], infoAdicional: "", onboardingCompletado: false },
+    profile: { nombreCompleto: "", rol: "", habilidades: [], infoAdicional: "", whatsapp: "", correoContacto: "", onboardingCompletado: false },
     updateProfile: jest.fn(),
     completeProfile: jest.fn(),
     ...overrides,
@@ -59,6 +59,13 @@ describe("LoginScreen", () => {
             const { getByTestId } = renderScreen();
             expect(getByTestId("email-input").props.value).toBe("");
             expect(getByTestId("password-input").props.value).toBe("");
+        });
+
+        it("shows and hides the password with the eye button", () => {
+            const { getByTestId } = renderScreen();
+            expect(getByTestId("password-input").props.secureTextEntry).toBe(true);
+            fireEvent.press(getByTestId("password-input-toggle"));
+            expect(getByTestId("password-input").props.secureTextEntry).toBe(false);
         });
 
         it("shows Log In button", () => {

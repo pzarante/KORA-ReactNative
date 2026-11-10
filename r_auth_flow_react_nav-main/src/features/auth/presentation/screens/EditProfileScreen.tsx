@@ -3,10 +3,11 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput
 
 import { TopBar } from "@/src/features/projects/presentation/components/feed";
 import { colors, ui } from "@/src/features/projects/presentation/components/projectUi";
-import { PROFILE_ROLES, PROFILE_SKILLS, profileCompletion } from "../../domain/entities/UserProfile";
+import { contactError, PROFILE_ROLES, PROFILE_SKILLS, profileCompletion } from "../../domain/entities/UserProfile";
 import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import AuthSurface from "../components/AuthSurface";
+import ContactFields from "../components/ContactFields";
 import OptionPill from "../components/OptionPill";
 import ProfileProgress from "../components/ProfileProgress";
 import { useAuth } from "../context/authContext";
@@ -16,6 +17,7 @@ export default function EditProfileScreen({ navigation }: { navigation: any }) {
   const { profile, completeProfile, error, clearError } = useAuth();
   const [draft, setDraft] = useState(profile);
   const [nameError, setNameError] = useState<string>();
+  const [contactProblem, setContactProblem] = useState<string>();
   const [saving, setSaving] = useState(false);
 
   // Hide errors left over from another screen, and ours when leaving.
@@ -31,8 +33,12 @@ export default function EditProfileScreen({ navigation }: { navigation: any }) {
   const save = async () => {
     const nombreCompleto = draft.nombreCompleto.trim();
     if (!nombreCompleto) return setNameError("Tu nombre es obligatorio");
+    const problem = contactError(draft);
+    if (problem) return setContactProblem(problem);
     setSaving(true);
-    const saved = await completeProfile({ ...draft, nombreCompleto, infoAdicional: draft.infoAdicional.trim() });
+    const saved = await completeProfile({
+      ...draft, nombreCompleto, infoAdicional: draft.infoAdicional.trim(), correoContacto: draft.correoContacto.trim(),
+    });
     setSaving(false);
     if (saved) navigation.goBack();
   };
@@ -80,6 +86,16 @@ export default function EditProfileScreen({ navigation }: { navigation: any }) {
             ))}
           </View>
 
+          <Text style={[styles.section, styles.contactTitle]}>Medios de contacto</Text>
+          <ContactFields
+            value={draft}
+            onChange={(patch) => {
+              set(patch);
+              setContactProblem(undefined);
+            }}
+          />
+          {contactProblem ? <Text style={ui.error}>{contactProblem}</Text> : null}
+
           <Text style={styles.section}>Información adicional</Text>
           <TextInput
             style={[ui.input, ui.textArea, styles.bio]}
@@ -109,6 +125,8 @@ const styles = StyleSheet.create({
   subtitle: { color: colors.muted, fontSize: 15, fontWeight: "600", textAlign: "center", marginTop: 6, lineHeight: 21 },
   progressCard: { backgroundColor: "rgba(255,255,255,0.92)", borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 18, marginTop: 22 },
   section: { color: colors.text, fontSize: 18, fontWeight: "800", marginTop: 26, marginBottom: 12 },
+  // ContactFields brings its own top spacing.
+  contactTitle: { marginBottom: 0 },
   roles: { flexDirection: "row", gap: 8 },
   role: { flex: 1, paddingHorizontal: 4 },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 },

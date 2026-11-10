@@ -25,6 +25,12 @@ export default function ApplicantProfileScreen({ navigation, route }: { navigati
     setError(null);
     try {
       await ds.setRequestStatus(request.id, estado);
+      void ds.notify({
+        para: [request.usuarioId],
+        tipo: estado === "aceptada" ? "solicitud_aceptada" : "solicitud_rechazada",
+        proyectoId: project.id,
+        actorNombre: project.creadorNombre,
+      });
       if (estado === "aceptada") navigation.replace("MemberJoined", { request, project });
       else navigation.goBack();
     } catch (err: any) {

@@ -1,10 +1,26 @@
 import { LocalPreferencesAsyncStorage } from "@/src/core/LocalPreferencesAsyncStorage";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
 import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
-import { JoinRequest, NewProject, Project, ProjectComment, RequestStatus } from "../../domain/entities/Project";
+import { AppNotification, NewNotification } from "../../domain/entities/Notification";
+import { JoinRequest, NewProject, Project, ProjectChanges, ProjectComment, RequestStatus } from "../../domain/entities/Project";
 import { ProjectDataSource } from "./ProjectDataSource";
 
 const list = (value: unknown): string[] => (Array.isArray(value) ? value.map(String) : []);
+// App field -> Roble column of the "proyecto" table.
+const PROJECT_COLUMNS: Record<keyof ProjectChanges, string> = {
+  icono: "icono",
+  nombre: "nombre",
+  descripcion: "descripcion",
+  etiquetas: "etiquetas",
+  etapa: "etapa",
+  problema: "problema",
+  objetivo: "objetivo",
+  alcance: "alcance",
+  roles: "roles",
+  enlaces: "enlaces",
+  buscandoPersonas: "buscando_personas",
+};
+
 const newestFirst = <T extends { createdAt: string }>(rows: T[]) =>
   rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
@@ -33,7 +49,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
     const creadorId = await this.currentUserId();
     if (!creadorId) throw new Error("No hay una sesión activa para crear el proyecto");
 
-    const project: Project = { ...draft, id: "", creadorId, creadorNombre, createdAt: new Date().toISOString() };
+    const project: Project = { ...draft, id: "", buscandoPersonas: true, creadorId, creadorNombre, createdAt: new Date().toISOString() };
     const inserted = await this.insert("proyecto", this.toRecord(project), "No se pudo crear el proyecto");
     return { ...project, id: inserted?._id ?? "" };
   }
@@ -41,7 +57,7 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
   async listProjects(): Promise<Project[]> {
     const rows = await this.read("proyecto", {});
     return newestFirst(
-      rows.map((row) => ({
+      rows.filter((row) => !row.archivado).map((row) => ({
         id: row._id,
         icono: row.icono || "lightbulb-outline",
         nombre: row.nombre ?? "",
@@ -53,11 +69,70 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
         alcance: row.alcance ?? "",
         roles: list(row.roles),
         enlaces: list(row.enlaces),
+        // Rows from before the column existed are still looking for people.
+        buscandoPersonas: row.buscando_personas !== false,
         creadorId: row.creador_id ?? "",
         creadorNombre: row.creador_nombre ?? "",
         createdAt: row.created_at ?? "",
       })),
     );
+  }
+
+  async updateProject(id: string, changes: ProjectChanges) {
+    const updates = Object.fromEntries(
+      Object.entries(changes).map(([field, value]) => [PROJECT_COLUMNS[field as keyof ProjectChanges], value]),
+    );
+    await this.update("proyecto", id, updates, "No se pudo guardar el proyecto");
+  }
+
+  async archiveProject(id: string) {
+    await this.update("proyecto", id, { archivado: true }, "No se pudo eliminar el proyecto");
+  }
+
+  async listNotifications(): Promise<AppNotification[]> {
+    const me = await this.currentUserId();
+    if (!me) return [];
+    const rows = await this.read("notificacion", { destinatario_id: me });
+    return newestFirst(
+      rows.map((row) => ({
+        id: row._id,
+        tipo: row.tipo,
+        proyectoId: row.proyecto_id,
+        actorNombre: row.actor_nombre ?? "",
+        detalle: row.detalle ?? "",
+        leida: !!row.leida,
+        createdAt: row.created_at ?? "",
+      })),
+    );
+  }
+
+  async notify({ para, tipo, proyectoId, actorNombre, detalle }: NewNotification) {
+    try {
+      const me = await this.currentUserId();
+      const recipients = [...new Set(para)].filter((id) => id && id !== me);
+      if (recipients.length === 0) return;
+      const createdAt = new Date().toISOString();
+      await this.insert(
+        "notificacion",
+        recipients.map((id) => ({
+          destinatario_id: id,
+          tipo,
+          proyecto_id: proyectoId,
+          actor_nombre: actorNombre,
+          detalle: detalle ?? null,
+          leida: false,
+          created_at: createdAt,
+        })),
+        "No se pudo crear la notificación",
+      );
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  async markNotificationsRead(ids: string[]) {
+    // shortcut: Roble updates one row per call; fine for a personal inbox, batch it if inboxes get large.
+    await Promise.all(ids.map((id) => this.update("notificacion", id, { leida: true }, "No se pudo marcar la notificación")));
   }
 
   async listComments(proyectoId?: string): Promise<ProjectComment[]> {
@@ -131,11 +206,15 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
   }
 
   async setRequestStatus(id: string, estado: RequestStatus) {
+    await this.update("solicitud", id, { estado }, "No se pudo actualizar la solicitud");
+  }
+
+  private async update(table: string, id: string, updates: object, errorPrefix: string) {
     const response = await this.authorized(`${this.baseUrl}/update`, {
       method: "PUT",
-      body: JSON.stringify({ tableName: "solicitud", idColumn: "_id", idValue: id, updates: { estado } }),
+      body: JSON.stringify({ tableName: table, idColumn: "_id", idValue: id, updates }),
     });
-    await this.ensureOk(response, "No se pudo actualizar la solicitud");
+    await this.ensureOk(response, errorPrefix);
   }
 
   private async read(table: string, filter: Record<string, string>): Promise<any[]> {
@@ -148,10 +227,10 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
     return Array.isArray(rows) ? rows : [];
   }
 
-  private async insert(table: string, record: object, errorPrefix: string): Promise<any> {
+  private async insert(table: string, record: object | object[], errorPrefix: string): Promise<any> {
     const response = await this.authorized(`${this.baseUrl}/insert`, {
       method: "POST",
-      body: JSON.stringify({ tableName: table, records: [record] }),
+      body: JSON.stringify({ tableName: table, records: Array.isArray(record) ? record : [record] }),
     });
     await this.ensureOk(response, errorPrefix);
     const body = await response.json().catch(() => ({}));

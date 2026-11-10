@@ -2,12 +2,14 @@ import React from "react";
 import { StyleSheet, Text } from "react-native";
 
 import { colors } from "@/src/features/projects/presentation/components/projectUi";
+import { TopBar } from "@/src/features/projects/presentation/components/feed";
 import AccountPrompt from "../components/AccountPrompt";
 import AuthSurface from "../components/AuthSurface";
 
 export default function GuestProfileScreen({ navigation }: { navigation: any }) {
   return (
     <AuthSurface scroll>
+      <TopBar />
       <Text style={styles.title} testID="guest-profile-screen">Mi perfil</Text>
       <AccountPrompt
         title="Aún no tienes una cuenta"

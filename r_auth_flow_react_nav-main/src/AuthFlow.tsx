@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, TransitionPresets } from "@react-navigation/stack";
 import React from "react";
 import { StyleSheet } from "react-native";
 
@@ -20,12 +20,15 @@ import OnboardingNameScreen from "./features/auth/presentation/screens/Onboardin
 import OnboardingRoleScreen from "./features/auth/presentation/screens/OnboardingRoleScreen";
 import OnboardingSkillsScreen from "./features/auth/presentation/screens/OnboardingSkillsScreen";
 import OnboardingBioScreen from "./features/auth/presentation/screens/OnboardingBioScreen";
+import OnboardingContactScreen from "./features/auth/presentation/screens/OnboardingContactScreen";
+import OnboardingIntroScreen from "./features/auth/presentation/screens/OnboardingIntroScreen";
 import OnboardingSuccessScreen from "./features/auth/presentation/screens/OnboardingSuccessScreen";
 import { colors } from "./features/projects/presentation/components/projectUi";
 import { CreateProjectProvider } from "./features/projects/presentation/context/createProjectContext";
 import CreateProjectIntroScreen from "./features/projects/presentation/screens/CreateProjectIntroScreen";
 import ProjectBasicInfoScreen from "./features/projects/presentation/screens/ProjectBasicInfoScreen";
 import ProjectCreatedScreen from "./features/projects/presentation/screens/ProjectCreatedScreen";
+import EditProjectScreen from "./features/projects/presentation/screens/EditProjectScreen";
 import ProjectDetailScreen from "./features/projects/presentation/screens/ProjectDetailScreen";
 import ProjectGoalScreen from "./features/projects/presentation/screens/ProjectGoalScreen";
 import ProjectProblemScreen from "./features/projects/presentation/screens/ProjectProblemScreen";
@@ -49,7 +52,12 @@ import MyProfileScreen from "./features/auth/presentation/screens/MyProfileScree
 const Stack = createStackNavigator();
 // "float" stops the web build from growing each screen past the window and scrolling the whole page,
 // which pushed bottom bars (e.g. ProjectDetail's tab bar) out of view. Headers are hidden, so phones look the same.
-const stackOptions = { headerShown: false, headerMode: "float" } as const;
+// Same horizontal slide on iOS and Android so moving deeper/back feels the same on every phone.
+const stackOptions = { headerShown: false, headerMode: "float", ...TransitionPresets.SlideFromRightIOS } as const;
+// Creating a project is a separate task over the tabs: it rises from the bottom.
+const sheetOptions = { ...TransitionPresets.ModalSlideFromBottomIOS };
+// Confirmation screens fade in and can't be swiped back to the form that was already sent.
+const successOptions = { ...TransitionPresets.ModalFadeTransition, gestureEnabled: false };
 const Tab = createBottomTabNavigator();
 
 // The "+" tab never shows a screen: pressing it opens the create-project flow over the tabs.
@@ -75,7 +83,7 @@ function CreateProjectFlow() {
         <Stack.Screen name="ProjectGoal" component={ProjectGoalScreen} />
         <Stack.Screen name="ProjectTeam" component={ProjectTeamScreen} />
         <Stack.Screen name="ProjectReview" component={ProjectReviewScreen} />
-        <Stack.Screen name="ProjectCreated" component={ProjectCreatedScreen} />
+        <Stack.Screen name="ProjectCreated" component={ProjectCreatedScreen} options={successOptions} />
       </Stack.Navigator>
     </CreateProjectProvider>
   );
@@ -96,6 +104,7 @@ function ContentTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        animation: "fade",
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
         tabBarLabelStyle: styles.tabLabel,
@@ -137,17 +146,20 @@ function AuthenticatedStack() {
       >
         <Stack.Screen name="App" component={ContentTabs} />
         <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
+        <Stack.Screen name="OnboardingIntro" component={OnboardingIntroScreen} />
         <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
         <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
         <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
-        <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
-        <Stack.Screen name="CreateProject" component={CreateProjectFlow} />
+        <Stack.Screen name="OnboardingContact" component={OnboardingContactScreen} />
+        <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} options={successOptions} />
+        <Stack.Screen name="CreateProject" component={CreateProjectFlow} options={sheetOptions} />
         {publicFeedScreens}
         <Stack.Screen name="JoinRequest" component={JoinRequestScreen} />
-        <Stack.Screen name="RequestSent" component={RequestSentScreen} />
+        <Stack.Screen name="RequestSent" component={RequestSentScreen} options={successOptions} />
         <Stack.Screen name="Requests" component={RequestsScreen} />
+        <Stack.Screen name="EditProject" component={EditProjectScreen} />
         <Stack.Screen name="ApplicantProfile" component={ApplicantProfileScreen} />
-        <Stack.Screen name="MemberJoined" component={MemberJoinedScreen} />
+        <Stack.Screen name="MemberJoined" component={MemberJoinedScreen} options={successOptions} />
         <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen
@@ -192,10 +204,12 @@ export default function AuthFlow() {
           {publicFeedScreens}
           <Stack.Screen name="AccountRequired" component={AccountRequiredScreen} />
           <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
+          <Stack.Screen name="OnboardingIntro" component={OnboardingIntroScreen} />
           <Stack.Screen name="OnboardingRole" component={OnboardingRoleScreen} />
           <Stack.Screen name="OnboardingSkills" component={OnboardingSkillsScreen} />
           <Stack.Screen name="OnboardingBio" component={OnboardingBioScreen} />
-          <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} />
+          <Stack.Screen name="OnboardingContact" component={OnboardingContactScreen} />
+          <Stack.Screen name="OnboardingSuccess" component={OnboardingSuccessScreen} options={successOptions} />
         </>
       )}
     </Stack.Navigator>

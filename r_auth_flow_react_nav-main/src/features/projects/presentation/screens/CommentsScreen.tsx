@@ -28,6 +28,10 @@ export default function CommentsScreen({ navigation, route }: { navigation: any;
     setSendError(null);
     try {
       await ds.addComment({ proyectoId: project.id, texto: text.trim(), respuestaA: replyTo?.id ?? null, autorNombre: author });
+      // A reply to the creator's own comment only sends them the "respondió" notification.
+      const repliedTo = replyTo?.autorId ?? null;
+      if (repliedTo) void ds.notify({ para: [repliedTo], tipo: "respuesta_comentario", proyectoId: project.id, actorNombre: author });
+      if (project.creadorId !== repliedTo) void ds.notify({ para: [project.creadorId], tipo: "comentario", proyectoId: project.id, actorNombre: author });
       setText("");
       setReplyTo(null);
       reload();

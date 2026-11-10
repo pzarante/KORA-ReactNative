@@ -177,7 +177,11 @@ Todas en `src/features/*/presentation/screens/`.
 | `feedcomopersonaajena/solicitudenviada` | `projects/RequestSentScreen` |
 | `comousuarioinvitado`, `comousuarioqueomitio` | `auth/AccountRequiredScreen` (sin cuenta / perfil incompleto) |
 | `miperfil-invitado` | `auth/GuestProfileScreen` |
+| `construyamostuperfil.png` | `auth/OnboardingIntroScreen` (tras el nombre; "Hacerlo más tarde" guarda y va al Home) |
+| `medios de contacti.png` | `auth/OnboardingContactScreen` (paso 5/5) + `ContactFields`, también en `EditProfileScreen` |
 | `miperfil-estudiante`, `-docente`, `-egresado` | `auth/MyProfileScreen` + `ProfileView` |
+| `Editar proyecto/editarinformacion…`, `editarproyectorecursos`, `salirsinguardar` | `projects/EditProjectScreen` (solo integrantes; "Eliminar" solo el creador) |
+| `notificaciones-sinnotificaciones` | `projects/components/NotificationBell` (panel lateral; tipos en `notificationTypes.ts`) |
 
 ### Variantes de perfil por rol
 
