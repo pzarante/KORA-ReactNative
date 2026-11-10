@@ -7,6 +7,7 @@ import { Project } from "../../domain/entities/Project";
 import { ProjectSummary, TopBar, useProjectUseCases } from "../components/feed";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 export default function JoinRequestScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
@@ -76,6 +77,7 @@ export default function JoinRequestScreen({ navigation, route }: { navigation: a
           <Text style={ui.outlineButtonText}>Cancelar</Text>
         </TouchableOpacity>
         <TouchableOpacity disabled={!ready} onPress={send} style={[ui.primaryButton, !ready && ui.primaryButtonDisabled]} testID="send-request-button">
+          <ButtonGradient disabled={!ready} />
           <Text style={[ui.primaryButtonText, !ready && ui.primaryButtonTextDisabled]}>{sending ? "Enviando..." : "Enviar solicitud"}</Text>
         </TouchableOpacity>
       </View>

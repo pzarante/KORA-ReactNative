@@ -4,6 +4,7 @@ import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "reac
 
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 type Props = {
   visible: boolean;
@@ -87,6 +88,7 @@ export default function AddRolesSheet({ visible, roles, onClose, onDone }: Props
             style={[ui.primaryButton, styles.done]}
             testID="roles-done-button"
           >
+            <ButtonGradient />
             <Text style={ui.primaryButtonText}>Listo</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onClose} style={styles.cancel}>
@@ -99,7 +101,7 @@ export default function AddRolesSheet({ visible, roles, onClose, onDone }: Props
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(33,24,50,0.5)", justifyContent: "flex-end" },
+  backdrop: { flex: 1, backgroundColor: colors.scrim, justifyContent: "flex-end" },
   sheet: { backgroundColor: "#FFFFFF", borderTopLeftRadius: 36, borderTopRightRadius: 36, padding: 24, paddingBottom: 32 },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   title: { color: colors.text, fontSize: 28, fontWeight: "800" },

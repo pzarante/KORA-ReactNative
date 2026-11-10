@@ -11,6 +11,7 @@ import { Initial, ProjectIcon, RoundButton, Tags, TopBar, useFocusLoad, useProje
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 import { formatDate } from "@/src/shared/utils/dates";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 /** The design shows friendly titles for links ("Plan de sostenibilidad Uninorte"), so one is derived from the URL. */
 function linkTitle(url: string) {
@@ -58,12 +59,14 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   const isMember = isCreator || myRequest?.estado === "aceptada";
   const editButton = (
     <TouchableOpacity onPress={() => navigation.navigate("EditProject", { project })} style={[ui.primaryButton, styles.editButton]} testID="edit-project-button">
+      <ButtonGradient />
       <MaterialCommunityIcons name="pencil-outline" size={20} color="#FFFFFF" />
       <Text style={ui.primaryButtonText}>Editar proyecto</Text>
     </TouchableOpacity>
   );
   const koraNodeButton = (
     <TouchableOpacity onPress={() => navigation.navigate("KoraNode", { project })} style={[ui.primaryButton, styles.nodeButton]} testID="kora-node-button">
+      <ButtonGradient />
       <Image source={require("../../../../../assets/kora-node/device.png")} resizeMode="contain" style={styles.nodeIcon} tintColor="#FFFFFF" />
       {/* No arrow (unlike Figma): beside "Solicitudes" it doesn't fit on 360 pt phones. */}
       <Text adjustsFontSizeToFit numberOfLines={1} style={[ui.primaryButtonText, styles.nodeText]}>KORA NODE</Text>
@@ -221,6 +224,7 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
           <Text style={styles.status}>Este proyecto no está buscando integrantes</Text>
         ) : (
           <TouchableOpacity onPress={askToJoin} style={ui.primaryButton} testID="join-project-button">
+            <ButtonGradient />
             <Text style={ui.primaryButtonText}>Solicitar unirme</Text>
           </TouchableOpacity>
         )}

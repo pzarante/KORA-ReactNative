@@ -120,7 +120,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 48 },
   heading: { marginTop: 18, marginBottom: 27 },
-  eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
+  eyebrow: { color: colors.primary, fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
   title: { color: colors.text, fontSize: 32, fontWeight: "800", marginTop: 5 },
   form: { gap: 8 },
   label: { color: colors.text, fontSize: 14, fontWeight: "700", marginTop: 9 },

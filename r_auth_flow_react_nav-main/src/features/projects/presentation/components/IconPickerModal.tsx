@@ -5,6 +5,7 @@ import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 import { PROJECT_ICONS } from "@/src/features/projects/presentation/components/projectIcons";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 type Props = {
   visible: boolean;
@@ -46,6 +47,7 @@ export default function IconPickerModal({ visible, selected, onClose, onSelect }
             }}
             style={[ui.primaryButton, styles.done]}
           >
+            <ButtonGradient />
             <Text style={ui.primaryButtonText}>Listo</Text>
           </TouchableOpacity>
         </View>
@@ -55,7 +57,7 @@ export default function IconPickerModal({ visible, selected, onClose, onSelect }
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(33,24,50,0.5)", justifyContent: "center", padding: 20 },
+  backdrop: { flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: 20 },
   card: { maxHeight: "90%", backgroundColor: "#FFFFFF", borderRadius: 32, padding: 22 },
   close: { position: "absolute", top: 18, right: 18, width: 40, height: 40, borderRadius: 20, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center", zIndex: 1 },
   title: { color: colors.text, fontSize: 26, fontWeight: "800", textAlign: "center", marginTop: 8 },

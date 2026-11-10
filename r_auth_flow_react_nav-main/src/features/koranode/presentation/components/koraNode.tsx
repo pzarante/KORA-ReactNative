@@ -6,6 +6,7 @@ import { useDI } from "@/src/core/di/DIProvider";
 import { TOKENS } from "@/src/core/di/tokens";
 import { colors } from "@/src/shared/ui/tokens";
 import { KoraNodeUseCases } from "../../domain/use-cases/KoraNodeUseCases";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 /** The "listening / synced" green of the KORA NODE designs; only used by this feature. */
 export const LIVE_GREEN = "#6FBFA8";
@@ -117,6 +118,7 @@ export function WideButton({ icon, label, onPress, outline, disabled, testID }: 
       style={[styles.wide, outline ? styles.wideOutline : styles.widePrimary, disabled && styles.wideDisabled]}
       testID={testID}
     >
+      <ButtonGradient disabled={outline} />
       <MaterialCommunityIcons name={icon} size={24} color={color} />
       <View style={[styles.wideDivider, { backgroundColor: color }]} />
       <Text style={[styles.wideText, { color }]}>{label}</Text>
