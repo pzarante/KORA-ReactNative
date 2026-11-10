@@ -4,6 +4,7 @@ export type NewProject = {
   icono: string;
   nombre: string;
   descripcion: string;
+  sobre: string;
   etiquetas: string[];
   etapa: string;
   problema: string;

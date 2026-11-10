@@ -9,6 +9,7 @@ const draft: NewProject = {
   icono: "leaf",
   nombre: "EcoCampus",
   descripcion: "Campus sostenible",
+  sobre: "",
   etiquetas: ["Sostenibilidad"],
   etapa: "Idea",
   problema: "Mucho plástico",

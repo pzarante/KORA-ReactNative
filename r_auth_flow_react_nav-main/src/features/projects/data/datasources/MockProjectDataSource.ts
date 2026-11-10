@@ -11,6 +11,7 @@ export class MockProjectDataSource implements ProjectDataSource {
       icono: "sprout",
       nombre: "EcoCampus",
       descripcion: "Una iniciativa para hacer de la universidad un espacio más sostenible.",
+      sobre: "Desarrollar una estrategia participativa que promueva hábitos sostenibles en la comunidad universitaria a través de actividades, recursos y herramientas digitales.",
       etiquetas: ["Sostenibilidad", "Campus"],
       etapa: "Investigación",
       problema: "La falta de hábitos sostenibles en el campus genera un alto impacto ambiental.",

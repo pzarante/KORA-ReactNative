@@ -46,6 +46,7 @@ export default function ProjectReviewScreen({ navigation }: { navigation: any })
           <Text style={styles.value}>{draft.nombre}</Text>
         </View>
         <Text style={styles.muted} numberOfLines={3}>{draft.descripcion}</Text>
+        {draft.sobre ? <Text style={styles.muted} numberOfLines={3}>{draft.sobre}</Text> : null}
         {draft.etiquetas.length > 0 ? <Text style={styles.muted}>#{draft.etiquetas.join("  #")}</Text> : null}
       </ReviewCard>
 

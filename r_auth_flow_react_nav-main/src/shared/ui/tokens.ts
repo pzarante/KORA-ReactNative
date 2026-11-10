@@ -3,13 +3,13 @@
  * Feature code must import colors from here, never from another feature.
  */
 export const colors = {
-  primary: "#4500B5",
-  text: "#211832",
-  muted: "#756A8E",
-  border: "#E6DDF2",
-  soft: "#F5EEFF",
-  card: "#F8F5FC",
-  orange: "#FF5A00",
-  orangeSoft: "#FFEDE3",
+  primary: "#3C00A0",
+  text: "#1E1630",
+  muted: "#6B6282",
+  border: "#E9DCFA",
+  soft: "#EEE4FC",
+  card: "#FEFCFF",
+  orange: "#E96212",
+  orangeSoft: "#FFE8D8",
   error: "#C62828",
 } as const;

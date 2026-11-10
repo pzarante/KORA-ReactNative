@@ -4,6 +4,7 @@ import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "r
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AppTabBar from "@/src/navigation/AppTabBar";
+import BrandBlob from "@/src/shared/ui/BrandBlob";
 import BrandLogo from "@/src/shared/ui/BrandLogo";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 import { Project, PROJECT_STAGES } from "../../domain/entities/Project";
@@ -16,6 +17,19 @@ const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "
 function formatDate(iso: string) {
   const date = new Date(iso);
   return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+/** The design shows friendly titles for links ("Plan de sostenibilidad Uninorte"), so one is derived from the URL. */
+function linkTitle(url: string) {
+  try {
+    const parsed = new URL(url);
+    const segment = parsed.pathname.split("/").filter(Boolean).pop();
+    const source = segment ?? parsed.hostname.replace(/^www\./, "");
+    const pretty = decodeURIComponent(source).replace(/[-_]+/g, " ").trim();
+    return pretty ? pretty.replace(/\b\w/g, (char) => char.toUpperCase()) : parsed.hostname;
+  } catch {
+    return url;
+  }
 }
 
 function Section({ icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
@@ -59,6 +73,9 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.container} testID="project-detail-screen">
+      {/* Atmósfera de marca: los blobs decorativos del diseño, detrás del contenido. */}
+      <BrandBlob blur={20} color="#A855F7" diameter={200} style={styles.blobTopRight} />
+      <BrandBlob blur={22.5} color="#FF6B3D" diameter={220} style={styles.blobBottomLeft} />
       <View style={styles.topBar}>
         <TouchableOpacity accessibilityLabel="Volver" onPress={() => navigation.goBack()} style={styles.roundButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
@@ -87,7 +104,10 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
           </View>
           <View style={styles.dots}>
             {PROJECT_STAGES.map((stage, index) => (
-              <View key={stage} style={[styles.dot, index <= stageIndex && styles.dotActive]} />
+              <React.Fragment key={stage}>
+                {index > 0 ? <View style={[styles.dash, index <= stageIndex && styles.dashActive]} /> : null}
+                <View style={[styles.dot, index <= stageIndex && styles.dotActive]} />
+              </React.Fragment>
             ))}
           </View>
         </View>
@@ -105,6 +125,12 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
             <Text style={styles.strong}>{formatDate(project.createdAt)}</Text>
           </View>
         </View>
+
+        {project.sobre ? (
+          <Section icon="lightbulb-outline" title="Sobre el proyecto">
+            <Text style={styles.body}>{project.sobre}</Text>
+          </Section>
+        ) : null}
 
         {project.problema ? (
           <Section icon="alert-outline" title="Problema">
@@ -139,9 +165,9 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
         {project.enlaces.length > 0 ? (
           <Section icon="layers-outline" title="Referencias y recursos">
             {project.enlaces.map((url) => (
-              <TouchableOpacity key={url} onPress={() => Linking.openURL(url)} style={styles.link}>
+              <TouchableOpacity key={url} accessibilityLabel={linkTitle(url)} onPress={() => Linking.openURL(url)} style={styles.link}>
                 <MaterialCommunityIcons name="link-variant" size={18} color={colors.primary} />
-                <Text numberOfLines={1} style={styles.linkText}>{url}</Text>
+                <Text numberOfLines={1} style={styles.linkText}>{linkTitle(url)}</Text>
                 <MaterialCommunityIcons name="open-in-new" size={18} color={colors.primary} />
               </TouchableOpacity>
             ))}
@@ -202,14 +228,16 @@ const styles = StyleSheet.create({
   heroText: { flex: 1 },
   name: { color: colors.text, fontSize: 30, fontWeight: "800" },
   description: { color: colors.muted, fontSize: 15, marginTop: 6, lineHeight: 21 },
-  row: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18 },
+  row: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18, backgroundColor: colors.card },
   small: { color: colors.muted, fontSize: 13 },
   strong: { color: colors.text, fontSize: 17, fontWeight: "800", marginTop: 2 },
-  dots: { flexDirection: "row", gap: 4 },
-  dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 1.5, borderColor: "#B9AEDA" },
+  dots: { flexDirection: "row", alignItems: "center" },
+  dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 1, borderColor: "#D5C1E9", backgroundColor: "#FFFFFF" },
   dotActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  dash: { width: 8, height: 2, borderRadius: 1, backgroundColor: "#D5C1E9" },
+  dashActive: { backgroundColor: colors.primary },
   divider: { width: 1, alignSelf: "stretch", backgroundColor: colors.border },
-  section: { flexDirection: "row", gap: 14, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18 },
+  section: { flexDirection: "row", gap: 14, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18, backgroundColor: colors.card },
   sectionIcon: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
   sectionBody: { flex: 1, gap: 8 },
   sectionTitle: { color: colors.text, fontSize: 20, fontWeight: "800" },
@@ -223,8 +251,10 @@ const styles = StyleSheet.create({
   more: { color: colors.primary, fontWeight: "800", marginLeft: 4 },
   pill: { flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1.5, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginLeft: "auto" },
   pillText: { color: colors.primary, fontSize: 14, fontWeight: "800" },
-  commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18 },
+  commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 18, backgroundColor: colors.card },
   commentsTitle: { flex: 1, color: colors.text, fontSize: 18, fontWeight: "800" },
-  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.border },
+  footer: { flexDirection: "row", gap: 12, paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: "#FFFFFF" },
+  blobTopRight: { position: "absolute", top: -70, right: -80 },
+  blobBottomLeft: { position: "absolute", bottom: 101, left: -175 },
   status: { flex: 1, color: colors.primary, fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },
 });

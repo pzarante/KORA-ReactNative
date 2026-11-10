@@ -83,6 +83,19 @@ export default function ProjectBasicInfoScreen() {
       </View>
 
       <View>
+        <Text style={ui.label}>Sobre el proyecto</Text>
+        <TextInput
+          multiline
+          onChangeText={(sobre) => update({ sobre })}
+          placeholder="Cuenta los detalles y el contexto de tu proyecto..."
+          placeholderTextColor={colors.muted}
+          style={[ui.input, ui.textArea]}
+          testID="project-about-input"
+          value={draft.sobre}
+        />
+      </View>
+
+      <View>
         <Text style={ui.label}>Etiquetas relacionadas al proyecto</Text>
         <View style={[ui.input, styles.tagInput]}>
           <MaterialCommunityIcons name="magnify" size={22} color={colors.muted} />

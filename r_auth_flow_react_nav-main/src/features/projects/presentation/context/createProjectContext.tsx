@@ -10,6 +10,7 @@ const emptyDraft: NewProject = {
   icono: "leaf",
   nombre: "",
   descripcion: "",
+  sobre: "",
   etiquetas: [],
   etapa: "",
   problema: "",
