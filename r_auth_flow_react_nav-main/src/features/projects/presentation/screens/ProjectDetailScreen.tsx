@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
-import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AppTabBar from "@/src/navigation/AppTabBar";
@@ -10,13 +10,7 @@ import { Project, PROJECT_STAGES } from "../../domain/entities/Project";
 import { Initial, ProjectIcon, RoundButton, Tags, TopBar, useFocusLoad, useProjectUseCases } from "../components/feed";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
-
-const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-
-function formatDate(iso: string) {
-  const date = new Date(iso);
-  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
-}
+import { formatDate } from "@/src/shared/utils/dates";
 
 /** The design shows friendly titles for links ("Plan de sostenibilidad Uninorte"), so one is derived from the URL. */
 function linkTitle(url: string) {
@@ -66,6 +60,13 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
     <TouchableOpacity onPress={() => navigation.navigate("EditProject", { project })} style={[ui.primaryButton, styles.editButton]} testID="edit-project-button">
       <MaterialCommunityIcons name="pencil-outline" size={20} color="#FFFFFF" />
       <Text style={ui.primaryButtonText}>Editar proyecto</Text>
+    </TouchableOpacity>
+  );
+  const koraNodeButton = (
+    <TouchableOpacity onPress={() => navigation.navigate("KoraNode", { project })} style={ui.primaryButton} testID="kora-node-button">
+      <Image source={require("../../../../../assets/kora-node/device.png")} resizeMode="contain" style={styles.nodeIcon} tintColor="#FFFFFF" />
+      <Text style={ui.primaryButtonText}>KORA NODE</Text>
+      <MaterialCommunityIcons name="arrow-right" size={20} color="#FFFFFF" />
     </TouchableOpacity>
   );
   const members = [creador, ...(data?.requests.filter((r) => r.estado === "aceptada").map((r) => r.usuarioNombre) ?? [])];
@@ -202,15 +203,18 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
       </ScrollView>
 
       <View style={styles.footer}>
-        {isCreator ? (
-          <>
-            <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
-              <Text style={ui.outlineButtonText}>Solicitudes{pending ? ` (${pending})` : ""}</Text>
-            </TouchableOpacity>
+        {isMember ? (
+          <View style={styles.memberActions}>
+            <View style={styles.footerRow}>
+              {isCreator ? (
+                <TouchableOpacity onPress={() => navigation.navigate("Requests", { project })} style={[ui.outlineButton, styles.flex]} testID="view-requests-button">
+                  <Text style={ui.outlineButtonText}>Solicitudes{pending ? ` (${pending})` : ""}</Text>
+                </TouchableOpacity>
+              ) : null}
+              {koraNodeButton}
+            </View>
             {editButton}
-          </>
-        ) : isMember ? (
-          editButton
+          </View>
         ) : myRequest ? (
           <Text style={styles.status}>{myRequest.estado === "pendiente" ? "Solicitud enviada, esperando respuesta" : "Tu solicitud fue rechazada"}</Text>
         ) : !project.buscandoPersonas ? (
@@ -263,6 +267,9 @@ const styles = StyleSheet.create({
   // No top border: the tab bar right below already draws one. White so the blobs don't show through.
   footer: { flexDirection: "row", gap: 12, paddingHorizontal: 24, paddingVertical: 12, backgroundColor: "#FFFFFF" },
   editButton: { paddingHorizontal: 16 },
+  memberActions: { flex: 1, gap: 12 },
+  footerRow: { flexDirection: "row", gap: 12 },
+  nodeIcon: { width: 40, height: 20 },
   blobTopRight: { position: "absolute", top: -70, right: -80 },
   blobBottomLeft: { position: "absolute", bottom: 101, left: -175 },
   status: { flex: 1, color: colors.primary, fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },

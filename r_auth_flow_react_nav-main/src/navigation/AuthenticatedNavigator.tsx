@@ -13,6 +13,13 @@ import MemberJoinedScreen from "@/src/features/projects/presentation/screens/Mem
 import RequestSentScreen from "@/src/features/projects/presentation/screens/RequestSentScreen";
 import RequestsScreen from "@/src/features/projects/presentation/screens/RequestsScreen";
 
+import EditMeetingScreen from "@/src/features/koranode/presentation/screens/EditMeetingScreen";
+import KoraNodeScreen from "@/src/features/koranode/presentation/screens/KoraNodeScreen";
+import KoraNodeSyncedScreen from "@/src/features/koranode/presentation/screens/KoraNodeSyncedScreen";
+import MeetingHistoryScreen from "@/src/features/koranode/presentation/screens/MeetingHistoryScreen";
+import MeetingInProgressScreen from "@/src/features/koranode/presentation/screens/MeetingInProgressScreen";
+import MeetingNoteScreen from "@/src/features/koranode/presentation/screens/MeetingNoteScreen";
+
 import AppTabsNavigator from "./AppTabsNavigator";
 import CreateProjectNavigator from "./CreateProjectNavigator";
 import { onboardingScreens, publicFeedScreens } from "./sharedScreens";
@@ -38,6 +45,13 @@ export default function AuthenticatedNavigator() {
         <Stack.Screen name="EditProject" component={EditProjectScreen} />
         <Stack.Screen name="ApplicantProfile" component={ApplicantProfileScreen} />
         <Stack.Screen name="MemberJoined" component={MemberJoinedScreen} options={successOptions} />
+        {/* KORA NODE: only project members reach these (see ProjectDetail). */}
+        <Stack.Screen name="KoraNode" component={KoraNodeScreen} />
+        <Stack.Screen name="KoraNodeSynced" component={KoraNodeSyncedScreen} options={successOptions} />
+        <Stack.Screen name="MeetingInProgress" component={MeetingInProgressScreen} />
+        <Stack.Screen name="MeetingNote" component={MeetingNoteScreen} />
+        <Stack.Screen name="EditMeeting" component={EditMeetingScreen} />
+        <Stack.Screen name="MeetingHistory" component={MeetingHistoryScreen} />
         <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen
