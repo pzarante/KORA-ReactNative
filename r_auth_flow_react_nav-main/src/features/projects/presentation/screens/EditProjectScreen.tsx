@@ -12,6 +12,7 @@ import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 import ConfirmModal from "@/src/shared/ui/ConfirmModal";
 import { useConfirmLeave } from "@/src/shared/hooks/useConfirmLeave";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 const MAX_TEXT = 250;
 const EDITABLE = ["icono", "nombre", "descripcion", "sobre", "etiquetas", "etapa", "problema", "objetivo", "alcance", "roles", "enlaces", "buscandoPersonas"] as const;
@@ -306,7 +307,7 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
                 accessibilityLabel="Buscando personas"
                 onValueChange={(buscandoPersonas) => update({ buscandoPersonas })}
                 thumbColor="#FFFFFF"
-                trackColor={{ false: "#E4E0EA", true: colors.primary }}
+                trackColor={{ false: colors.disabled, true: colors.primary }}
                 testID="edit-project-looking"
                 value={draft.buscandoPersonas}
               />
@@ -338,7 +339,8 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
             style={[ui.primaryButton, styles.save, (!dirty || !valid) && ui.primaryButtonDisabled]}
             testID="edit-project-save"
           >
-            <MaterialCommunityIcons name="check" size={24} color={!dirty || !valid ? "#A49DB0" : "#FFFFFF"} />
+            <ButtonGradient disabled={(!dirty || !valid)} />
+            <MaterialCommunityIcons name="check" size={24} color={!dirty || !valid ? colors.disabledText : "#FFFFFF"} />
             <Text style={[ui.primaryButtonText, (!dirty || !valid) && ui.primaryButtonTextDisabled]}>{saving ? "Guardando..." : "Guardar cambios"}</Text>
           </TouchableOpacity>
         </View>

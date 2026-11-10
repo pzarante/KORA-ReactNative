@@ -10,6 +10,7 @@ import { Project } from "../../domain/entities/Project";
 import { RoundButton, timeAgo, useProjectUseCases } from "./feed";
 import { NOTIFICATION_TYPES } from "./notificationTypes";
 import { colors } from "@/src/shared/ui/tokens";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 type Row = AppNotification & { project: Project };
 
@@ -131,6 +132,7 @@ export default function NotificationBell() {
                     <View style={styles.guest} testID="notifications-guest">
                       <Text style={styles.guestText}>No olvides iniciar sesión o crear una cuenta para recibir notificaciones.</Text>
                       <TouchableOpacity onPress={() => go("Login")} style={styles.guestPrimary}>
+                        <ButtonGradient />
                         <Text style={styles.guestPrimaryText}>Iniciar sesión</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => go("Signup")} style={styles.guestOutline}>
@@ -150,7 +152,7 @@ export default function NotificationBell() {
 
 const styles = StyleSheet.create({
   backdrop: { flex: 1, flexDirection: "row", justifyContent: "flex-end" },
-  scrim: { flex: 1, backgroundColor: "rgba(33,24,50,0.53)" },
+  scrim: { flex: 1, backgroundColor: colors.scrim },
   panelWrap: { width: "76%", maxWidth: 420 },
   panel: { flex: 1, backgroundColor: "#FFFFFF", borderTopLeftRadius: 32, borderBottomLeftRadius: 32, overflow: "hidden", paddingHorizontal: 16 },
   purpleGlow: { position: "absolute", top: -80, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: "#E5CEFF", opacity: 0.6 },

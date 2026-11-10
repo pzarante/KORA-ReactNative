@@ -10,6 +10,7 @@ import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import ProfileProgress from "../components/ProfileProgress";
 import ProfileView from "../components/ProfileView";
 import { useAuth } from "../context/authContext";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 export default function MyProfileScreen({ navigation }: { navigation: any }) {
   const { profile, logout } = useAuth();
@@ -42,6 +43,7 @@ export default function MyProfileScreen({ navigation }: { navigation: any }) {
             </View>
             <ProfileProgress value={completion} label="Perfil completado" />
             <TouchableOpacity accessibilityRole="button" onPress={edit} style={styles.cardButton} testID="complete-profile-button">
+              <ButtonGradient />
               <Text style={ui.primaryButtonText}>Completar mi información</Text>
             </TouchableOpacity>
           </View>

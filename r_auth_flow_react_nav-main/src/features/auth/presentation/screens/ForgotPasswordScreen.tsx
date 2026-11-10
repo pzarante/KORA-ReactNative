@@ -15,6 +15,7 @@ import BrandLogo from "@/src/shared/ui/BrandLogo";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
 import { colors } from "@/src/shared/ui/tokens";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 export default function ForgotPasswordScreen({ navigation }: { navigation: any }) {
   const { forgotPassword, error, loading, clearError } = useAuth();
@@ -133,6 +134,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
               style={styles.backButton}
               testID="back-to-login-button"
             >
+              <ButtonGradient radius={28} />
               <Text style={styles.backButtonText}>
                 Volver a Inicio de sesión
               </Text>

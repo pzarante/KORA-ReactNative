@@ -6,6 +6,7 @@ import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { commentCount, memberCount, Message, TopBar, useFeed } from "../components/feed";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 const NEW_DAYS = 3;
 const ALL = "Todos";
@@ -46,6 +47,7 @@ export default function ExploreScreen({ navigation }: { navigation: any }) {
           </Text>
           {/* shortcut: no camera library installed yet; add expo-camera when the KORA TAG format is defined. */}
           <TouchableOpacity onPress={() => Alert.alert("Próximamente", "El escáner de KORA TAG estará disponible pronto.")} style={[ui.primaryButton, styles.scan]}>
+            <ButtonGradient />
             <MaterialCommunityIcons name="camera-outline" size={24} color="#FFFFFF" />
             <Text style={ui.primaryButtonText}>Escanear QR</Text>
           </TouchableOpacity>

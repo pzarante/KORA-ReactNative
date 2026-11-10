@@ -6,6 +6,7 @@ import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { Project } from "../../domain/entities/Project";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 export default function ProjectCreatedScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
@@ -27,6 +28,7 @@ export default function ProjectCreatedScreen({ navigation, route }: { navigation
             style={ui.primaryButton}
             testID="view-project-button"
           >
+            <ButtonGradient />
             <Text style={ui.primaryButtonText}>Ver proyecto</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.getParent()?.goBack()} style={styles.home}>

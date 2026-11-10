@@ -4,6 +4,7 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { ui } from "./styles";
 import { colors } from "./tokens";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 type Props = {
   visible: boolean;
@@ -29,6 +30,7 @@ export default function ConfirmModal({ visible, icon, title, text, confirm, canc
           <Text style={styles.dialogTitle}>{title}</Text>
           <Text style={styles.dialogText}>{text}</Text>
           <TouchableOpacity onPress={onConfirm} style={[ui.primaryButton, styles.dialogButton]} testID="confirm-modal-accept">
+            <ButtonGradient />
             <Text style={ui.primaryButtonText}>{confirm}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onCancel} style={[ui.outlineButton, styles.dialogButton]} testID="confirm-modal-cancel">
@@ -41,7 +43,7 @@ export default function ConfirmModal({ visible, icon, title, text, confirm, canc
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(33,24,50,0.53)", justifyContent: "center", padding: 24 },
+  backdrop: { flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: 24 },
   dialog: { backgroundColor: "#FFFFFF", borderRadius: 32, padding: 24, alignItems: "center" },
   dialogIcon: { width: 120, height: 120, borderRadius: 60, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center", marginBottom: 16 },
   dialogTitle: { color: colors.text, fontSize: 24, fontWeight: "800", textAlign: "center" },

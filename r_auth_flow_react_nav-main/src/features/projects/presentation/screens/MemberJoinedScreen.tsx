@@ -6,6 +6,7 @@ import { JoinRequest, Project } from "../../domain/entities/Project";
 import { Initial, RoundButton } from "../components/feed";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 export default function MemberJoinedScreen({ navigation, route }: { navigation: any; route: any }) {
   const { request, project }: { request: JoinRequest; project: Project } = route.params;
@@ -27,6 +28,7 @@ export default function MemberJoinedScreen({ navigation, route }: { navigation: 
         </View>
         <View style={styles.actions}>
           <TouchableOpacity onPress={() => navigation.replace("TeamMembers", { project })} style={[ui.primaryButton, styles.button]} testID="member-joined-team-button">
+            <ButtonGradient />
             <Text style={ui.primaryButtonText}>Ver equipo</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.goBack()} style={ui.outlineButton}>

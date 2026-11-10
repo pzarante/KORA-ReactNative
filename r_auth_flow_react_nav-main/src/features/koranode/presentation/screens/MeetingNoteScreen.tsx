@@ -9,6 +9,7 @@ import { colors } from "@/src/shared/ui/tokens";
 import { formatRange } from "@/src/shared/utils/dates";
 import { Meeting } from "../../domain/entities/Meeting";
 import { InfoCard, k, KoraNodeHeader, useKoraNode } from "../components/koraNode";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 function Section({ icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
   return (
@@ -131,6 +132,7 @@ export default function MeetingNoteScreen({ navigation, route }: { navigation: a
                 <Text style={ui.outlineButtonText}>Ver historial</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.popTo("KoraNode", { project })} style={ui.primaryButton} testID="note-done-button">
+                <ButtonGradient />
                 <Text style={ui.primaryButtonText}>Listo</Text>
               </TouchableOpacity>
             </View>

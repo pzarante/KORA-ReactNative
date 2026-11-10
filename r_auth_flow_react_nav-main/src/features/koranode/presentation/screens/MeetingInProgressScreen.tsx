@@ -10,6 +10,7 @@ import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { ui } from "@/src/shared/ui/styles";
 import { colors } from "@/src/shared/ui/tokens";
 import { InfoCard, k, KoraNodeHeader, StatusPill, useKoraNode } from "../components/koraNode";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 const clock = (seconds: number) =>
   `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
@@ -96,6 +97,7 @@ export default function MeetingInProgressScreen({ navigation, route }: { navigat
           />
           {error ? <Text style={k.error}>{error}</Text> : null}
           <TouchableOpacity onPress={() => setPaused((p) => !p)} style={[ui.primaryButton, styles.button]} testID="pause-meeting-button">
+            <ButtonGradient />
             <Text style={ui.primaryButtonText}>{paused ? "Reanudar reunión" : "Pausar reunión"}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={finish} style={ui.outlineButton} testID="finish-meeting-button">

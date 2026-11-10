@@ -11,6 +11,7 @@ import { ui } from "@/src/shared/ui/styles";
 import { colors } from "@/src/shared/ui/tokens";
 import { Meeting, MeetingDraft } from "../../domain/entities/Meeting";
 import { k, useKoraNode } from "../components/koraNode";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 function RemoveButton({ label, onPress, testID }: { label: string; onPress: () => void; testID: string }) {
   return (
@@ -173,6 +174,7 @@ export default function EditMeetingScreen({ navigation, route }: { navigation: a
             style={[ui.primaryButton, (!dirty || !valid || saving) && ui.primaryButtonDisabled]}
             testID="save-meeting-button"
           >
+            <ButtonGradient disabled={(!dirty || !valid || saving)} />
             <Text style={[ui.primaryButtonText, (!dirty || !valid || saving) && ui.primaryButtonTextDisabled]}>{saving ? "Guardando…" : "Guardar cambios"}</Text>
           </TouchableOpacity>
         </View>

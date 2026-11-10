@@ -7,11 +7,6 @@ export const TOKENS = {
   ProfileDataSource: Symbol("ProfileDataSource"),
   ProfileRepository: Symbol("ProfileRepository"),
   ProfileUseCases: Symbol("ProfileUseCases"),
-  // Products
-  LocalProductCacheDS: Symbol("LocalProductCacheDS"),
-  ProductRemoteDS: Symbol("ProductRemoteDS"),
-  ProductRepo: Symbol("ProductRepo"),
-  ProductUseCases: Symbol("ProductUseCases"),
   // Projects
   ProjectDataSource: Symbol("ProjectDataSource"),
   ProjectRepository: Symbol("ProjectRepository"),

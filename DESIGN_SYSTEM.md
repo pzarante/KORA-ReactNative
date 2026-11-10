@@ -22,29 +22,29 @@ Los tokens de la app viven en `src/shared/ui/tokens.ts` → `colors` (estilos de
 | Token | Figma (muestreado) | Código actual | Uso |
 |---|---|---|---|
 | `primary` | `#3C00A0` | `#3C00A0` | Botones, links, tab activo, barra de progreso, filtro activo, hero del Home, círculo de éxito |
-| `primaryGradient` | `#4E11BD → #5F22D9` (horizontal) | — | Relleno de los botones primarios grandes |
+| `primaryGradient` | `#4E11BD → #5F22D9` (horizontal) | `#4E11BD → #5F22D9` (`ButtonGradient`) | Relleno de los botones primarios grandes |
 | `text` | `#1E1630` | `#1E1630` | Títulos y texto principal |
 | `muted` | `#6B6282` | `#6B6282` | Texto secundario, placeholders, íconos y labels inactivos |
 | `border` | lavanda claro | `#E9DCFA` | Bordes de inputs, cards, tab bar, divisores |
-| `soft` | `#F0EBFF` | `#EEE4FC` | Fondo de chips morados, contenedor de ícono, opción seleccionada |
+| `soft` | `#F0EBFF` | `#F0EBFF` | Fondo de chips morados, contenedor de ícono, opción seleccionada |
 | `cardHeader` | `#F0E7FC` | — | Cabecera de las cards del grid de Explorar |
 | `filterChip` | `#E3DAEF` | — | Chips de filtro no activos (Explorar) |
 | `card` | `#FBFBFB` – `#FEFCFF` | `#FEFCFF` | Fondo de cards (casi blanco) |
-| `orange` | `#FF6B00` (texto de chip) | `#E96212` | Acento de marca, asterisco de requerido, chips de etapa, ícono "salir" |
-| `orangeSoft` | `#FFEBDF` | `#FFE8D8` | Fondo de chips naranja |
+| `orange` | `#FF6B00` (texto de chip) | `#FF6B00` | Acento de marca, asterisco de requerido, chips de etapa, ícono "salir" |
+| `orangeSoft` | `#FFEBDF` | `#FFEBDF` | Fondo de chips naranja |
 | `error` | — | `#C62828` | Errores de formulario |
-| `progressTrack` | `#E8D9FA` | `#EADFFB` | Pista de la barra de pasos |
-| `disabled` | `#E5E0E8` | `#E4E0EA` / texto `#A49DB0` | Botón "Siguiente" sin completar |
-| `scrim` | ≈ `rgba(33,24,50,0.53)` | `rgba(33,24,50,0.5)` | Fondo detrás de popups y sheets |
+| `progressTrack` | `#E8D9FA` | `#E8D9FA` | Pista de la barra de pasos |
+| `disabled` | `#E5E0E8` | `#E5E0E8` / texto `disabledText` `#A49DB0` | Botón "Siguiente" sin completar |
+| `scrim` | ≈ `rgba(33,24,50,0.53)` | `rgba(33,24,50,0.53)` | Fondo detrás de popups y sheets |
 | `background` | `#FFFFFF` | `#FFFFFF` | Fondo de todas las pantallas |
 
 **Logo "K"** (`src/shared/ui/BrandLogo.tsx`, imagen `assets/images/kora-k.png`): trazo vertical `#5700C9`, brazo superior `#7217F1`, brazo inferior `#FF5A00`.
 
 **Manchas de fondo** (`src/shared/ui/ScreenSurface.tsx`; `BrandBlob.tsx` para manchas difusas sueltas): círculos difusos detrás del contenido. Morado `#E5CEFF` arriba a la derecha (opacidad .72), `#E9D6FF` a media altura, durazno `#FFD4C8` abajo a la izquierda (.7). Aparecen en casi todas las pantallas de Figma, también encima de los modales y sheets.
 
-### 1.2 Tema de react-native-paper (no coincide)
+### 1.2 Tema de react-native-paper
 
-`src/theme/light-colors.json` / `dark-colors.json` son un tema MD3 con primario **ámbar** (`rgb(121,89,0)` / `rgb(248,189,42)`). Ninguna pantalla de Figma usa esa paleta. Figma no tiene modo oscuro.
+`src/theme/theme.ts` → `brandTheme`: un solo tema claro armado con los tokens de §1.1 (se borró el tema MD3 ámbar). Figma no tiene modo oscuro, así que la app queda en claro aunque el teléfono esté en modo oscuro (`app.json` → `userInterfaceStyle: "light"`).
 
 ### 1.3 Semántica de chips
 
@@ -60,13 +60,7 @@ Los tokens de la app viven en `src/shared/ui/tokens.ts` → `colors` (estilos de
 
 **Plus Jakarta Sans** (identificada por la forma de las letras en las capturas: `a` de dos pisos, `g` de un piso, `y` de cola recta). Pesos usados: 400, 600, 700, 800.
 
-El código todavía **no la carga** (usa la fuente del sistema). Para instalarla:
-
-```sh
-npx expo install @expo-google-fonts/plus-jakarta-sans expo-font
-```
-
-Con fuentes cargadas, en React Native cada peso es una familia distinta (`PlusJakartaSans_800ExtraBold`, etc.); `fontWeight` solo no basta.
+Se carga en `App.tsx` (`useFonts(brandFonts)`) y `src/shared/ui/fonts.ts` → `installBrandFont()` la aplica a todo `Text` y `TextInput`: elige la familia según el `fontWeight` del estilo (`800` → `PlusJakartaSans_800ExtraBold`, etc.), porque con fuentes cargadas cada peso es una familia distinta. Las pantallas siguen escribiendo solo `fontWeight`. Un estilo con `fontFamily` propio se respeta (Sora en Bienvenida, fuentes de íconos).
 
 | Estilo | Tamaño / interlineado (pt) | Peso | Tracking | Ejemplo |
 |---|---|---|---|---|
@@ -214,11 +208,10 @@ Siempre siguen: Habilidades (chips), Contacto (WhatsApp + email) e Información 
 
 ## 8. Diferencias pendientes entre Figma y código
 
-1. **Morado primario:** el código ya usa `#3C00A0` de Figma vía `colors.primary`, pero plano: falta el degradado de los botones. Quedan morados sueltos que no son token: `#A04BFF` (eyebrow de Login, Registro y Verificar correo) y `#6750A4` (Products, plantilla). `soft`, `orange` y `orangeSoft` aún difieren de Figma (ver tabla).
-2. **Fuente:** Figma usa Plus Jakarta Sans; el código usa la del sistema.
-3. **Cards:** Figma casi blanco (`#FBFBFB`); el código usa `#F8F5FC`.
-4. **Tema de Paper ámbar**, sin relación con la marca (`src/theme/*.json`).
-5. **Errores en el copy de Figma:** "Objetico" (nombre de archivo), "¿En que puedes aportar?" → "¿En qué…?", "Cuentale" → "Cuéntale", "te gustaria" → "gustaría", "Escribe aqui" → "aquí", "Datos y analisis" → "análisis", "solictud" → "solicitud", "Tu proyecto () ha sido publicado" (falta el nombre).
+Resuelto: degradado de botones primarios (`ButtonGradient`), Plus Jakarta Sans, `soft`/`orange`/`orangeSoft` y demás tokens de §1.1, morado suelto `#A04BFF` de los eyebrows (ahora `primary`), tema de Paper ámbar, plantilla de productos y `SettingsScreen` borradas.
+
+1. **Copy de Figma con errores** (el código ya los tiene corregidos): "Objetico" (nombre de archivo), "¿En que puedes aportar?" → "¿En qué…?", "Cuentale" → "Cuéntale", "te gustaria" → "gustaría", "Escribe aqui" → "aquí", "Datos y analisis" → "análisis", "solictud" → "solicitud", "Tu proyecto () ha sido publicado" (falta el nombre).
+2. **Colores sueltos que no son token** (decorativos, sin equivalente en §1.1): rojos de error `#B42318`, blobs de `ProjectDetailScreen`, grises de `ForgotPasswordScreen`.
 
 ---
 

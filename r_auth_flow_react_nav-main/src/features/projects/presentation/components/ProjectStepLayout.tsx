@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 type Props = {
   title: string;
@@ -78,6 +79,7 @@ export default function ProjectStepLayout({ title, step, nextLabel = "Siguiente"
             style={[ui.primaryButton, nextDisabled && ui.primaryButtonDisabled]}
             testID="project-next-button"
           >
+            <ButtonGradient disabled={nextDisabled} />
             <Text style={[ui.primaryButtonText, nextDisabled && ui.primaryButtonTextDisabled]}>{nextLabel}</Text>
           </TouchableOpacity>
         </View>
@@ -94,6 +96,7 @@ export default function ProjectStepLayout({ title, step, nextLabel = "Siguiente"
               Perderás los cambios que has realizado hasta ahora y deberás empezar de nuevo si decides continuar más tarde.
             </Text>
             <TouchableOpacity onPress={abandon} style={[ui.primaryButton, styles.dialogButton]} testID="project-abandon-confirm">
+              <ButtonGradient />
               <Text style={ui.primaryButtonText}>Sí, abandonar</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setConfirmExit(false)} style={[ui.outlineButton, styles.dialogButton]}>
@@ -116,11 +119,11 @@ const styles = StyleSheet.create({
   progressRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
   stepText: { color: colors.muted, fontSize: 13, fontWeight: "800" },
   percentText: { color: colors.muted, fontSize: 13 },
-  track: { height: 6, borderRadius: 3, backgroundColor: "#EADFFB" },
+  track: { height: 6, borderRadius: 3, backgroundColor: colors.progressTrack },
   fill: { height: 6, borderRadius: 3, backgroundColor: colors.primary },
   content: { padding: 24, gap: 24 },
   footer: { flexDirection: "row", gap: 14, paddingHorizontal: 24, paddingBottom: 16, paddingTop: 8 },
-  backdrop: { flex: 1, backgroundColor: "rgba(33,24,50,0.5)", justifyContent: "center", padding: 24 },
+  backdrop: { flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: 24 },
   dialog: { backgroundColor: "#FFFFFF", borderRadius: 32, padding: 24, alignItems: "center" },
   dialogIcon: { width: 120, height: 120, borderRadius: 60, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center", marginBottom: 16 },
   dialogTitle: { color: colors.text, fontSize: 24, fontWeight: "800", textAlign: "center" },
