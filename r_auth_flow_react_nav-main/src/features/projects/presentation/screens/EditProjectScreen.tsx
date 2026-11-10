@@ -1,16 +1,17 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
-import { KeyboardAvoidingView, Linking, Modal, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import { KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
-import { Project, ProjectChanges, PROJECT_STAGES } from "../../domain/entities/Project";
+import { Project, ProjectChanges, PROJECT_STAGES, URL_PATTERN } from "../../domain/entities/Project";
 import AddRolesSheet from "../components/AddRolesSheet";
 import { useFocusLoad, useProjectUseCases } from "../components/feed";
 import IconPickerModal from "../components/IconPickerModal";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
-import { URL_PATTERN } from "../../domain/entities/Project";
+import ConfirmModal from "@/src/shared/ui/ConfirmModal";
+import { useConfirmLeave } from "@/src/shared/hooks/useConfirmLeave";
 
 const MAX_TEXT = 250;
 const EDITABLE = ["icono", "nombre", "descripcion", "etiquetas", "etapa", "problema", "objetivo", "alcance", "roles", "enlaces", "buscandoPersonas"] as const;
@@ -92,30 +93,6 @@ function AddInline({ label, placeholder, onAdd, validate }: { label: string; pla
   );
 }
 
-function ConfirmModal({ visible, icon, title, text, confirm, cancel, onConfirm, onCancel }: {
-  visible: boolean; icon: any; title: string; text: string; confirm: string; cancel: string; onConfirm: () => void; onCancel: () => void;
-}) {
-  return (
-    <Modal animationType="fade" onRequestClose={onCancel} transparent visible={visible}>
-      <View style={styles.backdrop}>
-        <View style={styles.dialog}>
-          <View style={styles.dialogIcon}>
-            <MaterialCommunityIcons name={icon} size={64} color={colors.primary} />
-          </View>
-          <Text style={styles.dialogTitle}>{title}</Text>
-          <Text style={styles.dialogText}>{text}</Text>
-          <TouchableOpacity onPress={onConfirm} style={[ui.primaryButton, styles.dialogButton]} testID="confirm-modal-accept">
-            <Text style={ui.primaryButtonText}>{confirm}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onCancel} style={[ui.outlineButton, styles.dialogButton]}>
-            <Text style={ui.outlineButtonText}>{cancel}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
 /** Only members reach this screen (see ProjectDetail); only the creator can delete. */
 export default function EditProjectScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
@@ -127,11 +104,9 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
   const [pickerOpen, setPickerOpen] = useState(false);
   const [rolesOpen, setRolesOpen] = useState(false);
   const [stagesOpen, setStagesOpen] = useState(false);
-  const [pendingExit, setPendingExit] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const leaving = useRef(false);
 
   const update = (patch: Partial<Draft>) => setDraft((current) => ({ ...current, ...patch }));
   const changes = Object.fromEntries(EDITABLE.filter((key) => JSON.stringify(draft[key]) !== JSON.stringify(initial[key])).map((key) => [key, draft[key]])) as ProjectChanges;
@@ -140,15 +115,7 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
   const stageIndex = PROJECT_STAGES.indexOf(draft.etapa);
 
   // Back button, Android back and swipe all ask before dropping unsaved changes.
-  useEffect(
-    () =>
-      navigation.addListener("beforeRemove", (e: any) => {
-        if (!dirty || leaving.current) return;
-        e.preventDefault();
-        setPendingExit(e.data.action);
-      }),
-    [navigation, dirty],
-  );
+  const { exitPending, allowLeave, confirmExit, cancelExit } = useConfirmLeave(navigation, dirty);
 
   const save = async () => {
     if (!dirty || !valid || saving) return;
@@ -164,7 +131,7 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
         proyectoId: project.id,
         actorNombre: profile.nombreCompleto || "Un integrante",
       });
-      leaving.current = true;
+      allowLeave();
       navigation.popTo("ProjectDetail", { project: { ...project, ...trimmed } });
     } catch (err: any) {
       setError(err?.message ?? "No se pudo guardar el proyecto");
@@ -177,7 +144,7 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
     setError(null);
     try {
       await ds.archiveProject(project.id);
-      leaving.current = true;
+      allowLeave();
       navigation.popTo("App");
     } catch (err: any) {
       setError(err?.message ?? "No se pudo eliminar el proyecto");
@@ -369,17 +336,14 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
       <IconPickerModal onClose={() => setPickerOpen(false)} onSelect={(icono) => update({ icono })} selected={draft.icono} visible={pickerOpen} />
       <AddRolesSheet onClose={() => setRolesOpen(false)} onDone={(roles) => update({ roles })} roles={draft.roles} visible={rolesOpen} />
       <ConfirmModal
-        visible={!!pendingExit}
+        visible={exitPending}
         icon="file-document-edit-outline"
         title="¿Salir sin guardar los cambios?"
         text="Perderás las modificaciones que has realizado en el proyecto."
         confirm="Sí, salir sin guardar"
         cancel="Seguir editando"
-        onConfirm={() => {
-          leaving.current = true;
-          navigation.dispatch(pendingExit);
-        }}
-        onCancel={() => setPendingExit(null)}
+        onConfirm={confirmExit}
+        onCancel={cancelExit}
       />
       <ConfirmModal
         visible={confirmDelete}
@@ -440,10 +404,4 @@ const styles = StyleSheet.create({
   deleteText: { color: colors.error, fontSize: 16, fontWeight: "800" },
   footer: { paddingHorizontal: 16, paddingBottom: 12, paddingTop: 8 },
   save: { flex: 0 },
-  backdrop: { flex: 1, backgroundColor: "rgba(33,24,50,0.53)", justifyContent: "center", padding: 24 },
-  dialog: { backgroundColor: "#FFFFFF", borderRadius: 32, padding: 24, alignItems: "center" },
-  dialogIcon: { width: 120, height: 120, borderRadius: 60, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center", marginBottom: 16 },
-  dialogTitle: { color: colors.text, fontSize: 24, fontWeight: "800", textAlign: "center" },
-  dialogText: { color: colors.muted, fontSize: 15, textAlign: "center", marginTop: 12, marginBottom: 24, lineHeight: 22 },
-  dialogButton: { alignSelf: "stretch", flex: 0, marginTop: 12 },
 });

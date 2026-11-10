@@ -1,9 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useDI } from "@/src/core/di/DIProvider";
+import { useFocusLoad } from "@/src/shared/hooks/useFocusLoad";
 import { TOKENS } from "@/src/core/di/tokens";
 import BrandLogo from "@/src/shared/ui/BrandLogo";
 import { JoinRequest, Project, ProjectComment } from "../../domain/entities/Project";
@@ -17,23 +17,7 @@ export function useProjectUseCases() {
   return useMemo(() => di.resolve<ProjectUseCases>(TOKENS.ProjectUseCases), [di]);
 }
 
-/** Runs `load` every time the screen gains focus, so lists refresh after creating or answering something. */
-export function useFocusLoad<T>(load: () => Promise<T>, deps: unknown[]) {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const run = useCallback(() => {
-    let active = true;
-    load()
-      .then((value) => active && (setData(value), setError(null)))
-      .catch((err) => active && setError(err?.message ?? "No se pudo cargar la información"));
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-  useFocusEffect(run);
-  return { data, error, reload: run };
-}
+export { useFocusLoad };
 
 export type Feed = { projects: Project[]; requests: JoinRequest[]; comments: ProjectComment[]; userId: string | null };
 
