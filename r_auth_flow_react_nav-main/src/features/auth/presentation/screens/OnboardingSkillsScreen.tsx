@@ -23,7 +23,7 @@ export default function OnboardingSkillsScreen({ navigation }: { navigation: any
   };
 
   return (
-    <OnboardingLayout step={3} pending={{ habilidades: selectedSkills }} navigation={navigation}>
+    <OnboardingLayout step={4} pending={{ habilidades: selectedSkills }} navigation={navigation}>
         <View style={styles.heading}>
           <Text style={styles.title}>¿Cuáles son tus principales habilidades?</Text>
           <Text style={styles.subtitle}>Selecciona la opción(es) que mejor te describa</Text>

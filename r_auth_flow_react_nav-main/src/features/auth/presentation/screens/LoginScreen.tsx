@@ -12,6 +12,18 @@ import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "../context/authContext";
 import { colors } from "@/src/shared/ui/tokens";
+import ErrorCard from "@/src/shared/ui/ErrorCard";
+
+/** Roble answers "Credenciales inválidas" for a wrong password and for an unknown e-mail alike. */
+function loginErrorCard(error: string) {
+  if (/credenciales|invalid|401/i.test(error)) {
+    return { title: "Correo o contraseña incorrectos", message: "Verifica que los datos ingresados sean correctos e inténtalo de nuevo." };
+  }
+  if (/network|fetch|conexi/i.test(error)) {
+    return { title: "No se pudo iniciar sesión", message: "Revisa tu conexión a internet e inténtalo de nuevo." };
+  }
+  return { title: "No se pudo iniciar sesión", message: error.replace(/^Login error:\s*/i, "") };
+}
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
   const { login, error, loading } = useAuth();
@@ -81,9 +93,15 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
               placeholder="Escribe tu contraseña"
               secureTextEntry
               autoComplete="password"
-              error={passwordError ?? error ?? undefined}
+              error={passwordError ?? undefined}
             />
           </View>
+
+          {error ? (
+            <View style={styles.errorCard}>
+              <ErrorCard {...loginErrorCard(error)} testID="login-error-card" />
+            </View>
+          ) : null}
 
           <TouchableOpacity
             accessibilityRole="link"
@@ -123,6 +141,7 @@ const styles = StyleSheet.create({
   eyebrow: { color: colors.primary, fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
   title: { color: colors.text, fontSize: 32, fontWeight: "800", marginTop: 5 },
   form: { gap: 8 },
+  errorCard: { marginTop: 18 },
   label: { color: colors.text, fontSize: 14, fontWeight: "700", marginTop: 9 },
   forgot: { alignSelf: "flex-end", marginTop: 14, marginBottom: 31 },
   link: { color: colors.primary, fontSize: 13, fontWeight: "800", textDecorationLine: "underline" },

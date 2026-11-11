@@ -58,4 +58,16 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   currentUserId(): Promise<string | null> {
     return this.dataSource.currentUserId();
   }
+
+  listSaved(): Promise<string[]> {
+    return this.dataSource.listSaved();
+  }
+
+  setSaved(proyectoId: string, saved: boolean): Promise<void> {
+    return this.dataSource.setSaved(proyectoId, saved);
+  }
+
+  addMember(member: { proyectoId: string; usuarioId: string; usuarioNombre: string; rol: string }): Promise<void> {
+    return this.dataSource.addMember(member);
+  }
 }

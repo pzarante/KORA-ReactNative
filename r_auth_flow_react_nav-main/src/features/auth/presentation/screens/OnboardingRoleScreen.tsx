@@ -30,7 +30,7 @@ export default function OnboardingRoleScreen({ navigation }: { navigation: any }
         onPress={() => {
           if (!selectedRole) return;
           updateProfile({ rol: selectedRole });
-          navigation.navigate("OnboardingSkills");
+          navigation.navigate("OnboardingRoleDetails");
         }}
       />
     </OnboardingLayout>

@@ -4,4 +4,6 @@ export interface ProfileDataSource {
   saveProfile(profile: Omit<UserProfile, "userId">): Promise<void>;
   /** The given user's profile, or the logged user's when omitted; null if they never saved one. */
   getProfile(userId?: string): Promise<UserProfile | null>;
+  /** Everyone who saved a profile (KORA TAG's simulated scan picks one). */
+  listProfiles(): Promise<UserProfile[]>;
 }
