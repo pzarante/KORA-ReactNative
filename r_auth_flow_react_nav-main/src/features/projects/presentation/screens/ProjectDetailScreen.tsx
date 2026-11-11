@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -50,13 +50,39 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
     const userId = await useCases.currentUserId();
     // Guests can't read Roble, so they only see the creator.
     const requests = userId && project.id ? await useCases.listRequests({ proyectoId: project.id }) : [];
-    return { userId, requests };
+    const saved = userId ? (await useCases.listSaved().catch(() => [] as string[])).includes(project.id) : false;
+    return { userId, requests, saved };
   }, [useCases, project.id]);
+  // Optimistic bookmark: flips at once, goes back if Roble refuses.
+  const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
+  const saved = savedOverride ?? data?.saved ?? false;
+  const toggleSaved = async () => {
+    const next = !saved;
+    setSavedOverride(next);
+    try {
+      await useCases.setSaved(project.id, next);
+    } catch {
+      setSavedOverride(!next);
+    }
+  };
 
   const userId = data?.userId ?? null;
   const isCreator = !!userId && userId === project.creadorId;
   const myRequest = data?.requests.find((r) => r.usuarioId === userId);
   const isMember = isCreator || myRequest?.estado === "aceptada";
+  const saveButton =
+    isLoggedIn && userId && !isMember ? (
+      <TouchableOpacity
+        accessibilityLabel={saved ? "Quitar de guardados" : "Guardar proyecto"}
+        accessibilityRole="button"
+        accessibilityState={{ selected: saved }}
+        onPress={toggleSaved}
+        style={[styles.saveButton, saved && styles.saveButtonActive]}
+        testID="save-project-button"
+      >
+        <MaterialCommunityIcons name={saved ? "bookmark" : "bookmark-outline"} size={26} color={saved ? "#FFFFFF" : colors.primary} />
+      </TouchableOpacity>
+    ) : null;
   const editButton = (
     <TouchableOpacity onPress={() => navigation.navigate("EditProject", { project })} style={[ui.primaryButton, styles.editButton]} testID="edit-project-button">
       <ButtonGradient />
@@ -219,14 +245,23 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
             {editButton}
           </View>
         ) : myRequest ? (
-          <Text style={styles.status}>{myRequest.estado === "pendiente" ? "Solicitud enviada, esperando respuesta" : "Tu solicitud fue rechazada"}</Text>
+          <>
+            {saveButton}
+            <Text style={styles.status}>{myRequest.estado === "pendiente" ? "Solicitud enviada, esperando respuesta" : "Tu solicitud fue rechazada"}</Text>
+          </>
         ) : !project.buscandoPersonas ? (
-          <Text style={styles.status}>Este proyecto no está buscando integrantes</Text>
+          <>
+            {saveButton}
+            <Text style={styles.status}>Este proyecto no está buscando integrantes</Text>
+          </>
         ) : (
-          <TouchableOpacity onPress={askToJoin} style={ui.primaryButton} testID="join-project-button">
-            <ButtonGradient />
-            <Text style={ui.primaryButtonText}>Solicitar unirme</Text>
-          </TouchableOpacity>
+          <>
+            {saveButton}
+            <TouchableOpacity onPress={askToJoin} style={ui.primaryButton} testID="join-project-button">
+              <ButtonGradient />
+              <Text style={ui.primaryButtonText}>Solicitar unirme</Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
       <AppTabBar navigation={navigation} />
@@ -273,6 +308,8 @@ const styles = StyleSheet.create({
   editButton: { paddingHorizontal: 16 },
   memberActions: { flex: 1, gap: 12 },
   footerRow: { flexDirection: "row", gap: 12 },
+  saveButton: { width: 54, height: 54, borderRadius: 27, borderWidth: 1.5, borderColor: colors.primary, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
+  saveButtonActive: { backgroundColor: colors.primary },
   nodeButton: { gap: 5, paddingHorizontal: 10 },
   nodeIcon: { width: 24, height: 12 },
   nodeText: { fontSize: 15 },

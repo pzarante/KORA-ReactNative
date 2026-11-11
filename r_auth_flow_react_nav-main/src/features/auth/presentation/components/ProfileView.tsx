@@ -4,18 +4,38 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
-import { UserProfile } from "../../domain/entities/UserProfile";
+import { RoleDetails, UserProfile } from "../../domain/entities/UserProfile";
 
 const ROLE_ICONS: Record<string, any> = { Estudiante: "school-outline", Docente: "briefcase-outline", Egresado: "briefcase-outline" };
 
+type InfoColumn = { icon?: any; label: string; value?: string };
+
+/** The two columns after the role in the info row (Figma p. 103–105); empty ones are skipped. */
+function roleColumns(rol: string, d: RoleDetails): InfoColumn[] {
+  const columns: Record<string, InfoColumn[]> = {
+    Estudiante: [
+      { label: "Carrera", value: d.carrera },
+      { icon: "calendar-blank-outline", label: "Semestre", value: d.semestre ? `${d.semestre}°` : "" },
+    ],
+    Docente: [
+      { icon: "layers-outline", label: "Departamento", value: d.departamento },
+      { icon: "book-open-outline", label: "Asignaturas", value: d.asignaturas },
+    ],
+    Egresado: [
+      { icon: "school-outline", label: "Carrera", value: d.carrera },
+      { icon: "calendar-blank-outline", label: "Año de egreso", value: d.anioEgreso },
+    ],
+  };
+  return (columns[rol] ?? []).filter((column) => column.value);
+}
+
 type Props = {
-  profile: Pick<UserProfile, "nombreCompleto" | "rol" | "habilidades" | "infoAdicional"> & Partial<Pick<UserProfile, "whatsapp" | "correoContacto">>;
-  stats?: { created: number; joined: number };
+  profile: Pick<UserProfile, "nombreCompleto" | "rol" | "habilidades" | "infoAdicional"> & Partial<Pick<UserProfile, "whatsapp" | "correoContacto">> & RoleDetails;
+  stats?: { created: number; joined: number; labels?: [string, string] };
   /** Rendered under the name, e.g. "Editar perfil". */
   action?: React.ReactNode;
 };
 
-// shortcut: carrera and semestre from the design are not stored in Usuario yet; add the columns and an onboarding step to show them.
 export default function ProfileView({ profile, stats, action }: Props) {
   const name = profile.nombreCompleto || "Sin nombre";
   return (
@@ -32,14 +52,14 @@ export default function ProfileView({ profile, stats, action }: Props) {
             <MaterialCommunityIcons name="folder-outline" size={32} color={colors.primary} />
             <View style={styles.statText}>
               <Text style={styles.statValue}>{stats.created}</Text>
-              <Text style={styles.statLabel}>Creados</Text>
+              <Text style={styles.statLabel}>{stats.labels?.[0] ?? "Creados"}</Text>
             </View>
           </View>
           <View style={styles.stat}>
             <MaterialCommunityIcons name="account-group-outline" size={32} color={colors.primary} />
             <View style={styles.statText}>
               <Text style={styles.statValue}>{stats.joined}</Text>
-              <Text style={styles.statLabel}>Participando</Text>
+              <Text style={styles.statLabel}>{stats.labels?.[1] ?? "Participando"}</Text>
             </View>
           </View>
         </View>
@@ -48,9 +68,23 @@ export default function ProfileView({ profile, stats, action }: Props) {
       {profile.rol ? (
         <>
           <Text style={styles.section}>{profile.rol === "Estudiante" ? "Información académica" : "Información profesional"}</Text>
-          <View style={styles.box}>
-            <MaterialCommunityIcons name={ROLE_ICONS[profile.rol] ?? "account-outline"} size={26} color={colors.primary} />
-            <Text style={styles.boxStrong}>{profile.rol}</Text>
+          <View style={styles.infoRow} testID="profile-info-row">
+            <View style={styles.infoCell}>
+              <MaterialCommunityIcons name={ROLE_ICONS[profile.rol] ?? "account-outline"} size={24} color={colors.primary} />
+              <Text style={styles.boxStrong}>{profile.rol}</Text>
+            </View>
+            {roleColumns(profile.rol, profile).map((column) => (
+              <React.Fragment key={column.label}>
+                <View style={styles.infoDivider} />
+                <View style={[styles.infoCell, styles.infoCellFlex]}>
+                  {column.icon ? <MaterialCommunityIcons name={column.icon} size={22} color={colors.primary} /> : null}
+                  <View style={styles.flex}>
+                    <Text style={styles.infoLabel}>{column.label}</Text>
+                    <Text numberOfLines={2} style={styles.infoValue}>{column.value}</Text>
+                  </View>
+                </View>
+              </React.Fragment>
+            ))}
           </View>
         </>
       ) : null}
@@ -114,7 +148,14 @@ const styles = StyleSheet.create({
   section: { color: colors.text, fontSize: 22, fontWeight: "800", marginTop: 26, marginBottom: 12 },
   box: { flexDirection: "row", alignItems: "center", gap: 14, borderWidth: 1, borderColor: colors.border, borderRadius: 26, padding: 18 },
   contact: { gap: 10 },
-  boxStrong: { color: colors.text, fontSize: 17, fontWeight: "800" },
+  boxStrong: { color: colors.text, fontSize: 15, fontWeight: "800" },
+  infoRow: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: colors.border, borderRadius: 22, paddingVertical: 14, paddingHorizontal: 12 },
+  infoCell: { flexDirection: "row", alignItems: "center", gap: 8 },
+  infoCellFlex: { flex: 1 },
+  infoDivider: { width: 1, alignSelf: "stretch", backgroundColor: colors.border, marginHorizontal: 10 },
+  infoLabel: { color: colors.muted, fontSize: 11 },
+  infoValue: { color: colors.text, fontSize: 14, fontWeight: "700" },
+  flex: { flex: 1 },
   boxText: { flex: 1, color: colors.text, fontSize: 15, lineHeight: 21 },
   skill: { fontWeight: "500" },
 });

@@ -12,4 +12,8 @@ export class ProfileUseCases {
   saveProfile(profile: ProfileDraft): Promise<void> {
     return this.repository.saveProfile(profile);
   }
+
+  listProfiles(): Promise<UserProfile[]> {
+    return this.repository.listProfiles();
+  }
 }

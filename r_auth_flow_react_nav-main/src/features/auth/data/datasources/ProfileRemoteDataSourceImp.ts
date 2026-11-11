@@ -1,6 +1,7 @@
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
+import { skippedReason } from "@/src/core/roble/RobleDatabase";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
-import { canJoinProjects, UserProfile } from "../../domain/entities/UserProfile";
+import { canJoinProjects, detailsForRole, UserProfile } from "../../domain/entities/UserProfile";
 import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 import { ProfileDataSource } from "./ProfileDataSource";
 
@@ -46,13 +47,29 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       const body = await response.json().catch(() => ({}));
       throw new Error(`No se pudo guardar el perfil: ${body.message ?? response.status}`);
     }
+    if (!existing) {
+      const body = await Promise.resolve().then(() => response.json()).catch(() => ({}));
+      const reason = skippedReason(body);
+      if (reason) throw new Error(`No se pudo guardar el perfil: ${reason}`);
+    }
   }
 
   async getProfile(userId?: string): Promise<UserProfile | null> {
     const token = await this.prefs.retrieveData<string>("token");
     if (!token) return null;
     const row: any = await this.findProfile(userId ?? userIdFromToken(token));
-    if (!row) return null;
+    return row ? this.fromRow(row) : null;
+  }
+
+  async listProfiles(): Promise<UserProfile[]> {
+    const response = await this.send(`${this.baseUrl}/read?tableName=Usuario`);
+    if (response.status === 404) return [];
+    if (!response.ok) throw new Error(`No se pudo consultar la tabla Usuario: ${response.status}`);
+    const rows = await response.json();
+    return Array.isArray(rows) ? rows.map((row) => this.fromRow(row)) : [];
+  }
+
+  private fromRow(row: any): UserProfile {
     const nombreCompleto = row.nombre_completo ?? "";
     const rol = row.rol ?? "";
     return {
@@ -63,6 +80,12 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       infoAdicional: row.info_adicional ?? "",
       whatsapp: row.whatsapp ?? "",
       correoContacto: row.correo_contacto ?? "",
+      carrera: row.carrera ?? "",
+      semestre: row.semestre ?? "",
+      departamento: row.departamento ?? "",
+      asignaturas: row.asignaturas ?? "",
+      anioEgreso: row.anio_egreso ?? "",
+      cargo: row.cargo ?? "",
       // Derived from the data, not the column: onboarding_completado is always filled (see toRecord).
       onboardingCompletado: canJoinProjects({ nombreCompleto, rol }),
     };
@@ -92,6 +115,8 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
   }
 
   private toRecord(profile: UserProfile, completedAt?: string | null) {
+    // Only the current role's details are kept; the columns come from docs/roble/perfil_y_guardados.sql.
+    const details = detailsForRole(profile.rol, profile);
     return {
       user_id: profile.userId,
       nombre_completo: profile.nombreCompleto,
@@ -100,6 +125,12 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       info_adicional: profile.infoAdicional,
       whatsapp: profile.whatsapp,
       correo_contacto: profile.correoContacto,
+      carrera: details.carrera || null,
+      semestre: details.semestre || null,
+      departamento: details.departamento || null,
+      asignaturas: details.asignaturas || null,
+      anio_egreso: details.anioEgreso || null,
+      cargo: details.cargo || null,
       // Roble keeps this column NOT NULL and its SQL console can't change that, so it always holds a
       // date: when the profile was first saved. Whether onboarding is done is derived on read.
       onboarding_completado: completedAt || new Date().toISOString(),

@@ -4,6 +4,7 @@ import OnboardingBioScreen from "@/src/features/auth/presentation/screens/Onboar
 import OnboardingContactScreen from "@/src/features/auth/presentation/screens/OnboardingContactScreen";
 import OnboardingIntroScreen from "@/src/features/auth/presentation/screens/OnboardingIntroScreen";
 import OnboardingNameScreen from "@/src/features/auth/presentation/screens/OnboardingNameScreen";
+import OnboardingRoleDetailsScreen from "@/src/features/auth/presentation/screens/OnboardingRoleDetailsScreen";
 import OnboardingRoleScreen from "@/src/features/auth/presentation/screens/OnboardingRoleScreen";
 import OnboardingSkillsScreen from "@/src/features/auth/presentation/screens/OnboardingSkillsScreen";
 import OnboardingSuccessScreen from "@/src/features/auth/presentation/screens/OnboardingSuccessScreen";
@@ -25,6 +26,7 @@ export const onboardingScreens = [
   <Stack.Screen key="OnboardingName" name="OnboardingName" component={OnboardingNameScreen} />,
   <Stack.Screen key="OnboardingIntro" name="OnboardingIntro" component={OnboardingIntroScreen} />,
   <Stack.Screen key="OnboardingRole" name="OnboardingRole" component={OnboardingRoleScreen} />,
+  <Stack.Screen key="OnboardingRoleDetails" name="OnboardingRoleDetails" component={OnboardingRoleDetailsScreen} />,
   <Stack.Screen key="OnboardingSkills" name="OnboardingSkills" component={OnboardingSkillsScreen} />,
   <Stack.Screen key="OnboardingBio" name="OnboardingBio" component={OnboardingBioScreen} />,
   <Stack.Screen key="OnboardingContact" name="OnboardingContact" component={OnboardingContactScreen} />,

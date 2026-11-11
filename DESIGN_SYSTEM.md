@@ -171,9 +171,14 @@ Todas en `src/features/*/presentation/screens/`.
 | `feedcomopersonaajena/solicitudenviada` | `projects/RequestSentScreen` |
 | `comousuarioinvitado`, `comousuarioqueomitio` | `auth/AccountRequiredScreen` (sin cuenta / perfil incompleto) |
 | `miperfil-invitado` | `auth/GuestProfileScreen` |
+| PDF p. 28–30 (*Conozcamos tu formación / perfil docente / trayectoria*) | `auth/OnboardingRoleDetailsScreen` (paso 3/6) + `RoleDetailsFields`, también en `EditProfileScreen`; columnas en `docs/roble/perfil_y_guardados.sql` |
+| PDF p. 21 (*Conecta ideas, crea impacto · Cargando…*) | `shared/ui/SplashScreen` (mientras carga la fuente y se restaura la sesión) |
+| PDF p. 16–18 (error de login) | `shared/ui/ErrorCard` en `auth/LoginScreen` |
+| PDF p. 35–38 (*Proyectos*: Mis proyectos · Participando · Guardados · Solicitudes) | `projects/MyProjectsScreen`; guardar con el marcador del detalle (tabla `guardado`) |
+| PDF p. 43–47 (KORA TAG) | `koratag/KoraTagScanScreen` (escaneo simulado) → `KoraTagProfileScreen` → `KoraTagSelectProjectScreen` → `KoraTagJoinedScreen` |
 | `construyamostuperfil.png` | `auth/OnboardingIntroScreen` (tras el nombre; "Hacerlo más tarde" guarda y va al Home) |
 | `medios de contacti.png` | `auth/OnboardingContactScreen` (paso 5/5) + `ContactFields`, también en `EditProfileScreen` |
-| `miperfil-estudiante`, `-docente`, `-egresado` | `auth/MyProfileScreen` + `ProfileView` |
+| `miperfil-estudiante`, `-docente`, `-egresado` | `auth/MyProfileScreen` + `ProfileView` (fila con rol + 2 columnas según el rol) |
 | `Editar proyecto/editarinformacion…`, `editarproyectorecursos`, `salirsinguardar` | `projects/EditProjectScreen` (solo integrantes; "Eliminar" solo el creador) |
 | `notificaciones-sinnotificaciones` | `projects/components/NotificationBell` (panel lateral; tipos en `notificationTypes.ts`) |
 | `koranode/KORANODE-sincronizarproyecto` | `koranode/KoraNodeScreen` sin aparato vinculado (código `KORA-XXXX`; el aparato se simula y confirma solo) |

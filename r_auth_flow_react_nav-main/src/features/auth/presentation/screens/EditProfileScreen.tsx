@@ -5,12 +5,13 @@ import { TopBar } from "@/src/features/projects/presentation/components/feed";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
-import { contactError, PROFILE_ROLES, PROFILE_SKILLS, profileCompletion } from "../../domain/entities/UserProfile";
+import { contactError, detailsForRole, PROFILE_ROLES, PROFILE_SKILLS, profileCompletion } from "../../domain/entities/UserProfile";
 import AuthField from "../components/AuthField";
 import AuthPrimaryButton from "../components/AuthPrimaryButton";
 import ContactFields from "../components/ContactFields";
 import OptionPill from "../components/OptionPill";
 import ProfileProgress from "../components/ProfileProgress";
+import RoleDetailsFields from "../components/RoleDetailsFields";
 import { useAuth } from "../context/authContext";
 
 /** Every profile section on one screen; opened from "Mi perfil" and when joining a project needs more info. */
@@ -39,6 +40,7 @@ export default function EditProfileScreen({ navigation }: { navigation: any }) {
     setSaving(true);
     const saved = await completeProfile({
       ...draft, nombreCompleto, infoAdicional: draft.infoAdicional.trim(), correoContacto: draft.correoContacto.trim(),
+      ...detailsForRole(draft.rol, draft),
     });
     setSaving(false);
     if (saved) navigation.goBack();
@@ -79,6 +81,11 @@ export default function EditProfileScreen({ navigation }: { navigation: any }) {
               <OptionPill key={rol} radio label={rol} selected={draft.rol === rol} onPress={() => set({ rol })} style={styles.role} />
             ))}
           </View>
+          {draft.rol ? (
+            <View style={styles.roleDetails}>
+              <RoleDetailsFields rol={draft.rol} value={draft} onChange={set} />
+            </View>
+          ) : null}
 
           <Text style={styles.section}>Habilidades</Text>
           <View style={styles.grid}>
@@ -130,6 +137,7 @@ const styles = StyleSheet.create({
   contactTitle: { marginBottom: 0 },
   roles: { flexDirection: "row", gap: 8 },
   role: { flex: 1, paddingHorizontal: 4 },
+  roleDetails: { marginTop: 20 },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 },
   skill: { width: "48%" },
   bio: { minHeight: 140, backgroundColor: "rgba(255,255,255,0.92)" },

@@ -15,7 +15,7 @@ export default function OnboardingContactScreen({ navigation }: { navigation: an
   const [error, setError] = useState<string>();
 
   return (
-    <OnboardingLayout step={5} pending={contact} navigation={navigation}>
+    <OnboardingLayout step={6} pending={contact} navigation={navigation}>
       <View style={styles.heading}>
         <Text style={styles.title}>¿Cómo quieres que te contacten?</Text>
         <Text style={styles.subtitle}>Elige los medios por los que otros miembros del equipo puedan comunicarse contigo.</Text>

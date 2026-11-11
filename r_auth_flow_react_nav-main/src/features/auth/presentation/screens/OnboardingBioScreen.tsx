@@ -14,7 +14,7 @@ export default function OnboardingBioScreen({ navigation }: { navigation: any })
   React.useEffect(() => setBio(profile.infoAdicional), [profile.infoAdicional]);
 
   return (
-      <OnboardingLayout step={4} pending={{ infoAdicional: bio }} navigation={navigation}>
+      <OnboardingLayout step={5} pending={{ infoAdicional: bio }} navigation={navigation}>
           <View style={styles.heading}>
             <Text style={styles.title}>Información adicional</Text>
             <Text style={styles.subtitle}>Esto nos ayudará a personalizar tu experiencia</Text>

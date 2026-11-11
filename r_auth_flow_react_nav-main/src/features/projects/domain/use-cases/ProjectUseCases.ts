@@ -60,4 +60,16 @@ export class ProjectUseCases {
   currentUserId(): Promise<string | null> {
     return this.repository.currentUserId();
   }
+
+  listSaved(): Promise<string[]> {
+    return this.repository.listSaved();
+  }
+
+  setSaved(proyectoId: string, saved: boolean): Promise<void> {
+    return this.repository.setSaved(proyectoId, saved);
+  }
+
+  addMember(member: { proyectoId: string; usuarioId: string; usuarioNombre: string; rol: string }): Promise<void> {
+    return this.repository.addMember(member);
+  }
 }

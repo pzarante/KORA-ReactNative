@@ -9,7 +9,8 @@ export type NotificationType =
   | "comentario"
   | "respuesta_comentario"
   | "edicion"
-  | "reunion";
+  | "reunion"
+  | "kora_tag";
 
 export type AppNotification = {
   id: string;

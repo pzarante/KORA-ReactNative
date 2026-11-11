@@ -13,4 +13,8 @@ export class ProfileRepositoryImpl implements ProfileRepository {
   getProfile(userId?: string): Promise<UserProfile | null> {
     return this.dataSource.getProfile(userId);
   }
+
+  listProfiles(): Promise<UserProfile[]> {
+    return this.dataSource.listProfiles();
+  }
 }

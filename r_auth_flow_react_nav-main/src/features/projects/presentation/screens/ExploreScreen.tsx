@@ -23,11 +23,14 @@ import {
 
 // Importación del Modal del Escáner
 import QRScannerModal from "../components/QRScannerModal";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
+import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 
 const NEW_DAYS = 3;
 const ALL = "Todos";
 
 export default function ExploreScreen({ navigation }: { navigation: any }) {
+  const { isLoggedIn } = useAuth();
   const [tab, setTab] = useState<"projects" | "people">("projects");
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState(ALL);

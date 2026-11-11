@@ -13,6 +13,12 @@ export const colors = {
   orange: "#FF6B00",
   orangeSoft: "#FFEBDF",
   error: "#C62828",
+  /** Error card (Figma p. 16–18): pink fill and border. */
+  errorSoft: "#FDE8E8",
+  errorBorder: "#F6C7C7",
+  /** Good-news icons (e.g. accepted request) on a mint tile. */
+  success: "#1E8E4E",
+  successSoft: "#E2F5EA",
   /** Track of the step progress bar. */
   progressTrack: "#E8D9FA",
   /** Disabled primary button: fill and label. */
