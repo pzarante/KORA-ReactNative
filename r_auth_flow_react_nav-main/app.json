@@ -34,7 +34,8 @@
           },
           "imageWidth": 200
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "eas": {
