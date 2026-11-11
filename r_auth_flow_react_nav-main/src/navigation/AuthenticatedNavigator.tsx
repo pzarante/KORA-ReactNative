@@ -17,6 +17,11 @@ import MeetingHistoryScreen from "@/src/features/koranode/presentation/screens/M
 import MeetingInProgressScreen from "@/src/features/koranode/presentation/screens/MeetingInProgressScreen";
 import MeetingNoteScreen from "@/src/features/koranode/presentation/screens/MeetingNoteScreen";
 
+import KoraTagJoinedScreen from "@/src/features/koratag/presentation/screens/KoraTagJoinedScreen";
+import KoraTagProfileScreen from "@/src/features/koratag/presentation/screens/KoraTagProfileScreen";
+import KoraTagScanScreen from "@/src/features/koratag/presentation/screens/KoraTagScanScreen";
+import KoraTagSelectProjectScreen from "@/src/features/koratag/presentation/screens/KoraTagSelectProjectScreen";
+
 import AppTabsNavigator from "./AppTabsNavigator";
 import CreateProjectNavigator from "./CreateProjectNavigator";
 import { onboardingScreens, publicFeedScreens } from "./sharedScreens";
@@ -48,6 +53,11 @@ export default function AuthenticatedNavigator() {
       <Stack.Screen name="MeetingNote" component={MeetingNoteScreen} />
       <Stack.Screen name="EditMeeting" component={EditMeetingScreen} />
       <Stack.Screen name="MeetingHistory" component={MeetingHistoryScreen} />
+      {/* KORA TAG: scan someone's tag (simulated) and add them to one of your projects. */}
+      <Stack.Screen name="KoraTagScan" component={KoraTagScanScreen} />
+      <Stack.Screen name="KoraTagProfile" component={KoraTagProfileScreen} />
+      <Stack.Screen name="KoraTagSelectProject" component={KoraTagSelectProjectScreen} />
+      <Stack.Screen name="KoraTagJoined" component={KoraTagJoinedScreen} options={successOptions} />
       <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
     </Stack.Navigator>

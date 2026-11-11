@@ -124,4 +124,18 @@ export class MockProjectDataSource implements ProjectDataSource {
   async setRequestStatus(id: string, estado: RequestStatus) {
     this.requests = this.requests.map((r) => (r.id === id ? { ...r, estado } : r));
   }
+
+  private saved: string[] = [];
+
+  async listSaved() {
+    return [...this.saved];
+  }
+
+  async setSaved(proyectoId: string, saved: boolean) {
+    this.saved = saved ? [proyectoId, ...this.saved.filter((id) => id !== proyectoId)] : this.saved.filter((id) => id !== proyectoId);
+  }
+
+  async addMember({ proyectoId, usuarioId, usuarioNombre, rol }: { proyectoId: string; usuarioId: string; usuarioNombre: string; rol: string }) {
+    this.requests.unshift({ id: `r${Date.now()}`, proyectoId, usuarioId, usuarioNombre, rol, mensaje: "Agregado con KORA TAG", estado: "aceptada", createdAt: new Date().toISOString() });
+  }
 }

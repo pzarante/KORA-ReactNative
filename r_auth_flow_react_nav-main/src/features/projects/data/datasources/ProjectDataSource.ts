@@ -19,6 +19,12 @@ export interface ProjectDataSource {
   /** Never throws: a lost notification must not undo the action that caused it. */
   notify(notification: NewNotification): Promise<void>;
   markNotificationsRead(ids: string[]): Promise<void>;
+  /** Ids of the projects the current user saved (bookmark), newest first; empty for guests. */
+  listSaved(): Promise<string[]>;
+  /** Saves or un-saves a project for the current user. */
+  setSaved(proyectoId: string, saved: boolean): Promise<void>;
+  /** Adds someone to a project directly, as an accepted request (KORA TAG). */
+  addMember(member: { proyectoId: string; usuarioId: string; usuarioNombre: string; rol: string }): Promise<void>;
   /** null without a session (guest). */
   currentUserId(): Promise<string | null>;
 }

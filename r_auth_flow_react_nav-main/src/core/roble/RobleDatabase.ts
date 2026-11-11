@@ -6,6 +6,15 @@ import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthR
  * Generic client for the Roble database API (read / insert / update), shared by every
  * feature's remote data source. Handles the session token, its refresh and guest sessions.
  */
+/**
+ * Roble answers 201 to /insert even when it drops rows (unknown table or columns): they come back
+ * in `skipped` with a reason. Returns that reason, or null when every row was saved.
+ */
+export function skippedReason(body: any): string | null {
+  const skipped = Array.isArray(body?.skipped) ? body.skipped : [];
+  return skipped.length > 0 ? String(skipped[0]?.reason ?? "Roble no guardó la información") : null;
+}
+
 export class RobleDatabase {
   private readonly baseUrl: string;
   private readonly authUrl: string;
@@ -52,6 +61,8 @@ export class RobleDatabase {
     });
     await this.ensureOk(response, errorPrefix);
     const body = await response.json().catch(() => ({}));
+    const reason = skippedReason(body);
+    if (reason) throw new Error(`${errorPrefix}: ${reason}`);
     return body?.inserted?.[0];
   }
 

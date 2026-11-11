@@ -8,7 +8,7 @@ import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import ProfileProgress from "./ProfileProgress";
 import { colors } from "@/src/shared/ui/tokens";
 
-export const ONBOARDING_STEPS = 5;
+export const ONBOARDING_STEPS = 6;
 
 type StepProps = {
   /** 1-based step; shows the progress bar and "Completar perfil después". */

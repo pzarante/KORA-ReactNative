@@ -200,6 +200,41 @@ export class ProjectRemoteDataSourceImp implements ProjectDataSource {
     await this.db.update("solicitud", id, { estado }, "No se pudo actualizar la solicitud");
   }
 
+  // Table "guardado" (docs/roble/perfil_y_guardados.sql). Un-saving flips `activo` instead of deleting,
+  // because the app's role can update but not delete.
+  async listSaved(): Promise<string[]> {
+    const me = await this.db.currentUserId();
+    if (!me) return [];
+    const rows = await this.db.read("guardado", { usuario_id: me });
+    return newestFirst(
+      rows
+        .filter((row) => row.usuario_id === me && row.activo !== false)
+        .map((row) => ({ id: String(row.proyecto_id), createdAt: row.created_at ?? "" })),
+    ).map((row) => row.id);
+  }
+
+  async setSaved(proyectoId: string, saved: boolean) {
+    const me = await this.db.currentUserId();
+    if (!me) throw new Error("Necesitas una cuenta para guardar proyectos");
+    const [row] = (await this.db.read("guardado", { usuario_id: me, proyecto_id: proyectoId }))
+      .filter((r) => r.usuario_id === me && r.proyecto_id === proyectoId);
+    const createdAt = new Date().toISOString();
+    if (row) {
+      await this.db.update("guardado", row._id, { activo: saved, created_at: createdAt }, "No se pudo guardar el proyecto");
+    } else if (saved) {
+      await this.db.insert("guardado", { usuario_id: me, proyecto_id: proyectoId, activo: true, created_at: createdAt }, "No se pudo guardar el proyecto");
+    }
+  }
+
+  async addMember({ proyectoId, usuarioId, usuarioNombre, rol }: { proyectoId: string; usuarioId: string; usuarioNombre: string; rol: string }) {
+    // Membership is an accepted request, the same row "Aceptar" produces from a normal request.
+    await this.db.insert(
+      "solicitud",
+      { proyecto_id: proyectoId, usuario_id: usuarioId, usuario_nombre: usuarioNombre, rol, mensaje: "Agregado con KORA TAG", estado: "aceptada", created_at: new Date().toISOString() },
+      "No se pudo agregar a la persona al proyecto",
+    );
+  }
+
   private toRecord(project: Project) {
     return {
       nombre: project.nombre,

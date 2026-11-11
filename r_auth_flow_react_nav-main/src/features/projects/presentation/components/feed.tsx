@@ -85,12 +85,12 @@ export function TopBar({ onBack, right }: { onBack?: () => void; right?: React.R
 }
 
 /** Tags alternate purple and orange, like the cards in the design. */
-export function Tags({ tags, small }: { tags: string[]; small?: boolean }) {
+export function Tags({ tags, small, onTint }: { tags: string[]; small?: boolean; /** On a lavender card: purple chips one shade darker. */ onTint?: boolean }) {
   if (tags.length === 0) return null;
   return (
     <View style={ui.chips}>
       {tags.map((tag, index) => (
-        <View key={tag} style={[ui.chip, small && styles.smallChip, index % 2 === 1 && styles.orangeChip]}>
+        <View key={tag} style={[ui.chip, small && styles.smallChip, onTint && styles.tintChip, index % 2 === 1 && styles.orangeChip]}>
           <Text style={[ui.chipText, small && styles.smallChipText, index % 2 === 1 && styles.orangeText]}>{tag}</Text>
         </View>
       ))}
@@ -98,9 +98,9 @@ export function Tags({ tags, small }: { tags: string[]; small?: boolean }) {
   );
 }
 
-export function ProjectIcon({ icon, size = 64, box = 110 }: { icon: string; size?: number; box?: number }) {
+export function ProjectIcon({ icon, size = 64, box = 110, background }: { icon: string; size?: number; box?: number; background?: string }) {
   return (
-    <View style={[styles.projectIcon, { width: box, height: box, borderRadius: box * 0.28 }]}>
+    <View style={[styles.projectIcon, { width: box, height: box, borderRadius: box * 0.28 }, background ? { backgroundColor: background } : null]}>
       <MaterialCommunityIcons name={icon as any} size={size} color={colors.primary} />
     </View>
   );
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
   sideRight: { justifyContent: "flex-end", gap: 8 },
   smallChip: { paddingHorizontal: 10, paddingVertical: 4 },
   smallChipText: { fontSize: 12 },
+  tintChip: { backgroundColor: "#E4D9F8" },
   orangeChip: { backgroundColor: colors.orangeSoft },
   orangeText: { color: colors.orange },
   projectIcon: { backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },

@@ -11,6 +11,7 @@ import { RoundButton, timeAgo, useProjectUseCases } from "./feed";
 import { NOTIFICATION_TYPES } from "./notificationTypes";
 import { colors } from "@/src/shared/ui/tokens";
 import ButtonGradient from "@/src/shared/ui/ButtonGradient";
+import { dayLabel } from "@/src/shared/utils/dates";
 
 type Row = AppNotification & { project: Project };
 
@@ -97,12 +98,17 @@ export default function NotificationBell() {
 
               {items.length > 0 && isLoggedIn ? (
                 <ScrollView contentContainerStyle={styles.list}>
-                  {items.map((n) => {
+                  {items.map((n, index) => {
                     const isUnread = !n.leida;
                     const look = NOTIFICATION_TYPES[n.tipo];
+                    // Items come newest first; a header starts each day (Figma p. 41).
+                    const day = dayLabel(n.createdAt);
+                    const newDay = index === 0 || dayLabel(items[index - 1].createdAt) !== day;
+                    const tone = look.tone === "success" ? TONE.success : look.tone === "danger" ? TONE.danger : TONE.default;
                     return (
+                      <React.Fragment key={n.id}>
+                      {newDay ? <Text style={styles.day}>{day}</Text> : null}
                       <TouchableOpacity
-                        key={n.id}
                         onPress={() => {
                           markRead([n.id]);
                           close(() => navigation.navigate(look.screen, { project: n.project }));
@@ -110,15 +116,17 @@ export default function NotificationBell() {
                         style={[styles.item, isUnread && styles.itemUnread]}
                         testID={`notification-${n.id}`}
                       >
-                        <View style={styles.itemIcon}>
-                          <MaterialCommunityIcons name={look.icon as any} size={22} color={colors.primary} />
+                        <View style={[styles.itemIcon, { backgroundColor: tone.background }]}>
+                          <MaterialCommunityIcons name={look.icon as any} size={22} color={tone.color} />
                         </View>
                         <View style={styles.itemText}>
+                          <Text style={styles.itemHeading}>{look.title}</Text>
                           <Text style={styles.itemTitle}>{look.text(n, n.project.nombre)}</Text>
                           <Text style={styles.itemTime}>{timeAgo(n.createdAt)}</Text>
                         </View>
                         {isUnread ? <View style={styles.dot} /> : null}
                       </TouchableOpacity>
+                      </React.Fragment>
                     );
                   })}
                 </ScrollView>
@@ -150,6 +158,12 @@ export default function NotificationBell() {
   );
 }
 
+const TONE = {
+  default: { color: colors.primary, background: "#FFFFFF" },
+  success: { color: colors.success, background: colors.successSoft },
+  danger: { color: colors.error, background: colors.errorSoft },
+};
+
 const styles = StyleSheet.create({
   backdrop: { flex: 1, flexDirection: "row", justifyContent: "flex-end" },
   scrim: { flex: 1, backgroundColor: colors.scrim },
@@ -170,7 +184,9 @@ const styles = StyleSheet.create({
   itemUnread: { backgroundColor: colors.soft },
   itemIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: "#FFFFFF", alignItems: "center", justifyContent: "center" },
   itemText: { flex: 1, gap: 4 },
-  itemTitle: { color: colors.text, fontSize: 14, lineHeight: 20, fontWeight: "600" },
+  itemHeading: { color: colors.text, fontSize: 15, fontWeight: "800" },
+  itemTitle: { color: colors.text, fontSize: 14, lineHeight: 20 },
+  day: { color: colors.muted, fontSize: 14, fontWeight: "700", marginTop: 6 },
   itemTime: { color: colors.muted, fontSize: 13 },
   dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.orange },
   empty: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 8 },

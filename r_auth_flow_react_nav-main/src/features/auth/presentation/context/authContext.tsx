@@ -25,6 +25,8 @@ export type AuthContextType = {
   loggedUser: AuthUser | null;
   isLoggedIn: boolean;
   needsOnboarding?: boolean;
+  /** True until the saved session (if any) has been checked at startup. */
+  restoring?: boolean;
   loading: boolean;
   error: string | null;
   clearError: () => void;
@@ -56,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [restoring, setRestoring] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<ProfileDraft>(emptyProfile);
   // Memory only: lets the VerifyEmail screen log in after the code without asking for the password again.
@@ -70,7 +73,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoggedIn(!!user);
       })
       .catch(() => setIsLoggedIn(false))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setRestoring(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -224,7 +230,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ loggedUser, isLoggedIn, needsOnboarding, loading, error, clearError, login, signup, logout, forgotPassword, validate, resendCode, getLoggedUser, profile, updateProfile, completeProfile }}>
+    <AuthContext.Provider value={{ loggedUser, isLoggedIn, needsOnboarding, restoring, loading, error, clearError, login, signup, logout, forgotPassword, validate, resendCode, getLoggedUser, profile, updateProfile, completeProfile }}>
       {children}
     </AuthContext.Provider>
   );

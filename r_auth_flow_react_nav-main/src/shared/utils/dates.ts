@@ -13,6 +13,16 @@ export function formatDay(date: Date) {
   return `${DAYS[date.getDay()]}, ${date.getDate()} ${MONTHS[date.getMonth()]}.`;
 }
 
+/** Section label for a list grouped by day: "Hoy", "Ayer" or "vie, 7 nov.". */
+export function dayLabel(iso: string, now = new Date()) {
+  const date = new Date(iso);
+  const startOf = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const days = Math.round((startOf(now) - startOf(date)) / 86_400_000);
+  if (days <= 0) return "Hoy";
+  if (days === 1) return "Ayer";
+  return formatDay(date);
+}
+
 /** "3:47 p. m." */
 export function formatTime(date: Date) {
   const hours = date.getHours();
