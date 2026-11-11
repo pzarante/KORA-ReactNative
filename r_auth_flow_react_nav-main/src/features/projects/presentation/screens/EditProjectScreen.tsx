@@ -12,9 +12,10 @@ import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 import ConfirmModal from "@/src/shared/ui/ConfirmModal";
 import { useConfirmLeave } from "@/src/shared/hooks/useConfirmLeave";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 const MAX_TEXT = 250;
-const EDITABLE = ["icono", "nombre", "descripcion", "etiquetas", "etapa", "problema", "objetivo", "alcance", "roles", "enlaces", "buscandoPersonas"] as const;
+const EDITABLE = ["icono", "nombre", "descripcion", "sobre", "etiquetas", "etapa", "problema", "objetivo", "alcance", "roles", "enlaces", "buscandoPersonas"] as const;
 type Draft = Required<ProjectChanges>;
 
 function Card({ icon, title, text, danger, children }: { icon: any; title: string; text: string; danger?: boolean; children?: React.ReactNode }) {
@@ -182,6 +183,17 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
             <TextInput onChangeText={(nombre) => update({ nombre })} style={ui.input} testID="edit-project-name" value={draft.nombre} />
             <Text style={styles.label}>Descripción</Text>
             <LongField value={draft.descripcion} onChange={(descripcion) => update({ descripcion })} />
+            {/* No length limit here: creation has none, so older texts may be longer than MAX_TEXT. */}
+            <Text style={styles.label}>Sobre el proyecto</Text>
+            <TextInput
+              multiline
+              onChangeText={(sobre) => update({ sobre })}
+              placeholder="Cuenta los detalles y el contexto de tu proyecto..."
+              placeholderTextColor={colors.muted}
+              style={[ui.input, styles.textArea]}
+              testID="edit-project-about"
+              value={draft.sobre}
+            />
             <Text style={styles.label}>Etiquetas</Text>
             <View style={ui.chips}>
               {draft.etiquetas.map((tag, index) => (
@@ -295,7 +307,7 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
                 accessibilityLabel="Buscando personas"
                 onValueChange={(buscandoPersonas) => update({ buscandoPersonas })}
                 thumbColor="#FFFFFF"
-                trackColor={{ false: "#E4E0EA", true: colors.primary }}
+                trackColor={{ false: colors.disabled, true: colors.primary }}
                 testID="edit-project-looking"
                 value={draft.buscandoPersonas}
               />
@@ -327,7 +339,8 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
             style={[ui.primaryButton, styles.save, (!dirty || !valid) && ui.primaryButtonDisabled]}
             testID="edit-project-save"
           >
-            <MaterialCommunityIcons name="check" size={24} color={!dirty || !valid ? "#A49DB0" : "#FFFFFF"} />
+            <ButtonGradient disabled={(!dirty || !valid)} />
+            <MaterialCommunityIcons name="check" size={24} color={!dirty || !valid ? colors.disabledText : "#FFFFFF"} />
             <Text style={[ui.primaryButtonText, (!dirty || !valid) && ui.primaryButtonTextDisabled]}>{saving ? "Guardando..." : "Guardar cambios"}</Text>
           </TouchableOpacity>
         </View>

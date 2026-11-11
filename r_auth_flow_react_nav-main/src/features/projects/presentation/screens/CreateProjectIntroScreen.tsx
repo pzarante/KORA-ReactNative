@@ -6,6 +6,7 @@ import BrandLogo from "@/src/shared/ui/BrandLogo";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 export default function CreateProjectIntroScreen({ navigation }: { navigation: any }) {
   return (
@@ -23,6 +24,7 @@ export default function CreateProjectIntroScreen({ navigation }: { navigation: a
         </Text>
         <View style={styles.actions}>
           <TouchableOpacity onPress={() => navigation.navigate("ProjectStage")} style={ui.primaryButton} testID="create-project-start">
+            <ButtonGradient />
             <Text style={ui.primaryButtonText}>Comenzar  →</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.getParent()?.goBack()} style={ui.outlineButton}>

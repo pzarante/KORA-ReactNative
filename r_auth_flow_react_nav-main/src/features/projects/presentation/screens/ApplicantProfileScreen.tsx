@@ -9,6 +9,7 @@ import ProfileView from "@/src/features/auth/presentation/components/ProfileView
 import { JoinRequest, Project, RequestStatus } from "../../domain/entities/Project";
 import { TopBar, useFeed, useFocusLoad, useProjectUseCases } from "../components/feed";
 import { ui } from "@/src/shared/ui/styles";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 export default function ApplicantProfileScreen({ navigation, route }: { navigation: any; route: any }) {
   const { request, project }: { request: JoinRequest; project: Project } = route.params;
@@ -61,6 +62,7 @@ export default function ApplicantProfileScreen({ navigation, route }: { navigati
           <Text style={ui.outlineButtonText}>Rechazar</Text>
         </TouchableOpacity>
         <TouchableOpacity disabled={saving} onPress={() => answer("aceptada")} style={ui.primaryButton} testID="accept-request-button">
+          <ButtonGradient />
           <Text style={ui.primaryButtonText}>Aceptar</Text>
         </TouchableOpacity>
       </View>

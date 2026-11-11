@@ -12,6 +12,8 @@ import { profileCompletion } from "@/src/features/auth/domain/entities/UserProfi
 import ProfileProgress from "@/src/features/auth/presentation/components/ProfileProgress";
 import ProfileView from "@/src/features/auth/presentation/components/ProfileView";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
+
 import {
   RoundButton,
   TopBar,
@@ -86,6 +88,7 @@ export default function MyProfileScreen({ navigation }: { navigation: any }) {
               style={styles.cardButton}
               testID="complete-profile-button"
             >
+              <ButtonGradient />
               <Text style={ui.primaryButtonText}>Completar mi información</Text>
             </TouchableOpacity>
           </View>

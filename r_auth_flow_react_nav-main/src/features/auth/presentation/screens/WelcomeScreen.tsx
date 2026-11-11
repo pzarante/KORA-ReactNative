@@ -6,6 +6,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import BrandLogo from "@/src/shared/ui/BrandLogo";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { colors } from "@/src/shared/ui/tokens";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 
 // Sizes come from the Figma frame (428 x 926) but are not scaled: the column scrolls
 // on short phones or with large system text instead of shrinking or overlapping.
@@ -46,6 +47,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
             onPress={() => navigation.navigate("Login")}
             style={[styles.button, styles.primaryButton]}
           >
+            <ButtonGradient radius={28} />
             <Text style={[styles.primaryButtonText, font("Sora_700Bold", "700")]}>Iniciar Sesión</Text>
             <MaterialCommunityIcons name="arrow-right" size={18} color="#FFFFFF" />
           </TouchableOpacity>

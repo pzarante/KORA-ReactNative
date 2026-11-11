@@ -12,16 +12,11 @@ import { AuthRepositoryImpl } from "@/src/features/auth/data/repositories/AuthRe
 import { ProfileRepositoryImpl } from "@/src/features/auth/data/repositories/ProfileRepositoryImpl";
 import { AuthUseCases } from "@/src/features/auth/domain/use-cases/AuthUseCases";
 import { ProfileUseCases } from "@/src/features/auth/domain/use-cases/ProfileUseCases";
-import { LocalProductCacheSource } from "@/src/features/products/data/datasources/local/LocalProductCacheSource";
 import { KoraNodeDataSource } from "@/src/features/koranode/data/datasources/KoraNodeDataSource";
 import { KoraNodeRemoteDataSourceImp } from "@/src/features/koranode/data/datasources/KoraNodeRemoteDataSourceImp";
 import { MockKoraNodeDataSource } from "@/src/features/koranode/data/datasources/MockKoraNodeDataSource";
 import { KoraNodeRepositoryImpl } from "@/src/features/koranode/data/repositories/KoraNodeRepositoryImpl";
 import { KoraNodeUseCases } from "@/src/features/koranode/domain/use-cases/KoraNodeUseCases";
-import { MockProductDataSource } from "@/src/features/products/data/datasources/MockProductDataSource";
-import { ProductRemoteDataSourceImp } from "@/src/features/products/data/datasources/ProductRemoteDataSourceImp";
-import { ProductRepositoryImpl } from "@/src/features/products/data/repositories/ProductRepositoryImpl";
-import { ProductUseCases } from "@/src/features/products/domain/use-cases/ProductUseCases";
 import { MockProjectDataSource } from "@/src/features/projects/data/datasources/MockProjectDataSource";
 import { ProjectDataSource } from "@/src/features/projects/data/datasources/ProjectDataSource";
 import { ProjectRemoteDataSourceImp } from "@/src/features/projects/data/datasources/ProjectRemoteDataSourceImp";
@@ -51,25 +46,12 @@ export function DIProvider({ children }: { children: React.ReactNode }) {
         // ── Profile ───────────────────────────────────────────
         const profileDS: ProfileDataSource = useMocks
             ? new MockProfileDataSource()
-            : new ProfileRemoteDataSourceImp();
+            : new ProfileRemoteDataSourceImp(undefined, authDS);
         const profileRepo = new ProfileRepositoryImpl(profileDS);
         const profileUseCases = new ProfileUseCases(profileRepo);
         c.register(TOKENS.ProfileDataSource, profileDS)
             .register(TOKENS.ProfileRepository, profileRepo)
             .register(TOKENS.ProfileUseCases, profileUseCases);
-
-        // ── Products ──────────────────────────────────────────
-        const localCacheDS = new LocalProductCacheSource();
-        const productProjectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID;
-        const productRemoteDS = useMocks
-            ? new MockProductDataSource()
-            : new ProductRemoteDataSourceImp(authDS, productProjectId);
-        const productRepo = new ProductRepositoryImpl(productRemoteDS, localCacheDS);
-        const productUseCases = new ProductUseCases(productRepo);
-        c.register(TOKENS.ProductRemoteDS, productRemoteDS)
-            .register(TOKENS.LocalProductCacheDS, localCacheDS)
-            .register(TOKENS.ProductRepo, productRepo)
-            .register(TOKENS.ProductUseCases, productUseCases);
 
         // ── Projects ──────────────────────────────────────────
         const projectDS: ProjectDataSource = useMocks

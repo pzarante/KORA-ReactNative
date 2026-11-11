@@ -95,7 +95,7 @@ export default function VerifyEmailScreen({ navigation, route }: { navigation: a
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 48 },
   heading: { marginTop: 18, marginBottom: 27 },
-  eyebrow: { color: "#A04BFF", fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
+  eyebrow: { color: colors.primary, fontSize: 13, fontWeight: "800", letterSpacing: 1.2 },
   title: { color: colors.text, fontSize: 32, fontWeight: "800", marginTop: 5 },
   description: { color: colors.muted, fontSize: 15, fontWeight: "600", lineHeight: 22, marginTop: 8 },
   email: { color: colors.text, fontWeight: "800" },

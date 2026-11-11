@@ -1,40 +1,42 @@
-import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import React from "react";
-import { useColorScheme } from "react-native";
 import { PaperProvider } from "react-native-paper";
 
 import { DIProvider } from "./src/core/di/DIProvider";
 import { AuthProvider } from "./src/features/auth/presentation/context/authContext";
 import RootNavigator from "./src/navigation/RootNavigator";
+import { brandFonts, installBrandFont } from "./src/shared/ui/fonts";
 import { installWebInputStyles } from "./src/shared/ui/webInputStyles";
-import { darkTheme, lightTheme } from "./src/theme/theme";
+import { brandTheme } from "./src/theme/theme";
 
 installWebInputStyles();
 
+const navigationTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: brandTheme.colors.background,
+    card: brandTheme.colors.surface,
+    text: brandTheme.colors.onSurface,
+    border: brandTheme.colors.outline,
+    primary: brandTheme.colors.primary,
+    notification: brandTheme.colors.error,
+  },
+};
+
 export default function App() {
-  const scheme = useColorScheme();
-  const theme = scheme === "dark" ? darkTheme : lightTheme;
+  const [fontsLoaded, fontError] = useFonts(brandFonts);
 
-  if (__DEV__) console.log("Current theme:", scheme);
-
-  const navigationTheme = {
-    ...(scheme === "dark" ? DarkTheme : DefaultTheme),
-    colors: {
-      ...(scheme === "dark" ? DarkTheme.colors : DefaultTheme.colors),
-      background: theme.colors.background,
-      card: theme.colors.surface,
-      text: theme.colors.onSurface,
-      border: theme.colors.outline,
-      primary: theme.colors.primary,
-      notification: theme.colors.error,
-    },
-  };
+  // Wait for Plus Jakarta Sans so no screen flashes in the system font. If it fails to load,
+  // the app still opens with the system font.
+  if (!fontsLoaded && !fontError) return null;
+  if (fontsLoaded) installBrandFont();
 
   return (
     <DIProvider>
       <AuthProvider>
-        {/* ✅ ProductProvider removed from here */}
-        <PaperProvider theme={theme}>
+        <PaperProvider theme={brandTheme}>
           <NavigationContainer theme={navigationTheme}>
             <RootNavigator />
           </NavigationContainer>

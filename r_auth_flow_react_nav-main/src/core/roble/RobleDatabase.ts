@@ -17,7 +17,7 @@ export class RobleDatabase {
     projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID,
   ) {
     if (!projectId) throw new Error("Missing EXPO_PUBLIC_ROBLE_PROJECT_ID env var");
-    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.openlab.uninorte.edu.co").replace(/\/$/, "");
+    const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.test-openlab.uninorte.edu.co").replace(/\/$/, "");
     this.baseUrl = `${apiUrl}/database/${projectId}`;
     this.authUrl = `${apiUrl}/auth/${projectId}`;
   }
@@ -120,6 +120,10 @@ export class RobleDatabase {
   private async ensureOk(response: Response, errorPrefix: string) {
     if (response.ok) return;
     const body = await response.json().catch(() => ({}));
+    if (response.status === 403) {
+      // Roble refuses by role or row owner (_owner), not because of the data: say so plainly.
+      throw new Error(`${errorPrefix}: Roble no le permite esta acción a tu cuenta. Revisa los permisos del rol en Roble.`);
+    }
     throw new Error(`${errorPrefix}: ${body.message ?? response.status}`);
   }
 }

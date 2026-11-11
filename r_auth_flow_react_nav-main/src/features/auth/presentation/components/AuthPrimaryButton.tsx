@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import ButtonGradient from "@/src/shared/ui/ButtonGradient";
 import { colors } from "@/src/shared/ui/tokens";
 
 export default function AuthPrimaryButton({
@@ -21,6 +22,7 @@ export default function AuthPrimaryButton({
       style={styles.button}
       testID={testID}
     >
+      <ButtonGradient />
       <Text style={styles.label}>{label}  →</Text>
     </TouchableOpacity>
   );
