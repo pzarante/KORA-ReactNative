@@ -1,3 +1,5 @@
+import { AuthUser } from "../../domain/entities/AuthUser";
+
 export interface AuthRemoteDataSource {
   login(email: string, password: string): Promise<void>;
   /** true when Roble e-mailed a code: the account must be verified before logging in. */
@@ -13,4 +15,5 @@ export interface AuthRemoteDataSource {
     validationCode: string,
   ): Promise<boolean>;
   verifyToken(): Promise<boolean>;
+  getCurrentUser(): Promise<AuthUser | null>;
 }

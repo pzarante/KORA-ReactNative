@@ -1,5 +1,8 @@
 import { ILocalPreferences } from "@/src/shared/storage/iLocalPreferences";
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
+import { userIdFromToken } from "@/src/core/userIdFromToken";
+import { ResilientHttpClient } from "@/src/core/roble/ResilientHttpClient";
+import { AuthUser } from "../../domain/entities/AuthUser";
 import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 
 export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -7,6 +10,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   private readonly baseUrl: string;
 
   private prefs: ILocalPreferences;
+  private refreshInFlight?: Promise<boolean>;
 
   constructor(
     projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID,
@@ -24,7 +28,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   async login(email: string, password: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/login`, {
+      const response = await ResilientHttpClient.request(`${this.baseUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify({ email, password }),
@@ -39,6 +43,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }
         await this.prefs.storeData("token", token);
         await this.prefs.storeData("refreshToken", refreshToken);
+        await this.prefs.storeData<AuthUser>("sessionUser", { email });
         //console.log("Token:", token, "\nRefresh Token:", refreshToken);
         return Promise.resolve();
       } else {
@@ -53,7 +58,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   async signUp(email: string, password: string): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/${this.signupEndpoint}`, {
+      const response = await ResilientHttpClient.request(`${this.baseUrl}/${this.signupEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify({
@@ -89,7 +94,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       const token = await this.prefs.retrieveData<string>("token");
       if (!token) throw new Error("No token found");
 
-      const response = await fetch(`${this.baseUrl}/logout`, {
+      const response = await ResilientHttpClient.request(`${this.baseUrl}/logout`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -97,6 +102,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response.status === 201) {
         await this.prefs.removeData("token");
         await this.prefs.removeData("refreshToken");
+        await this.prefs.removeData("sessionUser");
         console.log("Logged out successfully");
         return Promise.resolve();
       } else {
@@ -109,7 +115,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
   async resendCode(email: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/resend-code`, {
+    const response = await ResilientHttpClient.request(`${this.baseUrl}/resend-code`, {
       method: "POST",
       headers: { "Content-Type": "application/json; charset=UTF-8" },
       body: JSON.stringify({ email }),
@@ -122,7 +128,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   async validate(email: string, validationCode: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/verify-email`, {
+      const response = await ResilientHttpClient.request(`${this.baseUrl}/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify({ email, code: validationCode }),
@@ -141,14 +147,23 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   async refreshToken(): Promise<boolean> {
+    if (this.refreshInFlight) return this.refreshInFlight;
+    this.refreshInFlight = this.performTokenRefresh();
     try {
-      const refreshToken =
-        await this.prefs.retrieveData<string>("refreshToken");
+      return await this.refreshInFlight;
+    } finally {
+      this.refreshInFlight = undefined;
+    }
+  }
+
+  private async performTokenRefresh(): Promise<boolean> {
+    try {
+      const refreshToken = await this.prefs.retrieveData<string>("refreshToken");
       if (!refreshToken) {
         console.warn("Refresh token failed", "No refresh token found");
         return false;
       }
-      const response = await fetch(`${this.baseUrl}/refresh-token`, {
+      const response = await ResilientHttpClient.request(`${this.baseUrl}/refresh-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),
@@ -159,12 +174,12 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         const newToken = data["accessToken"];
         if (!newToken) throw new Error("Roble no devolvió un access token renovado");
         await this.prefs.storeData("token", newToken);
+        if (data["refreshToken"]) await this.prefs.storeData("refreshToken", data["refreshToken"]);
         console.log("Token refreshed successfully");
         return true;
-      } else {
-        const body = await response.json();
-        throw new Error(`Refresh token error: ${body.message}`);
       }
+      const body = await response.json();
+      throw new Error(`Refresh token error: ${body.message}`);
     } catch (e: any) {
       console.error("Refresh token failed", e);
       throw e;
@@ -173,7 +188,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   async forgotPassword(email: string): Promise<void> {
     let response: Response;
     try {
-      response = await fetch(`${this.baseUrl}/forgot-password`, {
+      response = await ResilientHttpClient.request(`${this.baseUrl}/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify({ email }),
@@ -207,7 +222,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       const token = await this.prefs.retrieveData<string>("token");
       if (!token) return false;
 
-      const response = await fetch(`${this.baseUrl}/verify-token`, {
+      const response = await ResilientHttpClient.request(`${this.baseUrl}/verify-token`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -223,6 +238,18 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e: any) {
       console.error("Verify token failed", e);
       return false;
+    }
+  }
+
+  async getCurrentUser(): Promise<AuthUser | null> {
+    const token = await this.prefs.retrieveData<string>("token");
+    if (!token) return null;
+    const savedUser = await this.prefs.retrieveData<AuthUser>("sessionUser");
+    if (savedUser?.email) return savedUser;
+    try {
+      return { email: "", userId: userIdFromToken(token) };
+    } catch {
+      return { email: "" };
     }
   }
 }

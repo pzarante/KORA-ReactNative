@@ -1,3 +1,4 @@
+import { AuthUser } from "../../domain/entities/AuthUser";
 import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 
 export class MockAuthRemoteDataSource implements AuthRemoteDataSource {
@@ -25,5 +26,9 @@ export class MockAuthRemoteDataSource implements AuthRemoteDataSource {
 
   async verifyToken(): Promise<boolean> {
     return false;
+  }
+
+  async getCurrentUser(): Promise<AuthUser | null> {
+    return null;
   }
 }

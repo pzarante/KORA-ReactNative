@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import {
     ScrollView,
+    RefreshControl,
     StyleSheet,
     Text,
     TextInput,
@@ -36,7 +37,7 @@ export default function ExploreScreen({ navigation }: { navigation: any }) {
   const [tag, setTag] = useState(ALL);
   const [scannerVisible, setScannerVisible] = useState(false);
 
-  const { data: feed, error } = useFeed();
+  const { data: feed, error, refreshing, reload } = useFeed();
 
   const tags = useMemo(
     () => [ALL, ...new Set(feed?.projects.flatMap((p) => p.etiquetas) ?? [])],
@@ -113,6 +114,7 @@ export default function ExploreScreen({ navigation }: { navigation: any }) {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
           testID="explore-projects"
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={reload} />}
         >
           <View style={styles.search}>
             <MaterialCommunityIcons

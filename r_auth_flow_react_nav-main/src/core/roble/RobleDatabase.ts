@@ -1,5 +1,6 @@
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
+import { ResilientHttpClient } from "@/src/core/roble/ResilientHttpClient";
 import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 
 /**
@@ -68,7 +69,10 @@ export class RobleDatabase {
 
   private async authorized(url: string, init: RequestInit): Promise<Response> {
     const send = (accessToken: string) =>
-      fetch(url, { ...init, headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` } });
+      ResilientHttpClient.request(url, {
+        ...init,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      });
 
     const token = await this.prefs.retrieveData<string>("token");
     if (!token) {
@@ -113,7 +117,7 @@ export class RobleDatabase {
   }
 
   private async postAuth(path: string, body: object): Promise<{ accessToken: string; refreshToken?: string }> {
-    const response = await fetch(`${this.authUrl}/${path}`, {
+    const response = await ResilientHttpClient.request(`${this.authUrl}/${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

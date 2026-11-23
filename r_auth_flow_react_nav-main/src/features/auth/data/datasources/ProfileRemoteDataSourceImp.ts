@@ -1,5 +1,7 @@
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { skippedReason } from "@/src/core/roble/RobleDatabase";
+import { ResilientHttpClient } from "@/src/core/roble/ResilientHttpClient";
+import { AsyncStorageCache } from "@/src/shared/storage/AsyncStorageCache";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
 import { canJoinProjects, detailsForRole, UserProfile } from "../../domain/entities/UserProfile";
 import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
@@ -9,6 +11,7 @@ type RemoteProfile = { _id?: string; user_id?: string; onboarding_completado?: s
 
 export class ProfileRemoteDataSourceImp implements ProfileDataSource {
   private readonly baseUrl: string;
+  private readonly cacheScope: string;
   private readonly prefs = LocalPreferencesAsyncStorage.getInstance();
 
   constructor(
@@ -19,6 +22,7 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
     if (!projectId) throw new Error("Missing EXPO_PUBLIC_ROBLE_PROJECT_ID env var");
     const apiUrl = (process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.test-openlab.uninorte.edu.co").replace(/\/$/, "");
     this.baseUrl = `${apiUrl}/database/${projectId}`;
+    this.cacheScope = encodeURIComponent(this.baseUrl);
   }
 
   async saveProfile(profile: Omit<UserProfile, "userId">): Promise<void> {
@@ -52,21 +56,56 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
       const reason = skippedReason(body);
       if (reason) throw new Error(`No se pudo guardar el perfil: ${reason}`);
     }
+    await Promise.all([
+      AsyncStorageCache.remove(this.profileCacheKey(userId)),
+      AsyncStorageCache.remove(`profiles:all:${this.cacheScope}`),
+    ]);
   }
 
   async getProfile(userId?: string): Promise<UserProfile | null> {
     const token = await this.prefs.retrieveData<string>("token");
     if (!token) return null;
-    const row: any = await this.findProfile(userId ?? userIdFromToken(token));
-    return row ? this.fromRow(row) : null;
+    const requestedUserId = userId ?? userIdFromToken(token);
+    return this.withCache(this.profileCacheKey(requestedUserId), async () => {
+      const row = await this.findProfile(requestedUserId);
+      return row ? this.fromRow(row) : null;
+    });
   }
 
   async listProfiles(): Promise<UserProfile[]> {
-    const response = await this.send(`${this.baseUrl}/read?tableName=Usuario`);
-    if (response.status === 404) return [];
-    if (!response.ok) throw new Error(`No se pudo consultar la tabla Usuario: ${response.status}`);
-    const rows = await response.json();
-    return Array.isArray(rows) ? rows.map((row) => this.fromRow(row)) : [];
+    return this.withCache(`profiles:all:${this.cacheScope}`, async () => {
+      const response = await this.send(`${this.baseUrl}/read?tableName=Usuario`);
+      if (response.status === 404) return [];
+      if (!response.ok) throw new Error(`No se pudo consultar la tabla Usuario: ${response.status}`);
+      const rows = await response.json();
+      return Array.isArray(rows) ? rows.map((row) => this.fromRow(row)) : [];
+    });
+  }
+
+  private profileCacheKey(userId: string): string {
+    return `profile:${this.cacheScope}:${userId}`;
+  }
+
+  private async withCache<T>(key: string, load: () => Promise<T>): Promise<T> {
+    const cached = await AsyncStorageCache.read<T>(key);
+    if (cached?.fresh) return cached.value;
+
+    if (cached) {
+      void load()
+        .then((value) => AsyncStorageCache.write(key, value))
+        .catch((error) => console.warn(`Profile cache revalidation failed for ${key}`, error));
+      return cached.value;
+    }
+
+    try {
+      const value = await load();
+      await AsyncStorageCache.write(key, value);
+      return value;
+    } catch (error) {
+      const fallback = await AsyncStorageCache.read<T>(key);
+      if (fallback) return fallback.value;
+      throw error;
+    }
   }
 
   private fromRow(row: any): UserProfile {
@@ -95,7 +134,10 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
   private async send(url: string, init: RequestInit = {}): Promise<Response> {
     const request = async () => {
       const token = await this.prefs.retrieveData<string>("token");
-      return fetch(url, { ...init, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
+      return ResilientHttpClient.request(url, {
+        ...init,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      });
     };
     const response = await request();
     if (response.status !== 401 || !this.authService) return response;

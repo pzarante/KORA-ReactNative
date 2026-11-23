@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import BrandLogo from "@/src/shared/ui/BrandLogo";
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
@@ -13,11 +13,16 @@ const RECENT = 10;
 
 export default function HomeFeedScreen({ navigation }: { navigation: any }) {
   const { isLoggedIn, profile } = useAuth();
-  const { data: feed, error } = useFeed();
+  const { data: feed, error, refreshing, reload } = useFeed();
 
   return (
     <ScreenSurface>
-      <ScrollView contentContainerStyle={styles.content} testID="home-screen" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        testID="home-screen"
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={reload} />}
+      >
         <View style={styles.header}>
           <BrandLogo />
           <View style={styles.headerRight}>

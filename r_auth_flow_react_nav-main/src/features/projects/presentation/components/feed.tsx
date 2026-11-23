@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useDI } from "@/src/core/di/DIProvider";
@@ -11,6 +11,7 @@ import { ProjectUseCases } from "../../domain/use-cases/ProjectUseCases";
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 import NotificationBell from "./NotificationBell";
+import { useAuth } from "@/src/features/auth/presentation/context/authContext";
 
 export function useProjectUseCases() {
   const di = useDI();
@@ -24,6 +25,22 @@ export type Feed = { projects: Project[]; requests: JoinRequest[]; comments: Pro
 /** Everything the lists need, including the counters for members and comments. */
 export function useFeed() {
   const useCases = useProjectUseCases();
+  const { isLoggedIn } = useAuth();
+  const [owner, setOwner] = useState<{ isLoggedIn: boolean; userId: string | null }>();
+
+  useEffect(() => {
+    let active = true;
+    useCases.currentUserId()
+      .then((id) => active && setOwner({ isLoggedIn, userId: id }))
+      .catch(() => active && setOwner({ isLoggedIn, userId: null }));
+    return () => {
+      active = false;
+    };
+  }, [useCases, isLoggedIn]);
+  const userId = owner?.isLoggedIn === isLoggedIn ? owner.userId : undefined;
+  const apiUrl = process.env.EXPO_PUBLIC_ROBLE_API_URL ?? "https://roble-api.test-openlab.uninorte.edu.co";
+  const projectId = process.env.EXPO_PUBLIC_ROBLE_PROJECT_ID ?? "";
+
   return useFocusLoad<Feed>(
     async () => {
       const [projects, requests, comments, userId] = await Promise.all([
@@ -34,7 +51,13 @@ export function useFeed() {
       ]);
       return { projects, requests, comments, userId };
     },
-    [useCases],
+    [useCases, userId],
+    {
+      cacheKey: userId === undefined
+        ? undefined
+        : `feed:${encodeURIComponent(apiUrl)}:${projectId}:${userId ?? "guest"}`,
+      enabled: userId !== undefined,
+    },
   );
 }
 

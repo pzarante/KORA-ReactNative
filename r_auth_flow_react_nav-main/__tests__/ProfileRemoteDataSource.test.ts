@@ -1,5 +1,6 @@
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { ProfileRemoteDataSourceImp } from "@/src/features/auth/data/datasources/ProfileRemoteDataSourceImp";
+import { AsyncStorageCache } from "@/src/shared/storage/AsyncStorageCache";
 
 const jwt = `x.${btoa(JSON.stringify({ sub: "user-1" })).replace(/=+$/, "")}.y`;
 
@@ -73,6 +74,7 @@ describe("ProfileRemoteDataSourceImp", () => {
     jest.spyOn(global, "fetch").mockResolvedValueOnce({ ok: true, status: 200, json: async () => [{ ...row, rol: "" }] } as unknown as Response);
     expect((await ds.getProfile())?.onboardingCompletado).toBe(false);
 
+    await AsyncStorageCache.remove(`profile:${encodeURIComponent("https://roble-api.test-openlab.uninorte.edu.co/database/test-project")}:user-1`);
     jest.spyOn(global, "fetch").mockResolvedValueOnce({ ok: true, status: 200, json: async () => [{ ...row, rol: "Estudiante" }] } as unknown as Response);
     expect((await ds.getProfile())?.onboardingCompletado).toBe(true);
   });

@@ -26,8 +26,7 @@ export class AuthRepositoryImpl implements AuthRepository {
   }
 
   async getCurrentUser(): Promise<AuthUser | null> {
-    // return this.dataSource.getCurrentUser();
-    return null;
+    return this.dataSource.getCurrentUser();
   }
 
   async forgotPassword(email: string): Promise<void> {
