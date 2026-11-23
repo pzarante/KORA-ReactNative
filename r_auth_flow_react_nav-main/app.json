@@ -1,22 +1,26 @@
 {
   "expo": {
-    "name": "r_auth_flow_react_nav",
-    "slug": "authproducttemplayte",
+    "name": "KORA",
+    "slug": "kora-mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rauthflowreactnav",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.uninorte.kora",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.uninorte.kora",
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false
+      }
     },
     "web": {
       "output": "single",
@@ -35,13 +39,15 @@
           "imageWidth": 200
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {
-        "projectId": "a7ddec17-a789-42a1-bc9d-2a7d44320ba3"
+        "projectId": "bde8acf0-26a4-4f0f-8329-413e68e14498"
       }
-    },
-    "owner": "augustosalazar"
+    }
   }
 }

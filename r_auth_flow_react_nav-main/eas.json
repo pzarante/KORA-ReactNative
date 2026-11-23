@@ -1,0 +1,24 @@
+{
+  "cli": {
+    "version": ">= 10.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "EXPO_PUBLIC_ROBLE_PROJECT_ID": "kora_eb11b19cdd",
+        "EXPO_PUBLIC_ROBLE_API_URL": "https://roble-api.test-openlab.uninorte.edu.co",
+        "EXPO_PUBLIC_ROBLE_SIGNUP_ENDPOINT": "signup-direct"
+      }
+    },
+    "production": {}
+  }
+}
