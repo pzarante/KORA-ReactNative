@@ -12,7 +12,7 @@ import { Initial, TopBar, useFocusLoad, useProjectUseCases } from "../components
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 
-type Member = { id: string; requestId?: string; name: string; rol: string; creator: boolean };
+type Member = { id: string; request?: JoinRequest; name: string; rol: string; creator: boolean };
 
 export default function TeamMembersScreen({ navigation, route }: { navigation: any; route: any }) {
   const project: Project = route.params.project;
@@ -26,12 +26,13 @@ export default function TeamMembersScreen({ navigation, route }: { navigation: a
       const userId = await useCases.currentUserId();
       if (!userId) return { userId, accepted: [] as JoinRequest[], contacts: {} as Record<string, string> };
       const accepted = (await useCases.listRequests({ proyectoId: project.id })).filter((r) => r.estado === "aceptada");
-      // shortcut: one getProfile per member, fine for small teams; batch into one read if teams grow.
       const ids = [project.creadorId, ...accepted.map((r) => r.usuarioId)];
-      const profiles = await Promise.all(ids.map((id) => profileUseCases.getProfile(id).catch(() => null)));
+      const everyone = await profileUseCases.listProfiles().catch(() => []);
+      const byId = new Map(everyone.map((p) => [p.userId, p]));
       const contacts: Record<string, string> = {};
-      ids.forEach((id, i) => {
-        const text = [profiles[i]?.whatsapp, profiles[i]?.correoContacto].filter(Boolean).join(" · ");
+      ids.forEach((id) => {
+        const p = byId.get(id);
+        const text = [p?.whatsapp, p?.correoContacto].filter(Boolean).join(" · ");
         if (text) contacts[id] = text;
       });
       return { userId, accepted, contacts };
@@ -41,20 +42,16 @@ export default function TeamMembersScreen({ navigation, route }: { navigation: a
   const isCreator = !!data?.userId && data.userId === project.creadorId;
   const members: Member[] = [
     { id: project.creadorId, name: project.creadorNombre || "Creador", rol: "", creator: true },
-    ...(data?.accepted ?? []).map((r) => ({ id: r.usuarioId, requestId: r.id, name: r.usuarioNombre, rol: r.rol, creator: false })),
+    ...(data?.accepted ?? []).map((r) => ({ id: r.usuarioId, request: r, name: r.usuarioNombre, rol: r.rol, creator: false })),
   ];
 
   const kick = async () => {
-    const member = kicking!;
+    if (!kicking?.request || !data) return;
+    const member = kicking.request;
     setKicking(null);
     setKickError(null);
     try {
-      await useCases.setRequestStatus(member.requestId!, "expulsada");
-      void useCases.notify({ para: [member.id], tipo: "expulsion", proyectoId: project.id, actorNombre: project.creadorNombre });
-      void useCases.notify({
-        para: members.filter((m) => !m.creator && m.id !== member.id).map((m) => m.id),
-        tipo: "salida", proyectoId: project.id, actorNombre: member.name,
-      });
+      await useCases.removeMember(project, member, data.accepted);
       reload();
     } catch {
       setKickError("No pudimos expulsar a esta persona. Inténtalo de nuevo.");
@@ -93,8 +90,8 @@ export default function TeamMembersScreen({ navigation, route }: { navigation: a
                 </View>
               ) : null}
             </View>
-            {isCreator && member.requestId ? (
-              <TouchableOpacity onPress={() => setKicking(member)} style={[ui.outlineButton, styles.kick]} testID={`kick-member-${member.requestId}`}>
+            {isCreator && member.request ? (
+              <TouchableOpacity onPress={() => setKicking(member)} style={[ui.outlineButton, styles.kick]} testID={`kick-member-${member.request.id}`}>
                 <Text style={ui.outlineButtonText}>Expulsar</Text>
               </TouchableOpacity>
             ) : null}

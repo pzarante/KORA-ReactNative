@@ -72,4 +72,22 @@ export class ProjectUseCases {
   addMember(member: { proyectoId: string; usuarioId: string; usuarioNombre: string; rol: string }): Promise<void> {
     return this.repository.addMember(member);
   }
+
+  /** The current user leaves `project`; `team` is the project's requests (as listRequests returns them). */
+  async leaveProject(project: Project, team: JoinRequest[]): Promise<void> {
+    const me = await this.repository.currentUserId();
+    const mine = team.find((r) => r.usuarioId === me && r.estado === "aceptada");
+    if (!mine) throw new Error("No formas parte de este proyecto");
+    await this.repository.setRequestStatus(mine.id, "retirada");
+    const others = team.filter((r) => r.estado === "aceptada" && r.id !== mine.id).map((r) => r.usuarioId);
+    await this.repository.notify({ para: [project.creadorId, ...others], tipo: "salida", proyectoId: project.id, actorNombre: mine.usuarioNombre });
+  }
+
+  /** The creator removes `member` (an accepted request) from `project`. */
+  async removeMember(project: Project, member: JoinRequest, team: JoinRequest[]): Promise<void> {
+    await this.repository.setRequestStatus(member.id, "expulsada");
+    await this.repository.notify({ para: [member.usuarioId], tipo: "expulsion", proyectoId: project.id, actorNombre: project.creadorNombre });
+    const others = team.filter((r) => r.estado === "aceptada" && r.id !== member.id).map((r) => r.usuarioId);
+    await this.repository.notify({ para: others, tipo: "salida", proyectoId: project.id, actorNombre: member.usuarioNombre });
+  }
 }

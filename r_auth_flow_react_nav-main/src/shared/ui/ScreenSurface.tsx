@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ScreenSurface({ children, scroll }: { children: React.ReactNode; scroll?: boolean }) {
   return (
     <SafeAreaView style={styles.surface}>
-      <StatusBar style="dark" backgroundColor="#FFFFFF" />
+      <StatusBar style="dark" />
       <View pointerEvents="none" style={styles.purpleGlow} />
       <View pointerEvents="none" style={styles.middleGlow} />
       <View pointerEvents="none" style={styles.orangeGlow} />

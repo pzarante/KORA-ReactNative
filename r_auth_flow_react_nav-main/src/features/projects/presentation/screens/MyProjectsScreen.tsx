@@ -59,16 +59,18 @@ function MyProjectCard({ project, members, comments, status, highlighted, onPres
   );
 }
 
-function Logged({ navigation, initialTab }: { navigation: any; initialTab?: Tab }) {
+function Logged({ navigation, params }: { navigation: any; params?: { tab?: Tab } }) {
   const { isLoggedIn } = useAuth();
   const useCases = useProjectUseCases();
-  const { data: feed, error } = useFeed();
+  const { data: feed, error, reload } = useFeed();
   const { data: savedIds } = useFocusLoad(() => useCases.listSaved().catch(() => [] as string[]), [useCases]);
-  const [tab, setTab] = useState<Tab>(initialTab ?? "mine");
-  // The tab screen may already be mounted when "Ver mis solicitudes" navigates here with a tab.
+  const [tab, setTab] = useState<Tab>(params?.tab ?? "mine");
+  // Each "Ver mis solicitudes" brings new params: open that tab and skip the cached feed, which lacks the request just sent.
   useEffect(() => {
-    if (initialTab) setTab(initialTab);
-  }, [initialTab]);
+    if (!params?.tab) return;
+    setTab(params.tab);
+    reload(); // reload changes once the user id is known, so the forced load can't be skipped on a fresh mount
+  }, [params, reload]);
 
   const byId = new Map((feed?.projects ?? []).map((p) => [p.id, p]));
   const mine = feed ? feed.requests.filter((r) => r.usuarioId === feed.userId) : [];
@@ -131,7 +133,7 @@ export default function MyProjectsScreen({ navigation, route }: { navigation: an
     <ScreenSurface>
       <TopBar />
       {isLoggedIn ? (
-        <Logged navigation={navigation} initialTab={route?.params?.tab} />
+        <Logged navigation={navigation} params={route?.params} />
       ) : (
         <View style={styles.flex}>
           <AccountPrompt

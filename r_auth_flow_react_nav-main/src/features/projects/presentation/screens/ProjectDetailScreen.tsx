@@ -78,9 +78,7 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
     setConfirmLeave(false);
     setLeaveError(null);
     try {
-      await useCases.setRequestStatus(myRequest!.id, "retirada");
-      const others = [project.creadorId, ...(data?.requests ?? []).filter((r) => r.estado === "aceptada" && r.usuarioId !== userId).map((r) => r.usuarioId)];
-      void useCases.notify({ para: others, tipo: "salida", proyectoId: project.id, actorNombre: myRequest!.usuarioNombre });
+      await useCases.leaveProject(project, data?.requests ?? []);
       setLeft(true);
       reload();
     } catch {

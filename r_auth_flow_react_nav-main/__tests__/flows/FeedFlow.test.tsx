@@ -42,6 +42,9 @@ describe("Project feed", () => {
         await waitFor(() => expect(getByTestId("request-sent-screen")).toBeTruthy());
         expect(tables.solicitud[0]).toMatchObject({ proyecto_id: "p1", usuario_id: "ana", usuario_nombre: "Ana", rol: "Diseño UI/UX", estado: "pendiente" });
         await waitFor(() => expect(tables.notificacion[1]).toMatchObject({ destinatario_id: "creator", tipo: "solicitud", detalle: "Diseño UI/UX" }));
+        await act(async () => fireEvent.press(utils.getByText("Ver mis solicitudes")));
+        await waitFor(() => expect(getByTestId("my-projects-tab-requests").props.accessibilityState.selected).toBe(true));
+        await waitFor(() => expect(utils.getByText("Pendiente")).toBeTruthy());
     });
 
     it("shows the tab bar on the project detail and switches tabs from it", async () => {
