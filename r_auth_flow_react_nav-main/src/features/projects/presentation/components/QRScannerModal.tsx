@@ -80,7 +80,7 @@ export default function QRScannerModal({
     >
       <View style={styles.container}>
         <CameraView
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
           facing="back"
           onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
           barcodeScannerSettings={{
@@ -108,24 +108,6 @@ export default function QRScannerModal({
               <Text style={styles.instructionText}>
                 Alinea el código QR de KORA TAG dentro del marco
               </Text>
-
-              {/* Botón flotante para disparar el escaneo si deseas captura manual */}
-              <TouchableOpacity
-                style={styles.captureButton}
-                onPress={() => {
-                  // Simula o confirma lectura manual si no detecta automáticamente
-                  handleBarcodeScanned({ data: "nancy-kora-tag-id" });
-                }}
-                activeOpacity={0.8}
-              >
-                <View style={styles.captureButtonInner}>
-                  <MaterialCommunityIcons
-                    name="qrcode-scan"
-                    size={28}
-                    color="#FFFFFF"
-                  />
-                </View>
-              </TouchableOpacity>
             </View>
           </View>
 
@@ -207,24 +189,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     paddingHorizontal: 20,
-  },
-  captureButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 4,
-    borderColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  captureButtonInner: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
   },
   permissionContainer: {
     flex: 1,

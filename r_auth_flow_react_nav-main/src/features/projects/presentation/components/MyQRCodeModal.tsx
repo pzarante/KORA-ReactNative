@@ -7,20 +7,22 @@ import QRCode from "react-native-qrcode-svg";
 interface MyQRCodeModalProps {
   visible: boolean;
   onClose: () => void;
-  userProfile: any;
+  userId: string | null | undefined;
+  name: string;
 }
 
 export default function MyQRCodeModal({
   visible,
   onClose,
-  userProfile,
+  userId,
+  name,
 }: MyQRCodeModalProps) {
   if (!visible) return null;
 
+  // ExploreScreen reads `id` (the userId) to open this person's KORA TAG profile.
   const qrPayload = JSON.stringify({
-    id: userProfile?.id || "user-123",
-    name: userProfile?.nombre || "Usuario KORA",
-    email: userProfile?.email || "",
+    id: userId ?? "",
+    name,
   });
 
   return (
@@ -43,7 +45,7 @@ export default function MyQRCodeModal({
           <View style={styles.header}>
             <Text style={styles.tagBrand}>KORA TAG</Text>
             <Text style={styles.title}>
-              {userProfile?.nombre || "Mi Código QR"}
+              {name || "Mi Código QR"}
             </Text>
             <Text style={styles.subtitle}>
               Muestra este código para ser incorporado a proyectos
