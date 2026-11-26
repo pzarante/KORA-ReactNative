@@ -1,3 +1,5 @@
+import { NO_CONNECTION_MESSAGE } from "@/src/core/roble/friendlyError";
+
 const MAX_CONCURRENT_REQUESTS = 2;
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 1200;
@@ -42,7 +44,11 @@ export class ResilientHttpClient {
           this.release();
         }
       } catch (error) {
-        if (!retryable || attempt >= MAX_RETRIES) throw error;
+        if (!retryable || attempt >= MAX_RETRIES) {
+          // fetch's own text ("Network request failed") would reach the screen otherwise.
+          console.warn("Network request failed", url, error);
+          throw new Error(NO_CONNECTION_MESSAGE);
+        }
         await this.delay(RETRY_DELAY_MS * 2 ** attempt);
         continue;
       }

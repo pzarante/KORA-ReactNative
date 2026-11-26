@@ -16,7 +16,7 @@ import ErrorCard from "@/src/shared/ui/ErrorCard";
 
 /** Roble answers "Credenciales inválidas" for a wrong password and for an unknown e-mail alike. */
 function loginErrorCard(error: string) {
-  if (/credenciales|invalid|401/i.test(error)) {
+  if (/incorrect|credenciales|invalid|401/i.test(error)) {
     return { title: "Correo o contraseña incorrectos", message: "Verifica que los datos ingresados sean correctos e inténtalo de nuevo." };
   }
   if (/network|fetch|conexi/i.test(error)) {

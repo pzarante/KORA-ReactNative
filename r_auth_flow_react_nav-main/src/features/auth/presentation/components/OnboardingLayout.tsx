@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -22,6 +23,17 @@ export default function OnboardingLayout({ children, ...stepProps }: { children:
   return (
     <ScreenSurface scroll>
       <View style={[styles.container, stepProps.step ? styles.withProgress : undefined]}>
+        {stepProps.step && stepProps.navigation?.canGoBack?.() ? (
+          <TouchableOpacity
+            accessibilityLabel="Volver al paso anterior"
+            accessibilityRole="button"
+            onPress={() => stepProps.navigation.goBack()}
+            style={styles.backButton}
+            testID="onboarding-back"
+          >
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
+          </TouchableOpacity>
+        ) : null}
         {stepProps.step ? <StepProgress {...(stepProps as StepProps)} /> : null}
         <BrandLogo />
         {children}
@@ -77,6 +89,7 @@ function SkipButton({ pending, navigation }: StepProps) {
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 70 },
   withProgress: { paddingTop: 16 },
+  backButton: { width: 44, height: 44, justifyContent: "center", marginBottom: 8 },
   progress: { marginBottom: 24 },
   skip: { alignItems: "center", marginTop: 14, paddingBottom: 12 },
   skipButton: { minHeight: 44, paddingHorizontal: 16, justifyContent: "center" },

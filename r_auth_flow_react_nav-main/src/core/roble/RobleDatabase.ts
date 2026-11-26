@@ -1,6 +1,7 @@
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
 import { ResilientHttpClient } from "@/src/core/roble/ResilientHttpClient";
+import { friendlyStatusMessage, NOT_SAVED_MESSAGE } from "@/src/core/roble/friendlyError";
 import { AuthRemoteDataSource } from "@/src/features/auth/data/datasources/AuthRemoteDataSource";
 
 /**
@@ -63,7 +64,10 @@ export class RobleDatabase {
     await this.ensureOk(response, errorPrefix);
     const body = await response.json().catch(() => ({}));
     const reason = skippedReason(body);
-    if (reason) throw new Error(`${errorPrefix}: ${reason}`);
+    if (reason) {
+      console.warn(`Roble skipped rows in ${table}:`, reason);
+      throw new Error(`${errorPrefix}: ${NOT_SAVED_MESSAGE}`);
+    }
     return body?.inserted?.[0];
   }
 
@@ -127,7 +131,8 @@ export class RobleDatabase {
     }
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data.accessToken) {
-      throw new Error(`No se pudieron cargar los proyectos de la comunidad: ${data.message ?? response.status}`);
+      console.warn(`Roble ${path} failed`, response.status, data);
+      throw new Error(`No se pudieron cargar los proyectos de la comunidad: ${friendlyStatusMessage(response.status)}`);
     }
     return data;
   }
@@ -135,10 +140,7 @@ export class RobleDatabase {
   private async ensureOk(response: Response, errorPrefix: string) {
     if (response.ok) return;
     const body = await response.json().catch(() => ({}));
-    if (response.status === 403) {
-      // Roble refuses by role or row owner (_owner), not because of the data: say so plainly.
-      throw new Error(`${errorPrefix}: Roble no le permite esta acción a tu cuenta. Revisa los permisos del rol en Roble.`);
-    }
-    throw new Error(`${errorPrefix}: ${body.message ?? response.status}`);
+    console.warn(`${errorPrefix} (Roble ${response.status})`, body);
+    throw new Error(`${errorPrefix}: ${friendlyStatusMessage(response.status)}`);
   }
 }

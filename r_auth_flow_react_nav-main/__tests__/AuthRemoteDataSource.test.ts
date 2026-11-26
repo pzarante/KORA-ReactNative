@@ -14,7 +14,7 @@ describe("AuthRemoteDataSourceImpl", () => {
     const dataSource = new AuthRemoteDataSourceImpl("test-project");
 
     await expect(dataSource.signUp("test@example.com", "password123"))
-      .rejects.toThrow("Signup error: El correo ya está registrado");
+      .rejects.toThrow(/^El correo ya está registrado$/);
   });
 
   it("in practice mode creates the account with signup-direct and logs in", async () => {
@@ -55,7 +55,7 @@ describe("AuthRemoteDataSourceImpl", () => {
     const dataSource = new AuthRemoteDataSourceImpl("test-project");
 
     await expect(dataSource.signUp("test@example.com", "123"))
-      .rejects.toThrow("Signup error: Correo inválido Contraseña débil");
+      .rejects.toThrow(/^Correo inválido Contraseña débil$/);
   });
 
   it("reports rate limiting without exposing the backend exception", async () => {

@@ -1,6 +1,7 @@
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { skippedReason } from "@/src/core/roble/RobleDatabase";
 import { ResilientHttpClient } from "@/src/core/roble/ResilientHttpClient";
+import { friendlyStatusMessage, NOT_SAVED_MESSAGE } from "@/src/core/roble/friendlyError";
 import { AsyncStorageCache } from "@/src/shared/storage/AsyncStorageCache";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
 import { canJoinProjects, detailsForRole, UserProfile } from "../../domain/entities/UserProfile";
@@ -49,12 +50,16 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
 
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      throw new Error(`No se pudo guardar el perfil: ${body.message ?? response.status}`);
+      console.warn(`Roble profile save failed (${response.status})`, body);
+      throw new Error(`No se pudo guardar el perfil: ${friendlyStatusMessage(response.status)}`);
     }
     if (!existing) {
       const body = await Promise.resolve().then(() => response.json()).catch(() => ({}));
       const reason = skippedReason(body);
-      if (reason) throw new Error(`No se pudo guardar el perfil: ${reason}`);
+      if (reason) {
+        console.warn("Roble skipped the profile row:", reason);
+        throw new Error(`No se pudo guardar el perfil: ${NOT_SAVED_MESSAGE}`);
+      }
     }
     await Promise.all([
       AsyncStorageCache.remove(this.profileCacheKey(userId)),
@@ -76,7 +81,7 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
     return this.withCache(`profiles:all:${this.cacheScope}`, async () => {
       const response = await this.send(`${this.baseUrl}/read?tableName=Usuario`);
       if (response.status === 404) return [];
-      if (!response.ok) throw new Error(`No se pudo consultar la tabla Usuario: ${response.status}`);
+      if (!response.ok) throw new Error(`No se pudieron cargar los perfiles: ${friendlyStatusMessage(response.status)}`);
       const rows = await response.json();
       return Array.isArray(rows) ? rows.map((row) => this.fromRow(row)) : [];
     });
@@ -149,7 +154,7 @@ export class ProfileRemoteDataSourceImp implements ProfileDataSource {
     const response = await this.send(`${this.baseUrl}/read?tableName=Usuario&user_id=${encodeURIComponent(userId)}`);
     if (response.status === 404) return undefined;
     if (!response.ok) {
-      throw new Error(`No se pudo consultar la tabla Usuario: ${response.status}`);
+      throw new Error(`No se pudo cargar el perfil: ${friendlyStatusMessage(response.status)}`);
     }
     const rows = (await response.json()) as RemoteProfile[];
     // Never trust rows[0]: if the filter is ignored, it would be another user's profile.

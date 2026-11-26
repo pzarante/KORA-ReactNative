@@ -57,3 +57,15 @@ This is a starter project for building React Native apps with [Expo](https://exp
 
 - User authentication (login, logout, register) with Roble
 - Product management (create, update, delete) with Roble
+
+## Datos demo (presentación)
+
+`scripts/seed-demo-projects.mjs` crea 6 proyectos demo en la tabla `proyecto` de Roble y lista los proyectos de prueba ("prueba", "hola", ...). Por defecto es un dry run: no escribe nada.
+
+```bash
+KORA_SEED_EMAIL=... KORA_SEED_PASSWORD=... npm run seed:demo                              # ver qué haría
+KORA_SEED_EMAIL=... KORA_SEED_PASSWORD=... npm run seed:demo -- --apply                   # insertar los demo
+KORA_SEED_EMAIL=... KORA_SEED_PASSWORD=... npm run seed:demo -- --apply --archive-junk    # además archivar la basura
+```
+
+Es idempotente (omite los demo que ya existen por nombre). Roble solo deja archivar filas propias: los proyectos de prueba de otras cuentas salen como 403 y hay que archivarlos con la cuenta de su creador. Los datos demo están al inicio del script para editarlos.

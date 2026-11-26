@@ -143,12 +143,12 @@ describe("Roble 'skipped' rows", () => {
   it("an insert Roble drops (201 + skipped) is an error, not a success", async () => {
     jest.spyOn(global, "fetch").mockResolvedValueOnce(ok([], 404))
       .mockResolvedValueOnce(ok({ inserted: [], skipped: [{ index: 0, reason: "Columnas inválidas: usuario_id" }] }, 201));
-    await expect(new ProjectRemoteDataSourceImp(authService, "test-project").setSaved("p1", true)).rejects.toThrow("Columnas inválidas");
+    await expect(new ProjectRemoteDataSourceImp(authService, "test-project").setSaved("p1", true)).rejects.toThrow("La información no se guardó");
   });
 
   it("a new profile Roble drops is reported too", async () => {
     jest.spyOn(global, "fetch").mockResolvedValueOnce(ok([]))
       .mockResolvedValueOnce(ok({ inserted: [], skipped: [{ index: 0, reason: "Columnas inválidas: carrera" }] }, 201));
-    await expect(new ProfileRemoteDataSourceImp("test-project").saveProfile(baseProfile)).rejects.toThrow("Columnas inválidas: carrera");
+    await expect(new ProfileRemoteDataSourceImp("test-project").saveProfile(baseProfile)).rejects.toThrow("No se pudo guardar el perfil: La información no se guardó");
   });
 });

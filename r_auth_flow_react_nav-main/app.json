@@ -39,6 +39,14 @@
           "imageWidth": 200
         }
       ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "KORA usa la cámara para escanear el KORA TAG de otras personas.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
       "expo-font",
       "expo-image",
       "expo-status-bar",

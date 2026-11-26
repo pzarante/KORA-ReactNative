@@ -2,6 +2,7 @@ import { ILocalPreferences } from "@/src/shared/storage/iLocalPreferences";
 import { LocalPreferencesAsyncStorage } from "@/src/shared/storage/LocalPreferencesAsyncStorage";
 import { userIdFromToken } from "@/src/core/userIdFromToken";
 import { ResilientHttpClient } from "@/src/core/roble/ResilientHttpClient";
+import { friendlyStatusMessage } from "@/src/core/roble/friendlyError";
 import { AuthUser } from "../../domain/entities/AuthUser";
 import { AuthRemoteDataSource } from "./AuthRemoteDataSource";
 
@@ -47,8 +48,12 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         //console.log("Token:", token, "\nRefresh Token:", refreshToken);
         return Promise.resolve();
       } else {
-        const body = await response.json();
-        throw new Error(`Login error: ${body.message}`);
+        const body = await response.json().catch(() => ({}));
+        console.warn(`Login failed (${response.status})`, body);
+        // Roble answers the same for a wrong password and an unknown e-mail.
+        if (response.status === 400 || response.status === 401) throw new Error("Correo o contraseña incorrectos.");
+        if (response.status === 429) throw new Error("Demasiados intentos. Espera un momento e inténtalo nuevamente.");
+        throw new Error(friendlyStatusMessage(response.status));
       }
     } catch (e: any) {
       //console.error("Login failed", e);
@@ -74,19 +79,27 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         await this.login(email, password);
         return false;
       } else {
-        const body = await response.json();
+        const body = await response.json().catch(() => ({}));
         if (response.status === 429) {
           throw new Error("Demasiados intentos. Espera un momento e inténtalo nuevamente.");
         }
-        const message = Array.isArray(body.message)
-          ? body.message.join(" ")
-          : body.message || "No fue posible crear la cuenta";
-        throw new Error(`Signup error: ${message}`);
+        throw new Error(this.userFacingMessage(response.status, body, "No fue posible crear la cuenta."));
       }
     } catch (e: any) {
       console.error("Signup failed", e);
       throw e;
     }
+  }
+
+  /**
+   * Roble's 4xx texts on signup / resend (e.g. e-mail already registered, password rules) are in Spanish
+   * and tell the person what to fix, so they're kept; 5xx bodies are server internals and are not.
+   */
+  private userFacingMessage(status: number, body: any, fallback: string): string {
+    console.warn(`Roble auth error (${status})`, body);
+    if (status >= 500 || status === 0) return friendlyStatusMessage(status);
+    const message = Array.isArray(body?.message) ? body.message.join(" ") : body?.message;
+    return typeof message === "string" && message.trim() ? message : fallback;
   }
 
   async logOut(): Promise<void> {
@@ -110,7 +123,7 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     });
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      throw new Error(body.message ?? "No pudimos reenviar el código. Intenta de nuevo.");
+      throw new Error(this.userFacingMessage(response.status, body, "No pudimos reenviar el código. Intenta de nuevo."));
     }
   }
 
@@ -125,8 +138,10 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response.status === 201) {
         return Promise.resolve();
       } else {
-        const body = await response.json();
-        throw new Error(`Validation error: ${body.message}`);
+        const body = await response.json().catch(() => ({}));
+        console.warn(`Email verification failed (${response.status})`, body);
+        if (response.status >= 400 && response.status < 500) throw new Error("El código no es válido o ya expiró.");
+        throw new Error(friendlyStatusMessage(response.status));
       }
     } catch (e: any) {
       console.error("Validation failed", e);
@@ -166,8 +181,10 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         console.log("Token refreshed successfully");
         return true;
       }
-      const body = await response.json();
-      throw new Error(`Refresh token error: ${body.message}`);
+      const body = await response.json().catch(() => ({}));
+      console.warn(`Refresh token failed (${response.status})`, body);
+      // Any 4xx here means the refresh token is no longer valid.
+      throw new Error(friendlyStatusMessage(response.status < 500 ? 401 : response.status));
     } catch (e: any) {
       console.error("Refresh token failed", e);
       throw e;

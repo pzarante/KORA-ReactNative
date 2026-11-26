@@ -57,11 +57,11 @@ describe("ProjectRemoteDataSourceImp", () => {
     expect((fetchMock.mock.calls[1][1] as RequestInit).headers).toMatchObject({ Authorization: `Bearer ${jwt("user-1")}new` });
   });
 
-  it("surfaces the Roble error message", async () => {
+  it("hides the raw Roble error behind a friendly message", async () => {
     jest.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 400, json: async () => ({ message: "Tabla no existe" }) } as Response);
 
     await expect(new ProjectRemoteDataSourceImp(authService, "test-project").createProject(draft, "Nancy"))
-      .rejects.toThrow("No se pudo crear el proyecto: Tabla no existe");
+      .rejects.toThrow("No se pudo crear el proyecto: Revisa los datos e intenta de nuevo.");
   });
 
   it("treats Roble's 404 on read as an empty list and sorts projects newest first", async () => {
