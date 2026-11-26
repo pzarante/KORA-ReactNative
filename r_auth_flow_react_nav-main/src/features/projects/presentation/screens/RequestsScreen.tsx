@@ -34,7 +34,7 @@ export default function RequestsScreen({ navigation, route }: { navigation: any;
             <View style={styles.header}>
               <Initial name={request.usuarioNombre} />
               <View style={styles.flex}>
-                <Text style={styles.name}>{request.usuarioNombre}</Text>
+                <Text numberOfLines={1} style={styles.name}>{request.usuarioNombre}</Text>
                 <Text style={styles.time}>{timeAgo(request.createdAt)}</Text>
               </View>
               <Text style={styles.link}>Ver perfil</Text>

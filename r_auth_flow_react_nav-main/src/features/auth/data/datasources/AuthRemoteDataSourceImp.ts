@@ -92,26 +92,14 @@ export class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   async logOut(): Promise<void> {
     try {
       const token = await this.prefs.retrieveData<string>("token");
-      if (!token) throw new Error("No token found");
-
-      const response = await ResilientHttpClient.request(`${this.baseUrl}/logout`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.status === 201) {
-        await this.prefs.removeData("token");
-        await this.prefs.removeData("refreshToken");
-        await this.prefs.removeData("sessionUser");
-        console.log("Logged out successfully");
-        return Promise.resolve();
-      } else {
-        const body = await response.json();
-        throw new Error(`Logout error: ${body.message}`);
-      }
-    } catch (e: any) {
-      //console.error("Logout failed", e);
-      throw e;
+      // Best effort: a failed server call must never keep the user signed in locally.
+      if (token) await ResilientHttpClient.request(`${this.baseUrl}/logout`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+    } catch {
+      // ignored on purpose
+    } finally {
+      await this.prefs.removeData("token");
+      await this.prefs.removeData("refreshToken");
+      await this.prefs.removeData("sessionUser");
     }
   }
   async resendCode(email: string): Promise<void> {

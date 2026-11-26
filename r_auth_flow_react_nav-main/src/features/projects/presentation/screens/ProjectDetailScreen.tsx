@@ -12,6 +12,7 @@ import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
 import { formatDate } from "@/src/shared/utils/dates";
 import ButtonGradient from "@/src/shared/ui/ButtonGradient";
+import ConfirmModal from "@/src/shared/ui/ConfirmModal";
 
 /** The design shows friendly titles for links ("Plan de sostenibilidad Uninorte"), so one is derived from the URL. */
 function linkTitle(url: string) {
@@ -46,7 +47,7 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
   const creador = project.creadorNombre || "Tú";
   const { isLoggedIn, profile } = useAuth();
   const useCases = useProjectUseCases();
-  const { data } = useFocusLoad(async () => {
+  const { data, reload } = useFocusLoad(async () => {
     const userId = await useCases.currentUserId();
     // Guests can't read Roble, so they only see the creator.
     const requests = userId && project.id ? await useCases.listRequests({ proyectoId: project.id }) : [];
@@ -68,10 +69,27 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 
   const userId = data?.userId ?? null;
   const isCreator = !!userId && userId === project.creadorId;
-  const myRequest = data?.requests.find((r) => r.usuarioId === userId);
+  // Left/removed members count as visitors again, so they can ask to join anew.
+  const myRequest = data?.requests.find((r) => r.usuarioId === userId && r.estado !== "retirada" && r.estado !== "expulsada");
+  const [confirmLeave, setConfirmLeave] = useState(false);
+  const [left, setLeft] = useState(false);
+  const [leaveError, setLeaveError] = useState<string | null>(null);
+  const leave = async () => {
+    setConfirmLeave(false);
+    setLeaveError(null);
+    try {
+      await useCases.setRequestStatus(myRequest!.id, "retirada");
+      const others = [project.creadorId, ...(data?.requests ?? []).filter((r) => r.estado === "aceptada" && r.usuarioId !== userId).map((r) => r.usuarioId)];
+      void useCases.notify({ para: others, tipo: "salida", proyectoId: project.id, actorNombre: myRequest!.usuarioNombre });
+      setLeft(true);
+      reload();
+    } catch {
+      setLeaveError("No pudimos sacarte del proyecto. Inténtalo de nuevo.");
+    }
+  };
   const isMember = isCreator || myRequest?.estado === "aceptada";
   const saveButton =
-    isLoggedIn && userId && !isMember ? (
+    isLoggedIn && userId && !isCreator ? (
       <TouchableOpacity
         accessibilityLabel={saved ? "Quitar de guardados" : "Guardar proyecto"}
         accessibilityRole="button"
@@ -83,6 +101,11 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
         <MaterialCommunityIcons name={saved ? "bookmark" : "bookmark-outline"} size={26} color={saved ? "#FFFFFF" : colors.primary} />
       </TouchableOpacity>
     ) : null;
+  const leaveButton = (
+    <TouchableOpacity accessibilityLabel="Salir del proyecto" accessibilityRole="button" onPress={() => setConfirmLeave(true)} style={styles.saveButton} testID="leave-project-button">
+      <MaterialCommunityIcons name="exit-run" size={26} color={colors.primary} />
+    </TouchableOpacity>
+  );
   const editButton = (
     <TouchableOpacity onPress={() => navigation.navigate("EditProject", { project })} style={[ui.primaryButton, styles.editButton]} testID="edit-project-button">
       <ButtonGradient />
@@ -225,14 +248,23 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
 
         <TouchableOpacity onPress={() => navigation.navigate("Comments", { project })} style={styles.commentsRow} testID="view-comments-button">
           <MaterialCommunityIcons name="comment-text-multiple-outline" size={26} color={colors.primary} />
-          <Text style={styles.commentsTitle}>Comentarios</Text>
-          <Text style={styles.pillText}>Ver comentarios</Text>
+          <Text numberOfLines={1} style={styles.commentsTitle}>Comentarios</Text>
+          <Text numberOfLines={1} style={styles.commentsLink}>Ver comentarios</Text>
           <MaterialCommunityIcons name="arrow-right" size={20} color={colors.primary} />
         </TouchableOpacity>
       </ScrollView>
 
+      {leaveError ? <Text style={[ui.error, styles.leaveError]}>{leaveError}</Text> : null}
       <View style={styles.footer}>
-        {isMember ? (
+        {left ? (
+          <Text style={styles.leaveSuccess} testID="leave-success">Saliste del proyecto con éxito</Text>
+        ) : isMember && !isCreator ? (
+          <>
+            {saveButton}
+            {koraNodeButton}
+            {leaveButton}
+          </>
+        ) : isMember ? (
           <View style={styles.memberActions}>
             <View style={styles.footerRow}>
               {isCreator ? (
@@ -264,6 +296,16 @@ export default function ProjectDetailScreen({ navigation, route }: { navigation:
           </>
         )}
       </View>
+      <ConfirmModal
+        visible={confirmLeave}
+        icon="exit-run"
+        title="¿Salir del proyecto?"
+        text="Dejarás de formar parte del equipo. Podrás volver a solicitar unirte."
+        confirm="Salir"
+        cancel="Cancelar"
+        onConfirm={leave}
+        onCancel={() => setConfirmLeave(false)}
+      />
       <AppTabBar navigation={navigation} />
     </SafeAreaView>
   );
@@ -302,9 +344,12 @@ const styles = StyleSheet.create({
   pill: { flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1.5, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginLeft: "auto" },
   pillText: { color: colors.primary, fontSize: 14, fontWeight: "800" },
   commentsRow: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 16, backgroundColor: colors.card },
-  commentsTitle: { flex: 1, color: colors.text, fontSize: 18, lineHeight: 24, fontWeight: "700" },
+  commentsTitle: { color: colors.text, fontSize: 18, lineHeight: 24, fontWeight: "700" },
+  commentsLink: { flex: 1, textAlign: "right", color: colors.primary, fontSize: 14, fontWeight: "800" },
   // No top border: the tab bar right below already draws one. White so the blobs don't show through.
   footer: { flexDirection: "row", gap: 12, paddingHorizontal: 24, paddingVertical: 12, backgroundColor: "#FFFFFF" },
+  leaveError: { textAlign: "center", paddingHorizontal: 24, backgroundColor: "#FFFFFF" },
+  leaveSuccess: { flex: 1, color: colors.success, backgroundColor: colors.successSoft, borderRadius: 20, overflow: "hidden", fontSize: 15, fontWeight: "800", textAlign: "center", paddingVertical: 16 },
   editButton: { paddingHorizontal: 16 },
   memberActions: { flex: 1, gap: 12 },
   footerRow: { flexDirection: "row", gap: 12 },

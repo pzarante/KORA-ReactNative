@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { colors } from "@/src/shared/ui/tokens";
 import { ui } from "@/src/shared/ui/styles";
@@ -34,7 +34,7 @@ export default function AddRolesSheet({ visible, roles, onClose, onDone }: Props
       transparent
       visible={visible}
     >
-      <View style={styles.backdrop}>
+      <KeyboardAvoidingView behavior="padding" style={styles.backdrop}>
         <View style={styles.sheet}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>Agregar rol</Text>
@@ -95,7 +95,7 @@ export default function AddRolesSheet({ visible, roles, onClose, onDone }: Props
             <Text style={ui.outlineButtonText}>Cancelar</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

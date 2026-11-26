@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { RoundButton, TopBar, useFeed } from "@/src/features/projects/presentation/components/feed";
@@ -11,12 +11,10 @@ import ProfileProgress from "../components/ProfileProgress";
 import ProfileView from "../components/ProfileView";
 import { useAuth } from "../context/authContext";
 import ButtonGradient from "@/src/shared/ui/ButtonGradient";
-import MyQRCodeModal from "@/src/features/projects/presentation/components/MyQRCodeModal";
 
 export default function MyProfileScreen({ navigation }: { navigation: any }) {
   const { profile, logout } = useAuth();
   const { data: feed } = useFeed();
-  const [qrVisible, setQrVisible] = useState(false);
   const completion = profileCompletion(profile);
   const stats = feed
     ? {
@@ -56,11 +54,6 @@ export default function MyProfileScreen({ navigation }: { navigation: any }) {
           stats={stats}
           action={
             <View style={styles.action}>
-              <TouchableOpacity onPress={() => setQrVisible(true)} style={[ui.primaryButton, styles.qr]} testID="show-qr-button">
-                <ButtonGradient />
-                <MaterialCommunityIcons name="qrcode" size={20} color="#FFFFFF" />
-                <Text style={ui.primaryButtonText}>Mi KORA TAG</Text>
-              </TouchableOpacity>
               <TouchableOpacity onPress={edit} style={[ui.outlineButton, styles.edit]} testID="edit-profile-button">
                 <Text style={ui.outlineButtonText}>Editar perfil</Text>
               </TouchableOpacity>
@@ -68,7 +61,6 @@ export default function MyProfileScreen({ navigation }: { navigation: any }) {
           }
         />
       </ScrollView>
-      <MyQRCodeModal visible={qrVisible} onClose={() => setQrVisible(false)} userId={feed?.userId} name={profile.nombreCompleto} />
     </ScreenSurface>
   );
 }
@@ -77,7 +69,6 @@ const styles = StyleSheet.create({
   content: { paddingBottom: 32 },
   title: { color: colors.text, fontSize: 32, fontWeight: "800", textAlign: "center" },
   action: { flexDirection: "row", justifyContent: "center", gap: 10 },
-  qr: { flex: 0, minHeight: 44, paddingHorizontal: 20 },
   edit: { minHeight: 44 },
   card: { backgroundColor: colors.soft, borderRadius: 26, padding: 18, gap: 16, marginTop: 16 },
   cardHeader: { flexDirection: "row", gap: 14, alignItems: "center" },

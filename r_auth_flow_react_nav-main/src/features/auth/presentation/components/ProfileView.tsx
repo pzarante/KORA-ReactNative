@@ -43,7 +43,7 @@ export default function ProfileView({ profile, stats, action }: Props) {
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>{name[0].toUpperCase()}</Text>
       </View>
-      <Text style={styles.name}>{name}</Text>
+      <Text numberOfLines={1} style={styles.name}>{name}</Text>
       {action}
 
       {stats ? (

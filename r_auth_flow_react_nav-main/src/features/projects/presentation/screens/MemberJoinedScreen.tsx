@@ -17,12 +17,12 @@ export default function MemberJoinedScreen({ navigation, route }: { navigation: 
         <RoundButton icon="home-variant-outline" label="Ir al inicio" color={colors.text} onPress={() => navigation.popTo("App")} />
       </View>
       <View style={styles.container} testID="member-joined-screen">
-        <Text style={styles.title}>¡{request.usuarioNombre} se ha unido a tu iniciativa!</Text>
+        <Text numberOfLines={2} style={styles.title}>¡{request.usuarioNombre} se ha unido a tu iniciativa!</Text>
         <Text style={styles.text}>Ahora forma parte de tu equipo.</Text>
         <View style={styles.card}>
           <Initial name={request.usuarioNombre} size={72} />
-          <View>
-            <Text style={styles.name}>{request.usuarioNombre}</Text>
+          <View style={styles.cardText}>
+            <Text numberOfLines={1} style={styles.name}>{request.usuarioNombre}</Text>
             <Text style={styles.rol}>{request.rol}</Text>
           </View>
         </View>
@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 32, fontWeight: "800", textAlign: "center" },
   text: { color: colors.muted, fontSize: 16, textAlign: "center" },
   card: { flexDirection: "row", alignItems: "center", gap: 20, backgroundColor: colors.card, borderRadius: 30, padding: 24, marginTop: 20 },
+  cardText: { flex: 1 },
   name: { color: colors.text, fontSize: 22, fontWeight: "800" },
   rol: { color: colors.muted, fontSize: 15 },
   actions: { gap: 14, marginTop: 40 },

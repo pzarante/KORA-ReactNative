@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
@@ -51,7 +51,7 @@ export default function CommentsScreen({ navigation, route }: { navigation: any;
       <Initial name={comment.autorNombre} size={reply ? 40 : 46} />
       <View style={styles.flex}>
         <View style={styles.commentHeader}>
-          <Text style={styles.author}>{comment.autorNombre}</Text>
+          <Text numberOfLines={1} style={styles.author}>{comment.autorNombre}</Text>
           {comment.autorId && comment.autorId === project.creadorId ? (
             <View style={[ui.chip, styles.creator]}>
               <MaterialCommunityIcons name="crown-outline" size={14} color={colors.primary} />
@@ -73,9 +73,9 @@ export default function CommentsScreen({ navigation, route }: { navigation: any;
 
   return (
     <ScreenSurface>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <TopBar onBack={() => navigation.goBack()} />
-        <ScrollView contentContainerStyle={styles.content} testID="comments-screen">
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" testID="comments-screen">
           <Text style={styles.title}>Comentarios</Text>
           <Text style={styles.subtitle}>Comparte tus ideas, preguntas o sugerencias con la comunidad</Text>
           <ProjectSummary project={project} />
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   comment: { flexDirection: "row", gap: 12 },
   reply: { marginLeft: 36, padding: 12, borderRadius: 20, backgroundColor: colors.soft },
   commentHeader: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 8 },
-  author: { color: colors.text, fontSize: 16, fontWeight: "800" },
+  author: { flexShrink: 1, color: colors.text, fontSize: 16, fontWeight: "800" },
   creator: { paddingHorizontal: 8, paddingVertical: 3 },
   creatorText: { fontSize: 12 },
   time: { color: colors.muted, fontSize: 13, marginLeft: "auto" },

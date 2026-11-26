@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import AccountPrompt from "@/src/features/auth/presentation/components/AccountPrompt";
@@ -29,7 +29,7 @@ const EMPTY: Record<Tab, string> = {
   requests: "No tienes solicitudes pendientes.",
 };
 
-const STATUS = { pendiente: "Pendiente", rechazada: "Rechazada", aceptada: "Aceptada" };
+const STATUS = { pendiente: "Pendiente", rechazada: "Rechazada", aceptada: "Aceptada", retirada: "Saliste", expulsada: "Expulsado" };
 
 /** Card of the Mis Proyectos lists: icon, name, tags, members and comments, and an optional status. */
 function MyProjectCard({ project, members, comments, status, highlighted, onPress }: {
@@ -59,12 +59,16 @@ function MyProjectCard({ project, members, comments, status, highlighted, onPres
   );
 }
 
-function Logged({ navigation }: { navigation: any }) {
+function Logged({ navigation, initialTab }: { navigation: any; initialTab?: Tab }) {
   const { isLoggedIn } = useAuth();
   const useCases = useProjectUseCases();
   const { data: feed, error } = useFeed();
   const { data: savedIds } = useFocusLoad(() => useCases.listSaved().catch(() => [] as string[]), [useCases]);
-  const [tab, setTab] = useState<Tab>("mine");
+  const [tab, setTab] = useState<Tab>(initialTab ?? "mine");
+  // The tab screen may already be mounted when "Ver mis solicitudes" navigates here with a tab.
+  useEffect(() => {
+    if (initialTab) setTab(initialTab);
+  }, [initialTab]);
 
   const byId = new Map((feed?.projects ?? []).map((p) => [p.id, p]));
   const mine = feed ? feed.requests.filter((r) => r.usuarioId === feed.userId) : [];
@@ -121,13 +125,13 @@ function Logged({ navigation }: { navigation: any }) {
   );
 }
 
-export default function MyProjectsScreen({ navigation }: { navigation: any }) {
+export default function MyProjectsScreen({ navigation, route }: { navigation: any; route?: any }) {
   const { isLoggedIn } = useAuth();
   return (
     <ScreenSurface>
       <TopBar />
       {isLoggedIn ? (
-        <Logged navigation={navigation} />
+        <Logged navigation={navigation} initialTab={route?.params?.tab} />
       ) : (
         <View style={styles.flex}>
           <AccountPrompt

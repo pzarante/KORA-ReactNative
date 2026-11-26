@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
-  Platform,
+ 
   ScrollView,
   StyleSheet,
   Text,
@@ -46,7 +46,7 @@ export default function ForgotPasswordScreen({ navigation }: { navigation: any }
   return (
     <ScreenSurface>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior="padding"
         style={styles.keyboard}
       >
         <ScrollView

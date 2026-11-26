@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import ScreenSurface from "@/src/shared/ui/ScreenSurface";
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
@@ -36,7 +36,8 @@ export default function JoinRequestScreen({ navigation, route }: { navigation: a
   return (
     <ScreenSurface>
       <TopBar onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.content} testID="join-request-screen">
+      <KeyboardAvoidingView behavior="padding" style={styles.flex}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" testID="join-request-screen">
         <Text style={styles.title}>Solicitar unirme</Text>
         <Text style={styles.subtitle}>Cuéntale al creador de la iniciativa por qué te gustaría ser parte de este proyecto</Text>
         <ProjectSummary project={project} />
@@ -81,6 +82,7 @@ export default function JoinRequestScreen({ navigation, route }: { navigation: a
           <Text style={[ui.primaryButtonText, !ready && ui.primaryButtonTextDisabled]}>{sending ? "Enviando..." : "Enviar solicitud"}</Text>
         </TouchableOpacity>
       </View>
+      </KeyboardAvoidingView>
     </ScreenSurface>
   );
 }

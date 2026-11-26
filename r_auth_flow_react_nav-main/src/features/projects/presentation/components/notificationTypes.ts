@@ -26,4 +26,6 @@ export const NOTIFICATION_TYPES: Record<NotificationType, NotificationLook> = {
   edicion: { title: "Proyecto editado", icon: "pencil-outline", text: (n, p) => `${n.actorNombre} editó el proyecto ${p}`, screen: "ProjectDetail" },
   reunion: { title: "Nueva reunión", icon: "text-box-check-outline", text: (n, p) => `${n.actorNombre} guardó el resumen de «${n.detalle}» en ${p}`, screen: "MeetingHistory" },
   kora_tag: { title: "Te agregaron a un proyecto", tone: "success", icon: "qrcode-scan", text: (n, p) => `${n.actorNombre} te agregó a ${p} con tu KORA TAG`, screen: "ProjectDetail" },
+  salida: { title: "Un integrante salió", icon: "account-remove-outline", text: (n, p) => `${n.actorNombre} ya no hace parte de ${p}`, screen: "ProjectDetail" },
+  expulsion: { title: "Te sacaron de un proyecto", tone: "danger", icon: "account-cancel-outline", text: (_, p) => `Te sacaron del proyecto ${p}`, screen: "ProjectDetail" },
 };

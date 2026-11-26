@@ -10,7 +10,9 @@ export type NotificationType =
   | "respuesta_comentario"
   | "edicion"
   | "reunion"
-  | "kora_tag";
+  | "kora_tag"
+  | "salida"
+  | "expulsion";
 
 export type AppNotification = {
   id: string;

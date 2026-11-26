@@ -42,7 +42,7 @@ export default function KoraTagJoinedScreen({ navigation, route }: { navigation:
         </View>
         <TagIllustration />
         <Text style={styles.title}>¡Se ha unido a tu proyecto con éxito!</Text>
-        <Text style={styles.text}>{profile.nombreCompleto} ahora forma parte de</Text>
+        <Text numberOfLines={2} style={styles.text}>{profile.nombreCompleto} ahora forma parte de</Text>
         <Text style={styles.project}>{project.nombre}.</Text>
         <View style={styles.thanks}>
           <MaterialCommunityIcons name="qrcode-scan" size={44} color={colors.primary} />

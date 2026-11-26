@@ -22,7 +22,7 @@ export default function RequestSentScreen({ navigation }: { navigation: any }) {
         <MaterialCommunityIcons name="clock-outline" size={32} color={colors.primary} />
         <Text style={styles.noteText}>El creador revisará tu solicitud y se te notificará cuando haya una respuesta.</Text>
       </View>
-      <TouchableOpacity onPress={() => navigation.popTo("App", { screen: "MyProjects" })} style={[ui.outlineButton, styles.button]}>
+      <TouchableOpacity onPress={() => navigation.popTo("App", { screen: "MyProjects", params: { tab: "requests" } })} style={[ui.outlineButton, styles.button]}>
         <Text style={ui.outlineButtonText}>Ver mis solicitudes</Text>
       </TouchableOpacity>
     </ScreenSurface>

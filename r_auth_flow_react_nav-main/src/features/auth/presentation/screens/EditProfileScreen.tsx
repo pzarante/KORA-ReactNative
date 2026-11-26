@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { TopBar } from "@/src/features/projects/presentation/components/feed";
 import { colors } from "@/src/shared/ui/tokens";
@@ -49,7 +49,7 @@ export default function EditProfileScreen({ navigation }: { navigation: any }) {
   return (
     <ScreenSurface>
       <TopBar onBack={() => navigation.goBack()} />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}>
+      <KeyboardAvoidingView behavior="padding" style={styles.flex}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} testID="edit-profile-screen">
           <Text style={styles.title}>Editar perfil</Text>
           <Text style={styles.subtitle}>Completa tu información para que otros puedan conocerte y colaborar contigo</Text>

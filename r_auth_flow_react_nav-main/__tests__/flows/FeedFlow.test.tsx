@@ -85,10 +85,11 @@ describe("Project feed", () => {
         await waitFor(() => expect(within(getByTestId("team-members-screen")).getByText("Ana")).toBeTruthy());
     });
 
-    it("lets a team member edit the project, notifies the creator and asks before dropping changes", async () => {
-        const accepted = { _id: "s1", proyecto_id: "p1", usuario_id: "ana", usuario_nombre: "Ana", rol: "Diseño UI/UX", mensaje: "", estado: "aceptada", created_at: "2026-08-11T00:00:00.000Z" };
+    const accepted = { _id: "s1", proyecto_id: "p1", usuario_id: "ana", usuario_nombre: "Ana", rol: "Diseño UI/UX", mensaje: "", estado: "aceptada", created_at: "2026-08-11T00:00:00.000Z" };
+
+    it("gives a non-creator member node, save and leave (no edit), and lets them leave and ask again", async () => {
         const tables: Record<string, any[]> = {
-            proyecto: [{ ...project }], Usuario: [profileRow("ana", "Ana")], comentario: [], solicitud: [accepted], notificacion: [],
+            proyecto: [{ ...project }], Usuario: [profileRow("ana", "Ana")], comentario: [], solicitud: [{ ...accepted }], notificacion: [],
         };
         globalThis.fetch = fakeRoble("ana", tables) as unknown as typeof fetch;
         const utils = renderApp();
@@ -96,22 +97,73 @@ describe("Project feed", () => {
         await loginAs(utils);
 
         await act(async () => fireEvent.press(getByTestId("project-row-p1")));
+        await waitFor(() => expect(getByTestId("leave-project-button")).toBeTruthy());
+        expect(getByTestId("kora-node-button")).toBeTruthy();
+        expect(getByTestId("save-project-button")).toBeTruthy();
+        expect(queryByTestId("edit-project-button")).toBeNull();
+
+        await act(async () => fireEvent.press(getByTestId("leave-project-button")));
+        await waitFor(() => expect(utils.getByText("¿Salir del proyecto?")).toBeTruthy());
+        await act(async () => fireEvent.press(getByTestId("confirm-modal-accept")));
+        await waitFor(() => expect(tables.solicitud[0].estado).toBe("retirada"));
+        await waitFor(() => expect(getByTestId("leave-success")).toBeTruthy());
+        await waitFor(() => expect(tables.notificacion).toEqual(
+            expect.arrayContaining([expect.objectContaining({ destinatario_id: "creator", tipo: "salida", actor_nombre: "Ana" })]),
+        ));
+        await act(async () => fireEvent.press(utils.getAllByLabelText("Volver").at(-1)!));
+        await act(() => new Promise((resolve) => setTimeout(resolve, 1000)));
+        await act(async () => fireEvent.press(getByTestId("project-row-p1")));
+        await waitFor(() => expect(getByTestId("join-project-button")).toBeTruthy());
+    });
+
+    it("lets the creator keep editing and kick a member, who disappears from the team", async () => {
+        const tables: Record<string, any[]> = {
+            proyecto: [{ ...project }], Usuario: [profileRow("creator", "María"), profileRow("ana", "Ana")], comentario: [], solicitud: [{ ...accepted }], notificacion: [],
+        };
+        globalThis.fetch = fakeRoble("creator", tables) as unknown as typeof fetch;
+        const utils = renderApp();
+        const { getByTestId, queryByTestId } = utils;
+        await loginAs(utils);
+
+        await act(async () => fireEvent.press(getByTestId("project-row-p1")));
         await waitFor(() => expect(getByTestId("edit-project-button")).toBeTruthy());
-        await act(async () => fireEvent.press(getByTestId("edit-project-button")));
-        await waitFor(() => expect(getByTestId("edit-project-screen")).toBeTruthy());
-        // Only the creator can delete.
-        expect(queryByTestId("edit-project-delete")).toBeNull();
+        expect(getByTestId("view-requests-button")).toBeTruthy();
 
-        fireEvent.changeText(getByTestId("edit-project-name"), "EcoCampus 2");
-        await act(async () => fireEvent.press(getByTestId("edit-project-back")));
-        await waitFor(() => expect(utils.getByText("¿Salir sin guardar los cambios?")).toBeTruthy());
-        await act(async () => fireEvent.press(utils.getByText("Seguir editando")));
+        await act(async () => fireEvent.press(getByTestId("view-team-button")));
+        await waitFor(() => expect(getByTestId("kick-member-s1")).toBeTruthy());
+        await act(async () => fireEvent.press(getByTestId("kick-member-s1")));
+        await waitFor(() => expect(utils.getByText("¿Expulsar a Ana?")).toBeTruthy());
+        await act(async () => fireEvent.press(getByTestId("confirm-modal-accept")));
+        await waitFor(() => expect(tables.solicitud[0].estado).toBe("expulsada"));
+        await waitFor(() => expect(tables.notificacion).toEqual([expect.objectContaining({ destinatario_id: "ana", tipo: "expulsion" })]));
+        await waitFor(() => expect(queryByTestId("kick-member-s1")).toBeNull());
+    });
 
-        await act(async () => fireEvent.press(getByTestId("edit-project-save")));
-        await waitFor(() => expect(queryByTestId("edit-project-screen")).toBeNull());
-        expect(tables.proyecto[0].nombre).toBe("EcoCampus 2");
-        await waitFor(() => expect(tables.notificacion).toEqual([expect.objectContaining({ destinatario_id: "creator", tipo: "edicion", actor_nombre: "Ana" })]));
-        await waitFor(() => expect(within(getByTestId("project-detail-screen")).getByText("EcoCampus 2")).toBeTruthy());
+    it("signs out locally even when the server logout fails", async () => {
+        const tables: Record<string, any[]> = { proyecto: [project], Usuario: [profileRow("ana", "Ana")], comentario: [], solicitud: [] };
+        globalThis.fetch = fakeRoble("ana", tables) as unknown as typeof fetch; // /logout answers 404
+        const utils = renderApp();
+        await loginAs(utils);
+        await act(async () => fireEvent.press(utils.getByText("Mi Perfil")));
+        await waitFor(() => expect(utils.getByTestId("logout-button")).toBeTruthy());
+        await act(async () => fireEvent.press(utils.getByTestId("logout-button")));
+        await waitFor(() => expect(utils.getByTestId("welcome-screen")).toBeTruthy());
+    });
+
+    it("shows each team member's whatsapp and email", async () => {
+        const tables: Record<string, any[]> = {
+            proyecto: [{ ...project }],
+            Usuario: [profileRow("creator", "María"), { ...profileRow("ana", "Ana"), whatsapp: "3001234567", correo_contacto: "ana@uninorte.edu.co" }],
+            comentario: [], solicitud: [{ ...accepted }], notificacion: [],
+        };
+        globalThis.fetch = fakeRoble("creator", tables) as unknown as typeof fetch;
+        const utils = renderApp();
+        await loginAs(utils);
+
+        await act(async () => fireEvent.press(utils.getByTestId("project-row-p1")));
+        await waitFor(() => expect(utils.getByTestId("view-team-button")).toBeTruthy());
+        await act(async () => fireEvent.press(utils.getByTestId("view-team-button")));
+        await waitFor(() => expect(within(utils.getByTestId("team-members-screen")).getByText("3001234567 · ana@uninorte.edu.co")).toBeTruthy());
     });
 
     it("shows the creator their notifications and marks them read", async () => {

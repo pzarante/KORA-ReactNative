@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Linking, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/src/features/auth/presentation/context/authContext";
@@ -155,7 +155,7 @@ export default function EditProjectScreen({ navigation, route }: { navigation: a
   return (
     <SafeAreaView style={styles.container} testID="edit-project-screen">
       <View pointerEvents="none" style={styles.purpleGlow} />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}>
+      <KeyboardAvoidingView behavior="padding" style={styles.flex}>
         <View style={styles.header}>
           <TouchableOpacity accessibilityLabel="Volver" onPress={() => navigation.goBack()} style={styles.back} testID="edit-project-back">
             <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />

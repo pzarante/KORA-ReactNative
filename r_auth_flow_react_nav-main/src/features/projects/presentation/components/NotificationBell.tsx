@@ -121,7 +121,7 @@ export default function NotificationBell() {
                         </View>
                         <View style={styles.itemText}>
                           <Text style={styles.itemHeading}>{look.title}</Text>
-                          <Text style={styles.itemTitle}>{look.text(n, n.project.nombre)}</Text>
+                          <Text numberOfLines={2} style={styles.itemTitle}>{look.text(n, n.project.nombre)}</Text>
                           <Text style={styles.itemTime}>{timeAgo(n.createdAt)}</Text>
                         </View>
                         {isUnread ? <View style={styles.dot} /> : null}

@@ -38,7 +38,7 @@ export type ProjectComment = {
   createdAt: string;
 };
 
-export type RequestStatus = "pendiente" | "aceptada" | "rechazada";
+export type RequestStatus = "pendiente" | "aceptada" | "rechazada" | "retirada" | "expulsada";
 
 export type JoinRequest = {
   id: string;
